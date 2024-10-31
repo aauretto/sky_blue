@@ -1,9 +1,12 @@
 import boto3
-# import xarray as xr
+import xarray as xr
 import numpy as np
 from datetime import datetime, timedelta
 from botocore import UNSIGNED
 from botocore.client import Config
+from netCDF4 import Dataset
+import matplotlib
+import matplotlib.pyplot as plt
 
 # Initialize the S3 client
 s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
@@ -15,6 +18,7 @@ prefix = 'ABI-L2-CMIPC/2023/'
 # Define the date range for 2023
 start_date = datetime(2023, 1, 1)
 end_date = datetime(2023, 12, 31)
+count = 0
 
 # Function to retrieve and manipulate CMIPC data
 def retrieve_and_manipulate_cmipc_data():
@@ -40,18 +44,28 @@ def retrieve_and_manipulate_cmipc_data():
                 # Read the NetCDF data directly into an xarray Dataset
                 obj_response = s3.get_object(Bucket=bucket_name, Key=file_key)
                 data = obj_response['Body'].read()  # Read the file data
-                # # Open the NetCDF data with xarray
+                # Open the file and read the data
+                s3.download_file(bucket_name, file_key, Filename=f"my_example")
+                # Open the NetCDF data with xarray
                 # with xr.open_dataset(xr.backends.NetCDF4DataStore(data)) as ds:
-                #     # Example manipulation: Print dataset information
-                #     print(ds)
-                    
-                #     # Example: Calculate mean of a variable (adjust variable name accordingly)
-                #     if 'your_variable_name' in ds.variables:
-                #         mean_value = ds['your_variable_name'].mean().values
-                #         print(f'Mean of your_variable_name: {mean_value}')
-                #     else:
-                #         print("Variable not found in the dataset.")
+                    # Example manipulation: Print dataset information
+                ds = Dataset("my_example", 'r')
+                for var in ds.variables:
+                    print(var)
+                CMI = ds.variables['CMI'][:]
+                fig = plt.figure(figsize=(4,4),dpi=200)
+                im = plt.imshow(CMI, cmap='Greys_r')
+                # cb = fig.colorbar(im, orientation='horizontal')
+                # cb.set_ticks([1, 100, 200, 300, 400, 500, 600])
+                # cb.set_label('Radiance (W m-2 sr-1 um-1)')
+                plt.show()
+                # print(ds.get_variables_by_attributes())
+                # print(ds)
+                # print(ds.__dict__)    # prints metadata
 
+                
+                break
+        break
         current_date += timedelta(days=1)
 
 retrieve_and_manipulate_cmipc_data()
