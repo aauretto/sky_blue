@@ -6,23 +6,55 @@ from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
 import io
+from datetime import datetime, timezone, timedelta
+
+# CONSTS
+BUCKET_NAME = 'noaa-goes16'
+MINUTE_INTERVAL = 5
+
+# Function get_range_CMIPC_data_fileKeys
+# Inputs:
+#   year    : int 2017-2024
+#   day     : int 1 - 366   
+#   hour    : int 0 - 23   
+#   minute  : int 1 - 59   
+#   bandNum : int 1 - 16   
+# Notes: Will get keys within MINUTE_INTERVAL minutes from specified timestamp, rolling over or under as required
+
+def get_range_CMIPC_data_fileKeys(year, day, hour, minute, bandNum):
+    dt = datetime(year, month = 1, day = 1, tzinfo=timezone.utc) + timedelta(days=day-1, hours=hour, minutes=minute)
+    
+    # Over/underflow for minutes -- need to grab files from next/prev day.month, or year
+    if minute < MINUTE_INTERVAL or minute + MINUTE_INTERVAL > 59:
+        delta = timedelta(minutes= MINUTE_INTERVAL)
+        lower_time = dt - delta
+        lower_files = get_CMIPC_data_fileKeys(lower_time.year, lower_time.timetuple().tm_yday, lower_time.hour, lower_time.minute, bandNum)
+
+        upper_time = dt + delta
+        upper_files = get_CMIPC_data_fileKeys(upper_time.year, upper_time.timetuple().tm_yday, upper_time.hour, upper_time.minute, bandNum)
+        
+        return lower_files + upper_files
+    
+    # No over/underflow
+    return get_CMIPC_data_fileKeys(year, day, hour, minute, bandNum)
+    
 
 # Function get_CMIPC_data_fileKeys
 # Inputs:
-#    Year     : int 2017-2024
-#    Day      : int 1 - 366
-#    Hour     : int 0 - 23
-#    Band Num : int 1 - 16
+#    year     : int 2017-2024              
+#    day      : int 1 - 366              
+#    hour     : int 0 - 23              
+#    minute   : int 1 - 59              
+#    bandNum : int 1 - 16              
 #
 # Returns:
 #    dataset obj containing relevant GOES-16 data 
+# Example:
+#                  YEAR DAY HOUR                 BAND      Start scan      End scan        Midpt b/t start and end time
+#                    V   V   V                    V        V               V               V
+# Key: ABI-L2-CMIPC/2023/001/01/OR_ABI-L2-CMIPC-M6C14_G16_s20230010101173_e20230010103546_c20230010104092.nc
 
-#               YEAR DAY HOUR                 BAND
-#                 V   V   V                    V
-## ABI-L2-CMIPC/2023/001/01/OR_ABI-L2-CMIPC-M6C14_G16_s20230010101173_e20230010103546_c20230010104092.nc EXAMPLE KEY
-
-BUCKET_NAME = 'noaa-goes16'
-def get_CMIPC_data_fileKeys(year, day, hour, bandNum):
+def get_CMIPC_data_fileKeys(year, day, hour, minute, bandNum):
     # Set up boto3 client that will access the bucket w/o authentication/creds.
     s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
     
@@ -33,19 +65,27 @@ def get_CMIPC_data_fileKeys(year, day, hour, bandNum):
     prefix += f'{year}/{day:03}/{hour:02}'
 
     # ask bucket for all CMIPC data taken in hour hour on day day in year year
-    response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
+    try:
+        response = s3.list_objects_v2(Bucket=BUCKET_NAME, Prefix=prefix)
+    except:
+        return []
     
     if "Contents" in response:
         fileList = []
         for object in response['Contents']:
             fileKey = object['Key']
+                
             if f"C{bandNum:02}" in fileKey:
-                print(f'Found file with key: {fileKey}')  # Print the file key
-                fileList.append(fileKey)
+                if minute - MINUTE_INTERVAL <= int(fileKey[-8:-6]) <= minute + MINUTE_INTERVAL:
+                    print(f'Found file with key: {fileKey}')  # Print the file key
+                    fileList.append(fileKey)
         return fileList
+    else:
+        return []
             
-# fileKey
-#    fileKey  : string -- key of a specific file in the bucket
+# retrieve_s3_data
+# Inputs:
+#   fileKey  : string -- key of a specific file in the bucket
 
 def retrieve_s3_data(fileKey):
     # Read the NetCDF data directly into an xarray Dataset
@@ -62,8 +102,9 @@ def retrieve_s3_data(fileKey):
     return nc_dataset
 
 # show_CMIPC_image
+# Inputs
 #   ds : a netCDF4 Dataset containing CMIPC data
-#
+
 # TODO : visualization people, this is all you
 def show_CMPIC_image(ds):
     CMI = ds.variables['CMI'][:]
@@ -91,16 +132,14 @@ def show_CMPIC_image(ds):
 #   idx      : int               Represents the idx-th scan of the hour
 #
 # NOTE: tmpFname MUST REALLY be different than any current filename in your directory
-def show_CMIPC_from(year, day, hour, bandNum, idx=0):
-    fkeys = get_CMIPC_data_fileKeys(year, day, hour, bandNum)
+def show_CMIPC_from(year, day, hour, minute, bandNum, idx=0):
+    fkeys = get_range_CMIPC_data_fileKeys(year, day, hour, minute, bandNum)
 
-    ds = retrieve_s3_data(fkeys[idx])
+    if idx < len(fkeys):
+        ds = retrieve_s3_data(fkeys[idx])
 
-    show_CMPIC_image(ds)
-    ds.close()
-
-def main():
-    show_CMIPC_from(2023, 1, 1, 14) # TODO : have fun with different dates here
+        show_CMPIC_image(ds)
+        ds.close()
 
 if __name__ == "__main__":
-    main()
+    show_CMIPC_from(2010, 366, 23, 59, 14) # change dates for testing
