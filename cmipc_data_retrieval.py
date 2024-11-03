@@ -5,6 +5,7 @@ from botocore.client import Config
 from netCDF4 import Dataset
 import matplotlib.pyplot as plt
 import cartopy.crs as ccrs
+import io
 
 # Function get_CMIPC_data_fileKeys
 # Inputs:
@@ -45,16 +46,20 @@ def get_CMIPC_data_fileKeys(year, day, hour, bandNum):
             
 # fileKey
 #    fileKey  : string -- key of a specific file in the bucket
-#    outFname : string -- location to store file on device
-def retrieve_s3_data(fileKey, outFname = "my_example"):
+
+def retrieve_s3_data(fileKey):
     # Read the NetCDF data directly into an xarray Dataset
     s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
 
-    # Open the file and read the data
-    s3.download_file(BUCKET_NAME, fileKey, Filename=outFname)
-    ds = Dataset(outFname, 'r')
+    s3_object = s3.get_object(Bucket=BUCKET_NAME, Key=fileKey)
 
-    return ds
+    data = s3_object['Body'].read()
+    # Open the file and read the data
+    nc_dataset = None
+    with io.BytesIO(data) as data_io:
+        nc_dataset = Dataset('in_memory.nc', mode='r', memory=data_io.read())
+
+    return nc_dataset
 
 # show_CMIPC_image
 #   ds : a netCDF4 Dataset containing CMIPC data
@@ -84,24 +89,15 @@ def show_CMPIC_image(ds):
 #   hour     : int 0 - 23
 #   bandNum  : int 1 - 16
 #   idx      : int               Represents the idx-th scan of the hour
-#   tmpFname : string            the name of a file that we are temporarily making in the local directory to access the data
 #
 # NOTE: tmpFname MUST REALLY be different than any current filename in your directory
-def show_CMIPC_from(year, day, hour, bandNum, idx=0, tmpFname="my_example"):
+def show_CMIPC_from(year, day, hour, bandNum, idx=0):
     fkeys = get_CMIPC_data_fileKeys(year, day, hour, bandNum)
 
-    ds = retrieve_s3_data(fkeys[idx], outFname = tmpFname)
+    ds = retrieve_s3_data(fkeys[idx])
 
     show_CMPIC_image(ds)
-    
-    # Remove temp file
     ds.close()
-    if os.path.exists(f'./{tmpFname}'):
-        os.remove(f'./{tmpFname}')
-        print(f"File '{tmpFname}' deleted successfully.")
-    else:
-        print(f"File '{tmpFname}' not found.")
-
 
 def main():
     show_CMIPC_from(2023, 1, 1, 14) # TODO : have fun with different dates here
