@@ -23,33 +23,39 @@ MINUTE_FIELD_WIDTH = 2
 #   hour    : int 0 - 23   
 #   minute  : int 1 - 59   
 #   bandNum : int 1 - 16   
+# Returns:
+#   All the scans in the interval of the given time +/- MINUTE_INTERVAL
 # Notes: Will get keys within MINUTE_INTERVAL minutes from specified timestamp, rolling over or under as required
 
 def get_range_CMIPC_data_fileKeys(year, day, hour, minute, bandNum):
     dt = datetime(year, month = 1, day = 1, tzinfo=timezone.utc) + timedelta(days=day-1, hours=hour, minutes=minute)
     
-    # Over/underflow for minutes -- need to grab files from next/prev day.month, or year
+    # Over/underflow for minutes -- need to grab files from next/prev day, month, or year
     if minute < MINUTE_INTERVAL or minute + MINUTE_INTERVAL > 59:
         delta = timedelta(minutes= MINUTE_INTERVAL)
         lower_time = dt - delta
-        lower_files = get_CMIPC_data_fileKeys(lower_time.year, lower_time.timetuple().tm_yday, lower_time.hour, lower_time.minute, bandNum)
+        lower_files = get_CMIPC_data_fileKeys(lower_time.year, lower_time.timetuple().tm_yday, lower_time.hour, bandNum, lower_time.minute, 59)
 
         upper_time = dt + delta
-        upper_files = get_CMIPC_data_fileKeys(upper_time.year, upper_time.timetuple().tm_yday, upper_time.hour, upper_time.minute, bandNum)
+                                                                # We want to not include scans from the upper_time.minute-th minute hence the - 1
+        upper_files = get_CMIPC_data_fileKeys(upper_time.year, upper_time.timetuple().tm_yday, upper_time.hour, bandNum, 0, upper_time.minute - 1)
         
         return lower_files + upper_files
-    
+
     # No over/underflow
-    return get_CMIPC_data_fileKeys(year, day, hour, minute, bandNum)
+    return get_CMIPC_data_fileKeys(year, day, hour, bandNum, minute - MINUTE_INTERVAL, minute + MINUTE_INTERVAL)
     
 
 # Function get_CMIPC_data_fileKeys
 # Inputs:
-#    year     : int 2017-2024              
-#    day      : int 1 - 366              
-#    hour     : int 0 - 23              
-#    minute   : int 1 - 59              
-#    bandNum : int 1 - 16              
+#    year       : int 2017-2024              
+#    day        : int 1 - 366              
+#    hour       : int 0 - 23                           
+#    bandNum    : int 1 - 16 
+#    min_minute : int 0 - 59        
+#    max_minute : int 0 - 59
+#
+# Note: Scans will be found in the range from min_minute to max_minute inclusive
 #
 # Returns:
 #    dataset obj containing relevant GOES-16 data 
@@ -58,7 +64,7 @@ def get_range_CMIPC_data_fileKeys(year, day, hour, minute, bandNum):
 #                    V   V   V                    V        V               V               V
 # Key: ABI-L2-CMIPC/2023/001/01/OR_ABI-L2-CMIPC-M6C14_G16_s20230010101173_e20230010103546_c20230010104092.nc
 
-def get_CMIPC_data_fileKeys(year, day, hour, minute, bandNum):
+def get_CMIPC_data_fileKeys(year, day, hour, bandNum, min_minute, max_minute):
     # Set up boto3 client that will access the bucket w/o authentication/creds.
     s3 = boto3.client('s3', config=Config(signature_version=UNSIGNED))
     
@@ -80,8 +86,10 @@ def get_CMIPC_data_fileKeys(year, day, hour, minute, bandNum):
             fileKey = object['Key']
                 
             if f"C{bandNum:02}" in fileKey:
+                # Gets the starting index of the minute field for the scan start time of the file
                 startMinIdx = fileKey.index(SCAN_START_INDICATOR) + SCAN_START_INDICATOR_LENGTH + START_MINUTE_OFFSET
-                if minute - MINUTE_INTERVAL <= int(fileKey[startMinIdx:startMinIdx + MINUTE_FIELD_WIDTH]) <= minute + MINUTE_INTERVAL:
+
+                if min_minute <= int(fileKey[startMinIdx:startMinIdx + MINUTE_FIELD_WIDTH]) <= max_minute:
                     print(f'Found file with key: {fileKey}')  # Print the file key
                     fileList.append(fileKey)
         return fileList
@@ -147,4 +155,4 @@ def show_CMIPC_from(year, day, hour, minute, bandNum, idx=0):
         ds.close()
 
 if __name__ == "__main__":
-    show_CMIPC_from(2020, 366, 23, 59, 14) # change dates for testing
+    show_CMIPC_from(2019, 364, 23, 61, 14) # change dates for testing
