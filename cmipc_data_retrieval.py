@@ -11,6 +11,10 @@ from datetime import datetime, timezone, timedelta
 # CONSTS
 BUCKET_NAME = 'noaa-goes16'
 MINUTE_INTERVAL = 5
+SCAN_START_INDICATOR = "_s"
+SCAN_START_INDICATOR_LENGTH = 2
+START_MINUTE_OFFSET = 9
+MINUTE_FIELD_WIDTH = 2
 
 # Function get_range_CMIPC_data_fileKeys
 # Inputs:
@@ -76,7 +80,8 @@ def get_CMIPC_data_fileKeys(year, day, hour, minute, bandNum):
             fileKey = object['Key']
                 
             if f"C{bandNum:02}" in fileKey:
-                if minute - MINUTE_INTERVAL <= int(fileKey[-8:-6]) <= minute + MINUTE_INTERVAL:
+                startMinIdx = fileKey.index(SCAN_START_INDICATOR) + SCAN_START_INDICATOR_LENGTH + START_MINUTE_OFFSET
+                if minute - MINUTE_INTERVAL <= int(fileKey[startMinIdx:startMinIdx + MINUTE_FIELD_WIDTH]) <= minute + MINUTE_INTERVAL:
                     print(f'Found file with key: {fileKey}')  # Print the file key
                     fileList.append(fileKey)
         return fileList
@@ -142,4 +147,4 @@ def show_CMIPC_from(year, day, hour, minute, bandNum, idx=0):
         ds.close()
 
 if __name__ == "__main__":
-    show_CMIPC_from(2010, 366, 23, 59, 14) # change dates for testing
+    show_CMIPC_from(2020, 366, 23, 59, 14) # change dates for testing
