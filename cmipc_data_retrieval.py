@@ -1,3 +1,5 @@
+# cmipc_data_retrieval retrieves data from the NOAA S3 AWS Bucket
+
 import os
 import boto3
 from botocore import UNSIGNED
@@ -58,9 +60,9 @@ def get_range_CMIPC_data_fileKeys(year, day, hour, minute, bandNum):
 # Note: Scans will be found in the range from min_minute to max_minute inclusive
 #
 # Returns:
-#    dataset obj containing relevant GOES-16 data 
+#    List of file keys that specify files in the given time range
 # Example:
-#                  YEAR DAY HOUR                 BAND      Start scan      End scan        Midpt b/t start and end time
+#                  YEAR DAY HOUR                 BAND      Start scan      End scan        File creation time
 #                    V   V   V                    V        V               V               V
 # Key: ABI-L2-CMIPC/2023/001/01/OR_ABI-L2-CMIPC-M6C14_G16_s20230010101173_e20230010103546_c20230010104092.nc
 
@@ -99,6 +101,8 @@ def get_CMIPC_data_fileKeys(year, day, hour, bandNum, min_minute, max_minute):
 # retrieve_s3_data
 # Inputs:
 #   fileKey  : string -- key of a specific file in the bucket
+# Returns:
+#   returns a dataset of the object retrieved from the given fileKey
 
 def retrieve_s3_data(fileKey):
     # Read the NetCDF data directly into an xarray Dataset
@@ -119,40 +123,40 @@ def retrieve_s3_data(fileKey):
 #   ds : a netCDF4 Dataset containing CMIPC data
 
 # TODO : visualization people, this is all you
-def show_CMPIC_image(ds):
-    CMI = ds.variables['CMI'][:]
-    lon_origin = ds.variables['geospatial_lat_lon_extent'].geospatial_westbound_longitude
-    lon_extent = ds.variables['geospatial_lat_lon_extent'].geospatial_eastbound_longitude
-    lat_origin = ds.variables['geospatial_lat_lon_extent'].geospatial_southbound_latitude
-    lat_extent = ds.variables['geospatial_lat_lon_extent'].geospatial_northbound_latitude
+# def show_CMPIC_image(ds):
+#     CMI = ds.variables['CMI'][:]
+#     lon_origin = ds.variables['geospatial_lat_lon_extent'].geospatial_westbound_longitude
+#     lon_extent = ds.variables['geospatial_lat_lon_extent'].geospatial_eastbound_longitude
+#     lat_origin = ds.variables['geospatial_lat_lon_extent'].geospatial_southbound_latitude
+#     lat_extent = ds.variables['geospatial_lat_lon_extent'].geospatial_northbound_latitude
 
-    fig = plt.figure(figsize=(8,8),dpi=200)
-    ax = plt.axes(projection=ccrs.PlateCarree())
-    ax.set_extent([lon_origin, lon_extent, lat_origin, lat_extent], crs=ccrs.PlateCarree())
-    ax.coastlines(resolution='10m', color='black', linewidth=1)
-    im = plt.imshow(CMI, origin='upper', extent=(lon_origin, lon_extent, lat_origin, lat_extent), transform=ccrs.PlateCarree())
+#     fig = plt.figure(figsize=(8,8),dpi=200)
+#     ax = plt.axes(projection=ccrs.PlateCarree())
+#     ax.set_extent([lon_origin, lon_extent, lat_origin, lat_extent], crs=ccrs.PlateCarree())
+#     ax.coastlines(resolution='10m', color='black', linewidth=1)
+#     im = plt.imshow(CMI, origin='upper', extent=(lon_origin, lon_extent, lat_origin, lat_extent), transform=ccrs.PlateCarree())
 
-    plt.show()
+#     plt.show()
 
-# show_CMIPC_from
-# Shows a CMPIPC data thing from the specified time and in the specified band
-#
-# Inputs:
-#   year     : int 2017 - 2024
-#   day      : int 1 - 366
-#   hour     : int 0 - 23
-#   bandNum  : int 1 - 16
-#   idx      : int               Represents the idx-th scan of the hour
-#
-# NOTE: tmpFname MUST REALLY be different than any current filename in your directory
-def show_CMIPC_from(year, day, hour, minute, bandNum, idx=0):
-    fkeys = get_range_CMIPC_data_fileKeys(year, day, hour, minute, bandNum)
+# # show_CMIPC_from
+# # Shows a CMPIPC data thing from the specified time and in the specified band
+# #
+# # Inputs:
+# #   year     : int 2017 - 2024
+# #   day      : int 1 - 366
+# #   hour     : int 0 - 23
+# #   bandNum  : int 1 - 16
+# #   idx      : int               Represents the idx-th scan of the hour
+# #
+# # NOTE: tmpFname MUST REALLY be different than any current filename in your directory
+# def show_CMIPC_from(year, day, hour, minute, bandNum, idx=0):
+#     fkeys = get_range_CMIPC_data_fileKeys(year, day, hour, minute, bandNum)
 
-    if idx < len(fkeys):
-        ds = retrieve_s3_data(fkeys[idx])
+#     if idx < len(fkeys):
+#         ds = retrieve_s3_data(fkeys[idx])
 
-        show_CMPIC_image(ds)
-        ds.close()
+#         show_CMPIC_image(ds)
+#         ds.close()
 
-if __name__ == "__main__":
-    show_CMIPC_from(2019, 364, 0, 5, 14) # change dates for testing
+# if __name__ == "__main__":
+#     show_CMIPC_from(2019, 364, 0, 5, 14) # change dates for testing
