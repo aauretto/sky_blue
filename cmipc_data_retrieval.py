@@ -155,4 +155,4 @@ def show_CMIPC_from(year, day, hour, minute, bandNum, idx=0):
         ds.close()
 
 if __name__ == "__main__":
-    show_CMIPC_from(2019, 364, 23, 61, 14) # change dates for testing
+    show_CMIPC_from(2019, 364, 0, 5, 14) # change dates for testing
