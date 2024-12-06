@@ -48,5 +48,4 @@ class Location(BaseModel):
                 lon *= -1
 
             return Location(lat=lat, lon=lon)
-
         return Location(lat=0, lon=0)
