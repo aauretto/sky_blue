@@ -15,7 +15,7 @@ FULL = re.compile(
     r"\s*/TM\s?(?P<time>[0-9]{4})"
     r"\s*/FL\s?(?P<altitude>[0-9]{3}|DURC|DURD|UNKN)"
     r"\s*/TP\s?(?P<aircraft>[A-Z0-9]{3,4})"
-    r"(?P<rest>[A-Z0-9\s/-]*)$"
+    r"(?P<rest>.*)$"
 )
 
 REST = re.compile(
