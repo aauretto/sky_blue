@@ -63,7 +63,7 @@ print(f"{lon.shape = }")
 print(lon)
 
 
-# plt.show()
+plt.show()
 
 # nc_dataset = Dataset('in_memory.nc', mode='r', memory=data_io.read())
 # noaa_orig = Dataset("./goes16_abi_conus_lat_lon/goes16_abi_conus_lat_lon.nc", 'r')
