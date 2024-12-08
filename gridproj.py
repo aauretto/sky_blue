@@ -27,14 +27,15 @@ x_min, y_min = transformer.transform(lon_min, lat_min)
 x_max, y_max = transformer.transform(lon_max, lat_max)
 
 sat_data = retrieve_s3_data(get_range_CMIPC_data_fileKeys(2024, 311, 23, 59, 14)[0])
+
+
 data_temps = sat_data.variables["CMI"][:]
 lat, lon = calculate_degrees(sat_data)
-lat      = lat.flatten('C')
-lon      = lon.flatten('C')
-data_temps = data_temps.flatten()
+
 
 # Transform latitudes and longitudes into Albers Equal-Area projection
 x, y = transformer.transform(lon, lat)
+
 
 # Define grid parameters (grid spacing and bounding box)
 grid_spacing = 2000  # Grid cell size (2 km per cell)
@@ -44,20 +45,38 @@ grid_spacing = 2000  # Grid cell size (2 km per cell)
 x_grid = np.arange(x_min, x_max, grid_spacing)
 y_grid = np.arange(y_min, y_max, grid_spacing)
 
+
 # Create an empty data array (grid) with the same shape as the grid
 data_array = np.zeros((len(y_grid), len(x_grid)))
 
+print(f"{data_array.shape=}")
 print(f"{x.shape=}")
 print(f"{y.shape=}")
 print(f"{data_temps.shape=}")
 
+
+print(f"Xmin = {x_min}", f"Smallest transformed X = {x.min()}")
+
 # Map the intensities to the grid
-for i, (xi, yi) in enumerate(zip(x, y)):
-    row_idx = np.argmin(np.abs(y_grid - yi))
-    col_idx = np.argmin(np.abs(x_grid - xi))
-    data_array[row_idx, col_idx] = data_temps[i]
+diffs = np.zeros(x.shape[1])
+for i in range(x.shape[0]):
+    print(i, end = ",", flush=True)
+    for j in range(x.shape[1]):
+        if not x.mask[i][j] and not y.mask[i][j] and not data_temps.mask[i][j]:
+            row_idx = np.argmin(np.abs(y_grid - y[i][j]))
+            # row_idx_2 = int(np.round((y[i][j] - y_min)/2000))
+            # col_idx_2 = int(np.round((x[i][j] - x_min)/2000))
+            col_idx = np.argmin(np.abs(x_grid - x[i][j]))
+            data_array[row_idx, col_idx] = data_temps[i][j]
+            # try:
+            #     data_array[row_idx_2, col_idx_2] = data_temps[i][j] 
+            # except:
+            #     pass
 
-# Print the resulting grid (NumPy array)
-print(data_array.shape)
-print(data_array)
+            # diffs[j] = abs(row_idx - row_idx_2)
+    # print(max(diffs))
 
+fig = plt.figure(figsize=(15, 12))
+ax_east = fig.add_subplot(1, 2, 2)
+ax_east.pcolormesh(data_array)
+plt.show()
