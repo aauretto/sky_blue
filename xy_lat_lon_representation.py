@@ -96,10 +96,11 @@ def sat_data_mapped(fileKey="", year=0, day=0, hour=0, minute=0, band=0, data_va
 
     return mapped_data
 
-fileKey = get_range_CMIPC_data_fileKeys(2024, 311, 23, 59, 14)[0]
-data_mapped = sat_data_mapped(fileKey)
+if __name__ == '__main__':
+    fileKey = get_range_CMIPC_data_fileKeys(2024, 311, 23, 59, 14)[0]
+    data_mapped = sat_data_mapped(fileKey)
 
-fig = plt.figure(figsize=(15, 12))
-ax_east = fig.add_subplot(1, 1, 1)
-ax_east.pcolormesh(data_mapped)
-plt.show()
+    fig = plt.figure(figsize=(15, 12))
+    ax_east = fig.add_subplot(1, 1, 1)
+    ax_east.pcolormesh(data_mapped)
+    plt.show()
