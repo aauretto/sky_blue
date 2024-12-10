@@ -3,10 +3,10 @@ from datetime import datetime, UTC
 from enum import StrEnum
 import re
 
-from defs.location import Location
-from defs.altitude import Altitude
-from defs.aircraft import Aircraft
-from defs.turbulence import Turbulence
+from pirep.defs.location import Location
+from pirep.defs.altitude import Altitude
+from pirep.defs.aircraft import Aircraft
+from pirep.defs.turbulence import Turbulence
 
 FULL = re.compile(
     r"^(?P<station>[A-Z]{3,4})?"

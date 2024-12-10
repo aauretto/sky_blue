@@ -1,7 +1,7 @@
 from pydantic import BaseModel
 from enum import StrEnum
 from typing import Optional
-from defs.altitude import Altitude
+from pirep.defs.altitude import Altitude
 import re
 
 TURBULENCE = re.compile(
