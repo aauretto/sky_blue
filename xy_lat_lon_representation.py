@@ -6,7 +6,7 @@ NUM_COLS = 2500 # Number of columns (longitudes)
 NUM_ROWS = 1500 # Number of rows (latitudes)
 
 # The latitude and longitude bounds of CONUS, with some leeway in all directions
-LON_MIN = -131
+LON_MIN = -126#-131
 LON_MAX = -66
 LAT_MIN = 23
 LAT_MAX = 51
@@ -89,16 +89,24 @@ def sat_data_mapped(fileKey="", year=0, day=0, hour=0, minute=0, band=0, data_va
     #     # Prevent division by zero by checking the count
     # mapped_data = np.where(count_data > 0, sum_data / count_data, 0)
     
-    #TODO smoothing
-    # from scipy.ndimage import gaussian_filter
-    # smoothed_data = gaussian_filter(mapped_data, sigma=1)
-    # mapped_data = np.where(mapped_data == 0, smoothed_data, mapped_data)
+    
+    from scipy.ndimage import distance_transform_edt
+    mask = mapped_data > 0
+    filled_data = mapped_data.copy()
+    indices = distance_transform_edt(~mask, return_distances=False, return_indices=True)
+    filled_data[~mask] = mapped_data[tuple(indices[:, ~mask])]
+    mapped_data = filled_data
+    
 
     return mapped_data
 
 if __name__ == '__main__':
     fileKey = get_range_CMIPC_data_fileKeys(2024, 311, 23, 59, 14)[0]
     data_mapped = sat_data_mapped(fileKey)
+    print(f"Total Squares = {NUM_COLS * NUM_ROWS}")
+    print(f"{np.count_nonzero(data_mapped)=}")
+    print(f"Fraction non-0 = {np.count_nonzero(data_mapped) / (NUM_COLS * NUM_ROWS)}")
+    print(data_mapped)
 
     fig = plt.figure(figsize=(15, 12))
     ax_east = fig.add_subplot(1, 1, 1)
