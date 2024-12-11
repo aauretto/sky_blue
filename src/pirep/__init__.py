@@ -43,6 +43,7 @@ def fetch(url: str) -> pd.DataFrame:
 def parse(row: pd.DataFrame) -> pd.DataFrame:
     from pirep.defs.report import PilotReport
     from pirep.defs.location import Location
+    from pirep.defs.altitude import Altitude
 
     try:
         report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
@@ -50,7 +51,13 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
         row["Location"] = Location(lat=row["Lat"], lon=row["Lon"])
         row["Altitude"] = report.altitude
         row["Aircraft"] = report.aircraft
+
+        # Fallback to PIREP altitude if turbulence altitude is unknown
+        for flag in report.turbulence:
+            if flag.altitude.err == Altitude.Error.UNKN:
+                flag.altitude = report.altitude
         row["Turbulence"] = report.turbulence
+
         return row
     except:
         return row
@@ -74,7 +81,7 @@ def compute_grid(pirep: pd.DataFrame) -> npt.NDArray:
     aircraft: Aircraft = pirep["Aircraft"]
     turbulence: Turbulence = pirep["Turbulence"]
 
-    if turbulence is Turbulence:
+    if type(turbulence) == Turbulence:
         if turbulence.intensity != Turbulence.Intensity.EXT:
             turbulence_index = TURBULENCE_INDEXES[aircraft][turbulence.intensity]
         else:
@@ -90,7 +97,7 @@ def compute_grid(pirep: pd.DataFrame) -> npt.NDArray:
             convert(loc.lon, "LON")
             - AREA_OF_EFFECT : convert(loc.lon, "LON")
             + AREA_OF_EFFECT,
-            (alt.min // 500) : (alt.max // 500),
+            (alt.min // 500) : (alt.max // 500) + 1,
         ] = turbulence_index
 
     return grid
