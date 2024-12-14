@@ -3,7 +3,7 @@ from typing import Any
 import pandas as pd
 
 CODES = (
-    pd.read_csv("pirep/utils/aircraft-codes.csv")[["type", "size"]]
+    pd.read_csv("pirep/utils/aircraft_codes.csv")[["type", "size"]]
     .drop_duplicates()
     .set_index("type")
     .to_dict("index")

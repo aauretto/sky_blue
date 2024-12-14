@@ -48,7 +48,7 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
     try:
         report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
         row["Priority"] = report.priority
-        row["Location"] = Location(lat=row["Lat"], lon=row["Lon"])
+        row["Location"] = report.location
         row["Altitude"] = report.altitude
         row["Aircraft"] = report.aircraft
 
@@ -74,7 +74,6 @@ def compute_grid(pirep: pd.DataFrame) -> npt.NDArray:
     grid = np.zeros((GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]))
 
     from pirep.defs.report import Location, Altitude, Aircraft, Turbulence
-    from pirep.consts import TURBULENCE_INDEXES
 
     loc: Location = pirep["Location"]
     alt: Altitude = pirep["Altitude"]
@@ -82,6 +81,8 @@ def compute_grid(pirep: pd.DataFrame) -> npt.NDArray:
     turbulence: Turbulence = pirep["Turbulence"]
 
     if type(turbulence) == Turbulence:
+        from pirep.consts import TURBULENCE_INDEXES
+
         if turbulence.intensity != Turbulence.Intensity.EXT:
             turbulence_index = TURBULENCE_INDEXES[aircraft][turbulence.intensity]
         else:
