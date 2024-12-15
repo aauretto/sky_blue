@@ -42,7 +42,6 @@ def fetch(url: str) -> pd.DataFrame:
 
 def parse(row: pd.DataFrame) -> pd.DataFrame:
     from pirep.defs.report import PilotReport
-    from pirep.defs.location import Location
     from pirep.defs.altitude import Altitude
 
     try:
@@ -68,17 +67,17 @@ def parse_all(table: pd.DataFrame) -> pd.DataFrame:
     return reports.drop(columns=["Lat", "Lon"]).explode(column="Turbulence")
 
 
-def compute_grid(pirep: pd.DataFrame) -> npt.NDArray:
+def compute_grid(report: pd.DataFrame) -> npt.NDArray:
     from consts import GRID_RANGE
 
     grid = np.zeros((GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]))
 
     from pirep.defs.report import Location, Altitude, Aircraft, Turbulence
 
-    loc: Location = pirep["Location"]
-    alt: Altitude = pirep["Altitude"]
-    aircraft: Aircraft = pirep["Aircraft"]
-    turbulence: Turbulence = pirep["Turbulence"]
+    loc: Location = report["Location"]
+    alt: Altitude = report["Altitude"]
+    aircraft: Aircraft = report["Aircraft"]
+    turbulence: Turbulence = report["Turbulence"]
 
     if type(turbulence) == Turbulence:
         from pirep.consts import TURBULENCE_INDEXES

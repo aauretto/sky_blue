@@ -1,4 +1,5 @@
 from pydantic import BaseModel
+from scipy import constants as u
 from math import *
 import re
 
@@ -61,9 +62,9 @@ class Location(BaseModel):
                 lon = int(lon)
             else:
                 # Degrees + minutes
-                lat_min = int(float(lat[-2:]) / 60.0 * 10000.0)
+                lat_min = int(int(lat[-2:]) / u.minute)
                 lat = float(f"{lat[:-2]}.{lat_min:.0f}")
-                lon_min = int(float(lon[-2:]) / 60.0 * 10000.0)
+                lon_min = int(int(lon[-2:]) / u.minute)
                 lon = float(f"{lon[:-2]}.{lon_min:.0f}")
 
             if m["latsign"] == "W":
@@ -78,29 +79,10 @@ class Location(BaseModel):
             m = re.match(LOC_OFFSET, src) if m is None else m
 
             loc = Location.convert_code(m["loc"])
-            dir = DIRECTIONS[m["dir"]] if m["dir"] in DIRECTIONS else int(m["dir"])
+            dir = DIRECTIONS.get(m["dir"], int(m["dir"]))
             dist = int(m["dist"])
 
-            # Compute new location
-            # TODO: Extract this into its own function
-            lat1 = radians(loc.lat)
-            lon1 = radians(loc.lon)
-            dir = radians(dir)
-            dist_ang = dist * 1.852 / 6371
-
-            lat2 = asin(
-                sin(lat1) * cos(dist_ang) + cos(lat1) * sin(dist_ang) * cos(dir)
-            )
-            lon2 = (
-                lon1
-                + atan2(
-                    sin(dir) * sin(dist_ang) * cos(lat1),
-                    cos(dist_ang) - sin(lat1) * sin(lat2),
-                )
-                + 540
-            ) % 360 - 180
-
-            return Location(lat=degrees(lat2), lon=degrees(lon2))
+            return loc.offset(dir, dist)
 
         elif len(src) == 3:
             return Location.convert_code(src)
@@ -124,3 +106,24 @@ class Location(BaseModel):
                 raise ValueError("Invalid code")
 
         return Location(lat=waypoint["lat"], lon=waypoint["lon"])
+
+    def offset(self, dir: int, dist: int):
+        # Convert units
+        lat1 = radians(self.lat)
+        lon1 = radians(self.lon)
+
+        dir = radians(dir)
+        dist_ang = dist * u.nautical_mile / 6_371_000
+
+        # Compute new location
+        lat2 = asin(sin(lat1) * cos(dist_ang) + cos(lat1) * sin(dist_ang) * cos(dir))
+        lon2 = (
+            lon1
+            + atan2(
+                sin(dir) * sin(dist_ang) * cos(lat1),
+                cos(dist_ang) - sin(lat1) * sin(lat2),
+            )
+            + 540
+        ) % 360 - 180
+
+        return Location(lat=degrees(lat2), lon=degrees(lon2))

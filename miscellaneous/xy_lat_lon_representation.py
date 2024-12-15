@@ -2,21 +2,22 @@ import numpy as np
 from cmipc_data_retrieval import *
 from noaa_calculate_degrees_func import calculate_degrees
 
-NUM_COLS = 2500 # Number of columns (longitudes)
-NUM_ROWS = 1500 # Number of rows (latitudes)
+NUM_COLS = 2500  # Number of columns (longitudes)
+NUM_ROWS = 1500  # Number of rows (latitudes)
 
 # The latitude and longitude bounds of CONUS, with some leeway in all directions
-LON_MIN = -126#-131
+LON_MIN = -126  # -131
 LON_MAX = -66
 LAT_MIN = 23
 LAT_MAX = 51
 
 # Function lat_to_row
 # Inputs:
-#   latitudes : array-like    
-# 
+#   latitudes : array-like
+#
 # Returns:
 #   the row coordinates that correspond to the given latitudes
+
 
 def lat_to_row(latitudes):
     # Normalize the latitude values to the range [0, 1]
@@ -25,14 +26,18 @@ def lat_to_row(latitudes):
     # Scale to the range [0, NUM_ROWS - 1]
     row_values = (normalized_lat) * (NUM_ROWS - 1)
 
-    return np.round(row_values).astype(int)  # Round and convert to integers for indexing
+    return np.round(row_values).astype(
+        int
+    )  # Round and convert to integers for indexing
+
 
 # Function lon_to_col
 # Inputs:
-#   longitudes : array-like    
-# 
+#   longitudes : array-like
+#
 # Returns:
 #   the col coordinates that correspond to the given longitudes
+
 
 def lon_to_col(longitudes):
     # Normalize the longitude values to the range [0, 1]
@@ -41,27 +46,34 @@ def lon_to_col(longitudes):
     # Scale to the range [0, NUM_COLS - 1]
     col_values = normalized_lon * (NUM_COLS - 1)
 
-    return np.round(col_values).astype(int)  # Round and convert to integers for indexing
+    return np.round(col_values).astype(
+        int
+    )  # Round and convert to integers for indexing
+
 
 # Function sat_data_mapped
 # Inputs:
 #   fileKey  : GOES file key
 #   year     : int 2017-2024
-#   day      : int 1 - 366   
-#   hour     : int 0 - 23   
-#   minute   : int 1 - 59   
+#   day      : int 1 - 366
+#   hour     : int 0 - 23
+#   minute   : int 1 - 59
 #   bandNum  : int 1 - 16
 #   data_var : the variable name of the data to be mapped
 # Returns:
 #   The satellite data mapped to a numpy array based on corresponding latitude and longitude values
 # Notes: either fileKey or year-day-hour-minute-band must be provided
-#        occasionally two points will map to the same cell in the array. These are ignored 
-def sat_data_mapped(fileKey="", year=0, day=0, hour=0, minute=0, band=0, data_var = "CMI"):
+#        occasionally two points will map to the same cell in the array. These are ignored
+def sat_data_mapped(
+    fileKey="", year=0, day=0, hour=0, minute=0, band=0, data_var="CMI"
+):
     if fileKey == "":
-        sat_data = retrieve_s3_data(get_range_CMIPC_data_fileKeys(year, day, hour, minute, band)[0])
+        sat_data = retrieve_s3_data(
+            get_range_CMIPC_data_fileKeys(year, day, hour, minute, band)[0]
+        )
     else:
         sat_data = retrieve_s3_data(fileKey)
-    
+
     data_temps = sat_data.variables[data_var][:]
     lat, lon = calculate_degrees(sat_data)
 
@@ -72,7 +84,7 @@ def sat_data_mapped(fileKey="", year=0, day=0, hour=0, minute=0, band=0, data_va
     rows = lat_to_row(lat[valid_mask])
     cols = lon_to_col(lon[valid_mask])
     data_temps = data_temps[valid_mask]
-    
+
     # This method ignores duplicate mappings
     mapped_data = np.zeros((NUM_ROWS, NUM_COLS))
     mapped_data[rows, cols] = data_temps
@@ -88,19 +100,19 @@ def sat_data_mapped(fileKey="", year=0, day=0, hour=0, minute=0, band=0, data_va
     #     # Calculate the average where the count is greater than 0
     #     # Prevent division by zero by checking the count
     # mapped_data = np.where(count_data > 0, sum_data / count_data, 0)
-    
-    
+
     from scipy.ndimage import distance_transform_edt
-    mask = mapped_data > 0
+
+    mask = mapped_data <= 0
     filled_data = mapped_data.copy()
-    indices = distance_transform_edt(~mask, return_distances=False, return_indices=True)
-    filled_data[~mask] = mapped_data[tuple(indices[:, ~mask])]
+    indices = distance_transform_edt(mask, return_distances=False, return_indices=True)
+    filled_data[mask] = mapped_data[tuple(indices[:, mask])]
     mapped_data = filled_data
-    
 
     return mapped_data
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     fileKey = get_range_CMIPC_data_fileKeys(2024, 311, 23, 59, 14)[0]
     data_mapped = sat_data_mapped(fileKey)
     print(f"Total Squares = {NUM_COLS * NUM_ROWS}")
