@@ -18,7 +18,7 @@ MAP_RANGE = {
 # Grid Range
 
 GRID_RANGE = {
-    "LAT": 1500,
-    "LON": 2500,
-    "ALT": 91,
+    "LAT": 1500, # number of rows
+    "LON": 2500, # number of cols
+    "ALT": 91,   # number of z layers
 }
