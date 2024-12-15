@@ -1,12 +1,12 @@
 import numpy as np
 import numpy.typing as npt
 
-from consts import MAP_RANGE, GRID_RANGE
-
 
 def convert_coord(
     values: npt.ArrayLike | npt.DTypeLike, axis: str
 ) -> npt.ArrayLike | npt.DTypeLike:
+    from consts import MAP_RANGE, GRID_RANGE
+
     # Normalize the latitude values to the range [0, 1]
     normalized = (values - MAP_RANGE[axis]["MIN"]) / (
         MAP_RANGE[axis]["MAX"] - MAP_RANGE[axis]["MIN"]

@@ -54,8 +54,8 @@ class PilotReport(BaseModel):
         location = Location.parse(m["location"], m["station"])
         altitude = Altitude.parse(m["altitude"])
         aircraft = Aircraft.parse(m["aircraft"])
-        data = {}
 
+        data = {}
         for field in re.finditer(REST, m["rest"]):
             field = field.groupdict()
             flag = field["flag"]
