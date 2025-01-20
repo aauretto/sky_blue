@@ -35,7 +35,7 @@ def fetch(url: str) -> pd.DataFrame:
             "PRODUCT_ID": "Lon",
         }
     )  # Account for seemingly wrong columns in CSV
-    df["Timestamp"] = pd.to_datetime(df["Timestamp"], format=f"%Y%m%d%H%M")
+    df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="%Y%m%d%H%M")
 
     return df
 
@@ -58,7 +58,7 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
         row["Turbulence"] = report.turbulence
 
         return row
-    except:
+    except Exception:
         return row
 
 
@@ -79,7 +79,7 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
     aircraft: Aircraft = report["Aircraft"]
     turbulence: Turbulence = report["Turbulence"]
 
-    if type(turbulence) == Turbulence:
+    if type(turbulence) is Turbulence:
         from pirep.consts import TURBULENCE_INDEXES
 
         if turbulence.intensity != Turbulence.Intensity.EXT:
@@ -91,11 +91,9 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
         from utils.convert import convert_coord as convert
 
         grid[
-            convert(loc.lat, "LAT")
-            - AREA_OF_EFFECT : convert(loc.lat, "LAT")
+            convert(loc.lat, "LAT") - AREA_OF_EFFECT : convert(loc.lat, "LAT")
             + AREA_OF_EFFECT,
-            convert(loc.lon, "LON")
-            - AREA_OF_EFFECT : convert(loc.lon, "LON")
+            convert(loc.lon, "LON") - AREA_OF_EFFECT : convert(loc.lon, "LON")
             + AREA_OF_EFFECT,
             (alt.min // 500) : (alt.max // 500) + 1,
         ] = turbulence_index

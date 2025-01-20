@@ -1,3 +1,6 @@
+from pirep.defs.turbulence import Turbulence
+from pirep.defs.aircraft import Aircraft
+
 # Data Sources
 
 SRC = "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?"
@@ -8,9 +11,6 @@ TIME_OF_EFFECT = 5  # minutes, ±
 AREA_OF_EFFECT = 5  # grid cells, TODO: find a better value/unit for this
 
 # Turbulence Index Lookup Table
-
-from pirep.defs.turbulence import Turbulence
-from pirep.defs.aircraft import Aircraft
 
 TURBULENCE_INDEXES = {
     Aircraft.LGT: {

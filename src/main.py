@@ -1,3 +1,4 @@
+import matplotlib.pyplot as plt
 import datetime as dt
 import pandas as pd
 import pirep as pr
@@ -29,8 +30,6 @@ data = st.fetch(dt.datetime(2024, 11, 6, 23, 59), sat_east)
 band_data = st.fetch_band(data, band)
 lats, lons = st.calculate_coordinates(data)
 projected_data = st.project(lats, lons, band_data)
-
-import matplotlib.pyplot as plt
 
 fig = plt.figure(figsize=(15, 12))
 ax_east = fig.add_subplot(1, 1, 1)

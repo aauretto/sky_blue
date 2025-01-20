@@ -54,7 +54,7 @@ def calculate_coordinates(data: Dataset) -> tuple[npt.ArrayLike, npt.ArrayLike]:
     abi_lat = (180.0 / np.pi) * (
         np.arctan(
             ((r_eq * r_eq) / (r_pol * r_pol))
-            * ((s_z / np.sqrt(((H - s_x) * (H - s_x)) + (s_y * s_y))))
+            * (s_z / np.sqrt(((H - s_x) * (H - s_x)) + (s_y * s_y)))
         )
     )
     abi_lon = (lambda_0 - np.arctan(s_y / (H - s_x))) * (180.0 / np.pi)

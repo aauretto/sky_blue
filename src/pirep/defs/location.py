@@ -1,6 +1,6 @@
 from pydantic import BaseModel
 from scipy import constants as u
-from math import *
+from math import radians, degrees, sin, cos, asin, atan2
 import re
 
 LOC_LATLON = re.compile(
