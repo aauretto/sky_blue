@@ -83,7 +83,7 @@ class TurbulenceType(StrEnum):
 
 class PilotReport:
     def __init__(
-        self, report: str, timestamp: dt.datetime = dt.datetime.now(dt.UTC)
+        self, report: str, timestamp: dt.datetime = dt.datetime.now(dt.timezone.utc)
     ) -> None:
         self.timestamp: dt.datetime = timestamp
         self.priority: Priority = Priority.ROUTINE

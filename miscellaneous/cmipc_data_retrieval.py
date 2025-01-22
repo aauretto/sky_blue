@@ -31,7 +31,7 @@ MINUTE_FIELD_WIDTH = 2
 
 
 def get_range_CMIPC_data_fileKeys(year, day, hour, minute, bandNum):
-    dt = datetime(year, month=1, day=1, tzinfo=timezone.utc) + timedelta(
+    dt = datetime(year, month=1, day=1, tzinfo=timezone.timezone.utc) + timedelta(
         days=day - 1, hours=hour, minutes=minute
     )
 

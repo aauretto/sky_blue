@@ -1,3 +1,5 @@
+# NOTE: this has been designated as the entry point for Docker 
+
 import matplotlib.pyplot as plt
 import datetime as dt
 import pandas as pd
@@ -9,8 +11,8 @@ from goes2go import GOES
 reports: pd.DataFrame = pr.parse_all(
     pr.fetch(
         pr.url(
-            date_s=dt.datetime(2024, 11, 6, 23, 54, 0, tzinfo=dt.UTC),
-            date_e=dt.datetime(2024, 11, 7, 0, 4, 0, tzinfo=dt.UTC),
+            date_s=dt.datetime(2024, 11, 6, 23, 54, 0, tzinfo=dt.timezone.utc),
+            date_e=dt.datetime(2024, 11, 7, 0, 4, 0, tzinfo=dt.timezone.utc),
         )
     )
 )
