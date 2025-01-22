@@ -93,7 +93,7 @@ class Location(BaseModel):
     def convert_code(cls, code: str):
         import pandas as pd
 
-        codes = pd.read_csv("pirep/utils/waypoint_codes.csv")
+        codes = pd.read_csv("src/pirep/utils/waypoint_codes.csv")
 
         match len(code):
             case 3:
