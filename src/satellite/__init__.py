@@ -12,7 +12,7 @@ def fetch(timestamp: dt.datetime, satellite: GOES) -> Dataset:
 def fetch_band(data: Dataset, band: int) -> DataArray:
     return data[f"CMI_C{band:02d}"].data
 
-
+# Code pulled from the NOAA Documentation for the AWS Bucket
 def calculate_coordinates(data: Dataset) -> tuple[npt.ArrayLike, npt.ArrayLike]:
     # Read in GOES ABI fixed grid projection variables and constants
     x_coordinate_1d = data.variables["x"][:]  # E/W scanning angle in radians
@@ -68,7 +68,6 @@ def project(
     temp: npt.ArrayLike | npt.DTypeLike,
 ) -> npt.ArrayLike | npt.DTypeLike:
     from consts import MAP_RANGE, GRID_RANGE
-    from scipy.ndimage import distance_transform_edt
     from utils.convert import convert_coord as convert
 
     # Create coordinate mask
@@ -87,7 +86,10 @@ def project(
     data = np.zeros((GRID_RANGE["LAT"], GRID_RANGE["LON"]))
     data[rows, cols] = temps
 
-    # Apply smoothing
+    return data
+
+def smooth(data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike:
+    from scipy.ndimage import distance_transform_edt
     empty_mask = data <= 0
     filled_data = data.copy()
     indices = distance_transform_edt(
@@ -96,3 +98,6 @@ def project(
     filled_data[empty_mask] = data[tuple(indices[:, empty_mask])]
 
     return filled_data
+
+def union_sat_data(west: npt.ArrayLike | npt.DTypeLike, east: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike:
+    pass

@@ -3,10 +3,11 @@
 In order to launch the container for our code, you first download [Docker Desktop] (https://www.docker.com/products/docker-desktop/)
 for your OS. Docker will prompt you to create an account. Unless you intend to push or make new images, for the purposes of our application, you do not need an account as we are already hosting our container on Docker Hub.
 
-To build our image from the top level of the GitHub Repository (aka skyblue) do this command
-`docker build -t skyblue:latest .`
+To build our image from the top level of the GitHub Repository (aka skyblue) do this command Powershell if you are not a Mac user.
+`docker build -t skyblue_dev:latest .`
 
-To run the container, do this command from a Linux shell: `docker run -v ${PWD}"/src/plots":/app/src/plots skyblue:latest`
+To run the container, do this command: `docker run -it --rm -v ${PWD}:/skyblue/ skyblue_dev:latest`
+The above command needs to be run from the skyblue directory on your computer and will sync the container files with local ones
 
 Note: whenever you make any change to the codebase and want to run the container, you will need to rebuild the image
 first before you will be able to test your changes.

@@ -26,12 +26,13 @@ grids = pd.DataFrame(
 )
 
 sat_east = GOES(satellite=16, product="ABI", domain="C")
+sat_west = GOES(satellite=18, product="ABI", domain="C")
 band = 14
 
-data = st.fetch(dt.datetime(2024, 11, 6, 23, 59), sat_east)
+data = st.fetch(dt.datetime(2024, 11, 6, 23, 59), sat_west)
 band_data = st.fetch_band(data, band)
 lats, lons = st.calculate_coordinates(data)
-projected_data = st.project(lats, lons, band_data)
+projected_data = st.smooth(st.project(lats, lons, band_data))
 
 fig = plt.figure(figsize=(15, 12))
 ax_east = fig.add_subplot(1, 1, 1)
