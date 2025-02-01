@@ -1,4 +1,4 @@
-# NOTE: this has been designated as the entry point for Docker 
+# NOTE: this has been designated as the entry point for Docker
 
 import matplotlib.pyplot as plt
 import datetime as dt
@@ -29,7 +29,7 @@ sat_east = GOES(satellite=16, product="ABI", domain="C")
 sat_west = GOES(satellite=18, product="ABI", domain="C")
 band = 14
 
-data = st.fetch(dt.datetime(2024, 11, 6, 23, 59), sat_west)
+data = st.fetch(dt.datetime(2025, 1, 19, 23, 59), sat_west)
 band_data = st.fetch_band(data, band)
 lats, lons = st.calculate_coordinates(data)
 projected_data = st.smooth(st.project(lats, lons, band_data))
@@ -37,4 +37,4 @@ projected_data = st.smooth(st.project(lats, lons, band_data))
 fig = plt.figure(figsize=(15, 12))
 ax_east = fig.add_subplot(1, 1, 1)
 ax_east.pcolormesh(projected_data)
-plt.savefig("src/plots/main_figure.png")
+plt.plot()

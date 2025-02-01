@@ -26,15 +26,15 @@ def fetch(url: str) -> pd.DataFrame:
     df = pd.read_csv(url)
 
     # Fix dataframe columns
-    df = df[["VALID", "REPORT", "LON", "PRODUCT_ID"]]
+    df = df[["VALID", "REPORT", "LAT", "LON"]]
     df = df.rename(
         columns={
             "VALID": "Timestamp",
             "REPORT": "Report",
-            "LON": "Lat",
-            "PRODUCT_ID": "Lon",
+            "LAT": "Lat",
+            "LON": "Lon",
         }
-    )  # Account for seemingly wrong columns in CSV
+    )
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="%Y%m%d%H%M")
 
     return df
