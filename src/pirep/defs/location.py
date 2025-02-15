@@ -3,17 +3,18 @@ from scipy import constants as u
 from math import radians, degrees, sin, cos, asin, atan2
 import re
 
+# TODO explain this
 LOC_LATLON = re.compile(
     r"\s*(?P<lat>[0-9]{2,4})(?P<latsign>[NS])"
     r"\s*(?P<lon>[0-9]{2,5})(?P<lonsign>[EW])"
 )
-
+# TODO explain this
 LOC_TWOLOC = re.compile(r"(?P<loc1>[A-Z0-9]{3,4})\s?-\s?(?P<loc2>[A-Z0-9]{3,4})")
-
+# TODO explain this
 LOC_LOCDIR = re.compile(
     r".*?(?P<loc>[A-Z0-9]{3,4})\s?(?P<dir>[0-9]{3})(?P<dist>[0-9]{3})"
 )
-
+# TODO explain this
 LOC_OFFSET = re.compile(
     r"(?P<dist>[0-9]{1,3})\s?"
     r"(?P<dir>NORTH|EAST|SOUTH|WEST|N|NNE|NE|ENE|E|ESE|"
@@ -48,8 +49,8 @@ class Location(BaseModel):
     lat: float
     lon: float
 
-    @classmethod
-    def parse(cls, src: str, base: str):
+    @staticmethod
+    def parse(src: str, base: str):
         if re.match(LOC_LATLON, src):
             m = re.match(LOC_LATLON, src).groupdict()
 
@@ -89,11 +90,13 @@ class Location(BaseModel):
 
         return Location(lat=0, lon=0)
 
-    @classmethod
-    def convert_code(cls, code: str):
+    @staticmethod
+    def convert_code(code: str):
         import pandas as pd
 
-        codes = pd.read_csv("src/pirep/utils/waypoint_codes.csv")
+        codes = pd.read_csv(
+            "src/pirep/utils/waypoint_codes.csv"
+        )  # TODO elaborate on this CSV
 
         match len(code):
             case 3:
@@ -103,7 +106,9 @@ class Location(BaseModel):
                 waypoint = codes[codes["icao"] == code].iloc[0]
 
             case _:
-                raise ValueError("Invalid code")
+                raise ValueError(
+                    "Invalid code"
+                )  # TODO ensure we have catches for this to not crash
 
         return Location(lat=waypoint["lat"], lon=waypoint["lon"])
 
@@ -113,11 +118,13 @@ class Location(BaseModel):
         lon1 = radians(self.lon)
 
         dir = radians(dir)
-        dist_ang = dist * u.nautical_mile / 6_371_000
+        dist_ang = (
+            dist * u.nautical_mile / 6_371_000
+        )  # TODO explain this constant m radius Earth
 
         # Compute new location
         lat2 = asin(sin(lat1) * cos(dist_ang) + cos(lat1) * sin(dist_ang) * cos(dir))
-        lon2 = (
+        lon2 = (  # TODO document sourcing on math
             lon1
             + atan2(
                 sin(dir) * sin(dist_ang) * cos(lat1),

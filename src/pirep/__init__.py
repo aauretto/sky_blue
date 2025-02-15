@@ -13,7 +13,7 @@ def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
         # Convert dates to Zulu time
         "sts": date_s.isoformat().replace("+00:00", "Z"),
         "ets": date_e.isoformat().replace("+00:00", "Z"),
-        "artcc": "_ALL",
+        "artcc": "_ALL",  # Fetch from all ATCs
         "fmt": "csv",
     }
 

@@ -2,6 +2,8 @@ import numpy as np
 import numpy.typing as npt
 
 
+# Used to convert any raw lat/lon/alt coordinates (PIREPS, satellite) to the
+# defined grid of lat/lon/alt values (in consts)
 def convert_coord(
     values: npt.ArrayLike | npt.DTypeLike, axis: str
 ) -> npt.ArrayLike | npt.DTypeLike:

@@ -38,8 +38,8 @@ class Turbulence(BaseModel):
     type: Optional[Type]
     altitude: Altitude = Altitude()
 
-    @classmethod
-    def parse(cls, src: str, alt_fallback: Altitude):
+    @staticmethod
+    def parse(src: str):
         results = []
 
         for m in re.finditer(TURBULENCE, src):

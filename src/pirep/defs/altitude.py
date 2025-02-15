@@ -19,8 +19,8 @@ class Altitude(BaseModel):
     min: Optional[NonNegativeInt] = None
     max: Optional[NonNegativeInt] = None
 
-    @classmethod
-    def parse(cls, src: str):
+    @staticmethod
+    def parse(src: str):
         err = Altitude.Error.UNKN
         alt_min = None
         alt_max = None
@@ -33,7 +33,7 @@ class Altitude(BaseModel):
             err = None
 
             if "alt1" in m.keys():
-                alt_min = int(m["alt1"]) * 100
+                alt_min = int(m["alt1"]) * 100  # TODO document this * 100
             if "alt2" in m.keys():
                 alt_max = int(m["alt2"]) * 100
 

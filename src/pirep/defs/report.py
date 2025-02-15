@@ -40,8 +40,8 @@ class PilotReport(BaseModel):
     # Additional fields
     turbulence: list[Turbulence] = []
 
-    @classmethod
-    def parse(cls, report: str, timestamp: datetime = datetime.now(UTC)):
+    @staticmethod
+    def parse(report: str, timestamp: datetime = datetime.now(UTC)):
         # Verify report is valid
         if not re.match(FULL, report):
             raise ValueError("Invalid PIREP provided:", report)

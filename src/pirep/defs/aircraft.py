@@ -1,8 +1,11 @@
 from enum import StrEnum
 import pandas as pd
 
+# TODO: Comment where/why the csv is here and what it is
 CODES = (
-    pd.read_csv("src/pirep/utils/aircraft_codes.csv")[["type", "size"]]
+    pd.read_csv("src/pirep/utils/aircraft_codes.csv")[
+        ["type", "size"]
+    ]  # TODO explain when and if they would need to pull a new version of this. Link original source
     .drop_duplicates()
     .set_index("type")
     .to_dict("index")
@@ -10,13 +13,17 @@ CODES = (
 
 
 class Aircraft(StrEnum):
+    """
+    TODO
+    """
+
     UNKN = "UNKN"
     LGT = "L"
     MED = "M"
     HVY = "H"
 
-    @classmethod
-    def parse(cls, src: str):
+    @staticmethod
+    def parse(src: str):
         if src not in CODES:
             return Aircraft.UNKN
 
