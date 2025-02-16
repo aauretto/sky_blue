@@ -41,8 +41,10 @@ def fetch(url: str) -> pd.DataFrame:
 
 
 def parse(row: pd.DataFrame) -> pd.DataFrame:
-    from pirep.defs.report import PilotReport
+    from pirep.defs.report import PilotReport, ReportError
+    from pirep.defs.location import CodeError
     from pirep.defs.altitude import Altitude
+    import traceback
 
     try:
         report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
@@ -58,8 +60,13 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
         row["Turbulence"] = report.turbulence
 
         return row
-    except Exception as e:
-        print(f"EXCEPTION IN SOMEWHERE: {e}")
+    except (ReportError, CodeError):
+        return row
+    except IndexError: #TODO this is becuase we don't have all vortacs
+        return row
+
+    except Exception:
+        print(traceback.format_exc())
         return row
 
 

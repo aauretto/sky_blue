@@ -3,8 +3,8 @@ from typing import Optional
 from enum import StrEnum
 import re
 
-ALT_MINABV = re.compile(r"ABV\s*(?P<alt1>[0-9]{3})")
-ALT_MAXBLO = re.compile(r"BLO\s*(?P<alt2>[0-9]{3})")
+ALT_MINABV = re.compile(r"ABV\s*(?P<alt1>[0-9]{3})") # Go up 2500ft
+ALT_MAXBLO = re.compile(r"BLO\s*(?P<alt2>[0-9]{3})") # Go down 2500ft
 ALT_SINGLE = re.compile(r"(?P<alt>[0-9]{3}|DURC|DURD|UNKN)")
 ALT_RANGED = re.compile(r"(?P<alt1>[0-9]{3})\s?-\s?(?P<alt2>[0-9]{3})")
 
@@ -22,8 +22,8 @@ class Altitude(BaseModel):
     @staticmethod
     def parse(src: str):
         err = Altitude.Error.UNKN
-        alt_min = None
-        alt_max = None
+        alt_min = 0 # None
+        alt_max = 40_000 # None
 
         for pat in [ALT_MINABV, ALT_MAXBLO, ALT_RANGED]:
             if pat.match(src) is None:

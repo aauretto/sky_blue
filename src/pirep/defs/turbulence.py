@@ -8,7 +8,7 @@ TURBULENCE = re.compile(
     r"("
     r"\s*(?P<duration>INTMT|OCNL|CONS)?"
     r"\s*(?:NEG|LGT|MOD|SEV|EXTRM)?\s*-?"
-    r"\s*(?P<intensity>NEG|LGT|MOD|SEV|EXTRM)"
+    r"\s*(?P<intensity>SMOOTH|NEG|LGT|MOD|SEV|EXTRM)"
     r"\s*(?P<type>CAT|CHOP)?"
     r"\s*(?P<altitude>[A-Z0-9\s-]*)?"
     r"/?)+"
@@ -54,7 +54,7 @@ class Turbulence(BaseModel):
                         if m["duration"] is None
                         else Turbulence.Duration(m["duration"])
                     ),
-                    intensity=Turbulence.Intensity(m["intensity"]),
+                    intensity=Turbulence.Intensity(m["intensity"]) if m["intensity"] != "SMOOTH" else Turbulence.Intensity.NEG,
                     type=None if m["type"] is None else Turbulence.Type(m["type"]),
                     altitude=altitude if altitude.err != Altitude.Error.UNKN else fallback,
                 )

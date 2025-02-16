@@ -8,7 +8,7 @@ SRC = "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?"
 # Prediction Parameters
 
 TIME_OF_EFFECT = 5  # minutes, ±
-AREA_OF_EFFECT = 5  # grid cells, TODO: find a better value/unit for this
+AREA_OF_EFFECT = 5  # grid cells, #TODO: find a better value/unit for this
 
 # Turbulence Index Lookup Table
 
@@ -32,3 +32,10 @@ TURBULENCE_INDEXES = {
         Turbulence.Intensity.SEV: 1.0,
     },
 }
+
+# #TODO
+# CRUISE_ALTITUDES = {
+#     Aircraft.LGT: 100,
+#     Aircraft.MED: 100,
+#     Aircraft.HVY: 40_000,
+# }

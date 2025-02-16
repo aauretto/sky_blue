@@ -44,6 +44,9 @@ DIRECTIONS = {
     "NNW": 337.5,
 }
 
+class CodeError(Exception):
+    def __init__(self, code):
+        super().__init__(f"Invalid Location Code: {code}")
 
 class Location(BaseModel):
     lat: float
@@ -80,7 +83,7 @@ class Location(BaseModel):
             m = re.match(LOC_OFFSET, src) if m is None else m
 
             loc = Location.convert_code(m["loc"])
-            dir = DIRECTIONS.get(m["dir"], int(m["dir"]))
+            dir = DIRECTIONS[m["dir"]] if m["dir"] in DIRECTIONS else int(m["dir"])
             dist = int(m["dist"])
 
             return loc.offset(dir, dist)
@@ -94,6 +97,9 @@ class Location(BaseModel):
     def convert_code(code: str):
         import pandas as pd
 
+        #TODO switch to use online CSVs using Navaids as fallback
+        # ourairports.com/data
+        # 
         codes = pd.read_csv(
             "src/pirep/utils/waypoint_codes.csv"
         )  # TODO elaborate on this CSV
@@ -106,10 +112,8 @@ class Location(BaseModel):
                 waypoint = codes[codes["icao"] == code].iloc[0]
 
             case _:
-                raise ValueError(
-                    "Invalid code"
-                )  # TODO ensure we have catches for this to not crash
-
+                raise CodeError(code)
+            
         return Location(lat=waypoint["lat"], lon=waypoint["lon"])
 
     def offset(self, dir: int, dist: int):

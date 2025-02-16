@@ -17,13 +17,17 @@ FULL = re.compile(
     r"\s*/TP\s?(?P<aircraft>[A-Z0-9]{3,4})"
     r"(?P<rest>.*)$"
 )
-# /TB OCNL LGT CHOP/RM ZVDWC
+
 REST = re.compile(
     r"/((?P<flag>SK|WX|TA|WV|TB|IC|RM)"
     r"\s?(?P<value>[A-Z0-9\s-]*"
     r"(?:/?(?!SK|WX|TA|WV|TB|IC|RM)[A-Z0-9\s\+-]*)*))*"
 )
 
+# Error to be caught if we cant match format for pirep
+class ReportError(Exception):
+    def __init__(self, report):
+        super().__init__(f"Invalid PIREP provided: {report}")
 
 class PilotReport(BaseModel):
     class Priority(StrEnum):
@@ -42,11 +46,10 @@ class PilotReport(BaseModel):
 
     @staticmethod
     def parse(report: str, timestamp: datetime = datetime.now(UTC)):
-        print(report)
         
         # Verify report is valid
         if not re.match(FULL, report):
-            raise ValueError("Invalid PIREP provided:", report)
+            raise ReportError(report)
 
         # Retrieve default fields
         m = re.match(FULL, report).groupdict()
