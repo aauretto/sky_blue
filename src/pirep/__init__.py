@@ -62,8 +62,6 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
         return row
     except (ReportError, CodeError):
         return row
-    except IndexError: #TODO this is becuase we don't have all vortacs
-        return row
 
     except Exception:
         print(traceback.format_exc())
@@ -72,7 +70,11 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
 
 def parse_all(table: pd.DataFrame, drop_no_turbulence: bool = True) -> pd.DataFrame:
     reports: pd.DataFrame = table.apply(parse, axis=1)
-    return reports.drop(columns=["Lat", "Lon"]).explode(column="Turbulence").dropna(subset=["Turbulence"])
+    return (
+        reports.drop(columns=["Lat", "Lon"])
+        .explode(column="Turbulence")
+        .dropna(subset=["Turbulence"])
+    )
 
 
 def compute_grid(report: pd.DataFrame) -> npt.NDArray:
@@ -99,7 +101,9 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
         #     turbulence_index = TURBULENCE_INDEXES[aircraft][Turbulence.Intensity.SEV]
 
         ## TODO UNKN not handled here and results in an error
-        turbulence_index = TURBULENCE_INDEXES.get(aircraft, TURBULENCE_INDEXES[Aircraft.MED])[intensity] #TODO be careful of MED default
+        turbulence_index = TURBULENCE_INDEXES.get(
+            aircraft, TURBULENCE_INDEXES[Aircraft.MED]
+        )[intensity]  # TODO be careful of MED default
         # turbulence_index = TURBULENCE_INDEXES[aircraft][intensity]
 
         from pirep.consts import AREA_OF_EFFECT

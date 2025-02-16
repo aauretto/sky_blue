@@ -4,6 +4,8 @@ from pirep.defs.aircraft import Aircraft
 # Data Sources
 
 SRC = "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?"
+SRC_AIRPORTS = "https://davidmegginson.github.io/ourairports-data/airports.csv"
+SRC_NAVAIDS = "https://davidmegginson.github.io/ourairports-data/navaids.csv"
 
 # Prediction Parameters
 

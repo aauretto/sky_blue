@@ -2,6 +2,7 @@ from pydantic import BaseModel
 from scipy import constants as u
 from math import radians, degrees, sin, cos, asin, atan2
 import re
+from ..consts import SRC_AIRPORTS, SRC_NAVAIDS
 
 # TODO explain this
 LOC_LATLON = re.compile(
@@ -44,9 +45,11 @@ DIRECTIONS = {
     "NNW": 337.5,
 }
 
+
 class CodeError(Exception):
     def __init__(self, code):
         super().__init__(f"Invalid Location Code: {code}")
+
 
 class Location(BaseModel):
     lat: float
@@ -97,24 +100,30 @@ class Location(BaseModel):
     def convert_code(code: str):
         import pandas as pd
 
-        #TODO switch to use online CSVs using Navaids as fallback
+        # TODO switch to use online CSVs using Navaids as fallback
         # ourairports.com/data
-        # 
-        codes = pd.read_csv(
-            "src/pirep/utils/waypoint_codes.csv"
-        )  # TODO elaborate on this CSV
+        airport_codes = pd.read_csv(SRC_AIRPORTS)
+        navaid_codes = pd.read_csv(SRC_NAVAIDS)
 
         match len(code):
             case 3:
-                waypoint = codes[codes["iata"] == code].iloc[0]
+                results = airport_codes[airport_codes["iata_code"] == code]
 
             case 4:
-                waypoint = codes[codes["icao"] == code].iloc[0]
+                results = airport_codes[airport_codes["local_code"] == code]
 
             case _:
                 raise CodeError(code)
-            
-        return Location(lat=waypoint["lat"], lon=waypoint["lon"])
+
+        if len(results) == 0:
+            results = navaid_codes[navaid_codes["ident"] == code]
+
+        if len(results) == 0:
+            raise CodeError(code)
+
+        waypoint = results.iloc[0]
+
+        return Location(lat=waypoint["latitude_deg"], lon=waypoint["longitude_deg"])
 
     def offset(self, dir: int, dist: int):
         # Convert units
