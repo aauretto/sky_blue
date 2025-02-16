@@ -58,13 +58,14 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
         row["Turbulence"] = report.turbulence
 
         return row
-    except Exception:
+    except Exception as e:
+        print(f"EXCEPTION IN SOMEWHERE: {e}")
         return row
 
 
-def parse_all(table: pd.DataFrame) -> pd.DataFrame:
+def parse_all(table: pd.DataFrame, drop_no_turbulence: bool = True) -> pd.DataFrame:
     reports: pd.DataFrame = table.apply(parse, axis=1)
-    return reports.drop(columns=["Lat", "Lon"]).explode(column="Turbulence")
+    return reports.drop(columns=["Lat", "Lon"]).explode(column="Turbulence").dropna(subset=["Turbulence"])
 
 
 def compute_grid(report: pd.DataFrame) -> npt.NDArray:
@@ -82,10 +83,17 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
     if type(turbulence) is Turbulence:
         from pirep.consts import TURBULENCE_INDEXES
 
-        if turbulence.intensity != Turbulence.Intensity.EXT:
-            turbulence_index = TURBULENCE_INDEXES[aircraft][turbulence.intensity]
-        else:
-            turbulence_index = TURBULENCE_INDEXES[aircraft][Turbulence.Intensity.SEV]
+        intensity = turbulence.intensity
+        if turbulence.intensity == Turbulence.Intensity.EXT:
+            intensity = Turbulence.Intensity.SEV
+        # if turbulence.intensity != Turbulence.Intensity.EXT:
+        #     turbulence_index = TURBULENCE_INDEXES[aircraft][turbulence.intensity]
+        # else:
+        #     turbulence_index = TURBULENCE_INDEXES[aircraft][Turbulence.Intensity.SEV]
+
+        ## TODO UNKN not handled here and results in an error
+        turbulence_index = TURBULENCE_INDEXES.get(aircraft, TURBULENCE_INDEXES[Aircraft.MED])[intensity] #TODO be careful of MED default
+        # turbulence_index = TURBULENCE_INDEXES[aircraft][intensity]
 
         from pirep.consts import AREA_OF_EFFECT
         from utils.convert import convert_coord as convert
@@ -98,4 +106,6 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
             (alt.min // 500) : (alt.max // 500) + 1,
         ] = turbulence_index
 
-    return grid
+        return (grid, aircraft, intensity)
+    else:
+        return (grid, None, None)

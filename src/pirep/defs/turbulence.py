@@ -39,11 +39,13 @@ class Turbulence(BaseModel):
     altitude: Altitude = Altitude()
 
     @staticmethod
-    def parse(src: str):
+    def parse(src: str, fallback: Altitude):
         results = []
 
         for m in re.finditer(TURBULENCE, src):
             m = m.groupdict()
+
+            altitude = Altitude.parse(m["altitude"])
 
             results.append(
                 Turbulence(
@@ -54,7 +56,7 @@ class Turbulence(BaseModel):
                     ),
                     intensity=Turbulence.Intensity(m["intensity"]),
                     type=None if m["type"] is None else Turbulence.Type(m["type"]),
-                    altitude=Altitude.parse(m["altitude"]),
+                    altitude=altitude if altitude.err != Altitude.Error.UNKN else fallback,
                 )
             )
 

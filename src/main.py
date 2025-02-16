@@ -12,7 +12,7 @@ reports: pd.DataFrame = pr.parse_all(
     pr.fetch(
         pr.url(
             date_s=dt.datetime(2024, 11, 6, 23, 54, 0, tzinfo=dt.timezone.utc),
-            date_e=dt.datetime(2024, 11, 7, 0, 4, 0, tzinfo=dt.timezone.utc),
+            date_e=dt.datetime(2024, 11, 7, 0, 24, 0, tzinfo=dt.timezone.utc),
         )
     )
 )
@@ -25,16 +25,20 @@ grids = pd.DataFrame(
     }
 )
 
-sat_east = GOES(satellite=16, product="ABI", domain="C")
-sat_west = GOES(satellite=18, product="ABI", domain="C")
-band = 14
+# print(grids["Grid"][0][1:3])
 
-data = st.fetch(dt.datetime(2025, 1, 19, 23, 59), sat_east)
-band_data = st.fetch_band(data, band)
-lats, lons = st.calculate_coordinates(data)
-projected_data = st.smooth(st.project(lats, lons, band_data))
+print(len(grids), " Reports!")
 
-fig = plt.figure(figsize=(15, 12))
-ax_east = fig.add_subplot(1, 1, 1)
-ax_east.pcolormesh(projected_data)
-plt.show()
+# sat_east = GOES(satellite=16, product="ABI", domain="C")
+# # sat_west = GOES(satellite=18, product="ABI", domain="C")
+# band = 14
+
+# data = st.fetch(dt.datetime(2025, 1, 19, 23, 59), sat_east)
+# band_data = st.fetch_band(data, band)
+# lats, lons = st.calculate_coordinates(data)
+# projected_data = st.smooth(st.project(lats, lons, band_data))
+
+# fig = plt.figure(figsize=(15, 12))
+# ax_east = fig.add_subplot(1, 1, 1)
+# ax_east.pcolormesh(projected_data)
+# plt.show()

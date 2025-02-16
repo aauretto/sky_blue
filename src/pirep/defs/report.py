@@ -17,7 +17,7 @@ FULL = re.compile(
     r"\s*/TP\s?(?P<aircraft>[A-Z0-9]{3,4})"
     r"(?P<rest>.*)$"
 )
-
+# /TB OCNL LGT CHOP/RM ZVDWC
 REST = re.compile(
     r"/((?P<flag>SK|WX|TA|WV|TB|IC|RM)"
     r"\s?(?P<value>[A-Z0-9\s-]*"
@@ -42,6 +42,8 @@ class PilotReport(BaseModel):
 
     @staticmethod
     def parse(report: str, timestamp: datetime = datetime.now(UTC)):
+        print(report)
+        
         # Verify report is valid
         if not re.match(FULL, report):
             raise ValueError("Invalid PIREP provided:", report)
@@ -60,7 +62,6 @@ class PilotReport(BaseModel):
             field = field.groupdict()
             flag = field["flag"]
             val = field["value"]
-
             match flag:
                 # Turbulence
                 case "TB":
@@ -74,7 +75,7 @@ class PilotReport(BaseModel):
                 case _:
                     # print("Unknown flag:", flag)
                     pass
-
+        
         return PilotReport(
             timestamp=timestamp,
             priority=priority,
