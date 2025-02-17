@@ -72,7 +72,6 @@ def project(
     from utils.convert import convert_coord as convert
 
     # Create coordinate mask
-    # TODO: Check bitwise AND
     lat_mask = (lat >= MAP_RANGE["LAT"]["MIN"]) & (lat <= MAP_RANGE["LAT"]["MAX"])
     lon_mask = (lon >= MAP_RANGE["LON"]["MIN"]) & (lon <= MAP_RANGE["LON"]["MAX"])
     mask = lat_mask & lon_mask

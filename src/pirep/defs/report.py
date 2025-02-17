@@ -24,10 +24,12 @@ REST = re.compile(
     r"(?:/?(?!SK|WX|TA|WV|TB|IC|RM)[A-Z0-9\s\+-]*)*))*"
 )
 
+
 # Error to be caught if we cant match format for pirep
 class ReportError(Exception):
     def __init__(self, report):
         super().__init__(f"Invalid PIREP provided: {report}")
+
 
 class PilotReport(BaseModel):
     class Priority(StrEnum):
@@ -46,7 +48,6 @@ class PilotReport(BaseModel):
 
     @staticmethod
     def parse(report: str, timestamp: datetime = datetime.now(UTC)):
-        
         # Verify report is valid
         if not re.match(FULL, report):
             raise ReportError(report)
@@ -78,7 +79,7 @@ class PilotReport(BaseModel):
                 case _:
                     # print("Unknown flag:", flag)
                     pass
-        
+
         return PilotReport(
             timestamp=timestamp,
             priority=priority,

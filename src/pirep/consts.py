@@ -1,16 +1,10 @@
 from pirep.defs.turbulence import Turbulence
 from pirep.defs.aircraft import Aircraft
 
-# Data Sources
-
-SRC = "https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?"
-SRC_AIRPORTS = "https://davidmegginson.github.io/ourairports-data/airports.csv"
-SRC_NAVAIDS = "https://davidmegginson.github.io/ourairports-data/navaids.csv"
-
 # Prediction Parameters
 
 TIME_OF_EFFECT = 5  # minutes, ±
-AREA_OF_EFFECT = 5  # grid cells, #TODO: find a better value/unit for this
+AREA_OF_EFFECT = 5  # grid cells
 
 # Turbulence Index Lookup Table
 
@@ -34,10 +28,3 @@ TURBULENCE_INDEXES = {
         Turbulence.Intensity.SEV: 1.0,
     },
 }
-
-# #TODO
-# CRUISE_ALTITUDES = {
-#     Aircraft.LGT: 100,
-#     Aircraft.MED: 100,
-#     Aircraft.HVY: 40_000,
-# }

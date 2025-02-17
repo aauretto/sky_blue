@@ -2,24 +2,25 @@ from pydantic import BaseModel
 from scipy import constants as u
 from math import radians, degrees, sin, cos, asin, atan2
 import re
-from ..consts import SRC_AIRPORTS, SRC_NAVAIDS
+from ..sources import SRC_AIRPORTS, SRC_NAVAIDS
 
-# TODO explain this
 LOC_LATLON = re.compile(
     r"\s*(?P<lat>[0-9]{2,4})(?P<latsign>[NS])"
     r"\s*(?P<lon>[0-9]{2,5})(?P<lonsign>[EW])"
 )
-# TODO explain this
-LOC_TWOLOC = re.compile(r"(?P<loc1>[A-Z0-9]{3,4})\s?-\s?(?P<loc2>[A-Z0-9]{3,4})")
-# TODO explain this
-LOC_LOCDIR = re.compile(
-    r".*?(?P<loc>[A-Z0-9]{3,4})\s?(?P<dir>[0-9]{3})(?P<dist>[0-9]{3})"
+LOC_TWOLOC = re.compile(
+    r"(?P<loc1>[A-Z0-9]{3,4})\s?-\s?"
+    r"(?P<loc2>[A-Z0-9]{3,4})"
 )
-# TODO explain this
+LOC_LOCDIR = re.compile(
+    r".*?(?P<loc>[A-Z0-9]{3,4})\s?"
+    r"(?P<dir>[0-9]{3})"
+    r"(?P<dist>[0-9]{3})"
+)
 LOC_OFFSET = re.compile(
     r"(?P<dist>[0-9]{1,3})\s?"
-    r"(?P<dir>NORTH|EAST|SOUTH|WEST|N|NNE|NE|ENE|E|ESE|"
-    r"SE|SSE|S|SSW|SW|WSW|W|WNW|NW|NNW)\s+(OF )?(?P<loc>[A-Z0-9]{3,4})"
+    r"(?P<dir>NORTH|EAST|SOUTH|WEST|N|NNE|NE|ENE|E|ESE|SE|SSE|S|SSW|SW|WSW|W|WNW|NW|NNW)\s+(OF )?"
+    r"(?P<loc>[A-Z0-9]{3,4})"
 )
 
 DIRECTIONS = {
@@ -100,17 +101,21 @@ class Location(BaseModel):
     def convert_code(code: str):
         import pandas as pd
 
-        # TODO switch to use online CSVs using Navaids as fallback
-        # ourairports.com/data
         airport_codes = pd.read_csv(SRC_AIRPORTS)
         navaid_codes = pd.read_csv(SRC_NAVAIDS)
 
         match len(code):
             case 3:
-                results = airport_codes[airport_codes["iata_code"] == code]
+                results = airport_codes[
+                    (airport_codes["iata_code"] == code)
+                    | (airport_codes["local_code"] == code)
+                ]
 
             case 4:
-                results = airport_codes[airport_codes["local_code"] == code]
+                results = airport_codes[
+                    (airport_codes["icao_code"] == code)
+                    | (airport_codes["gps_code"] == code)
+                ]
 
             case _:
                 raise CodeError(code)
@@ -126,18 +131,19 @@ class Location(BaseModel):
         return Location(lat=waypoint["latitude_deg"], lon=waypoint["longitude_deg"])
 
     def offset(self, dir: int, dist: int):
+        r_earth = 6_371_000  # meters
+
         # Convert units
         lat1 = radians(self.lat)
         lon1 = radians(self.lon)
 
         dir = radians(dir)
-        dist_ang = (
-            dist * u.nautical_mile / 6_371_000
-        )  # TODO explain this constant m radius Earth
+        dist_ang = dist * u.nautical_mile / r_earth
 
-        # Compute new location
+        # Compute new location with a distance and heading from a known location (waypoint)
+        # Source: https://www.movable-type.co.uk/scripts/latlong.html
         lat2 = asin(sin(lat1) * cos(dist_ang) + cos(lat1) * sin(dist_ang) * cos(dir))
-        lon2 = (  # TODO document sourcing on math
+        lon2 = (
             lon1
             + atan2(
                 sin(dir) * sin(dist_ang) * cos(lat1),

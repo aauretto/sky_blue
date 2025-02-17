@@ -6,7 +6,7 @@ import numpy.typing as npt
 
 def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
     from urllib import parse
-    from pirep.consts import SRC
+    from pirep.sources import SRC_PIREPS
 
     # URL parameters
     params = {
@@ -18,7 +18,7 @@ def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
     }
 
     # Build URL
-    url = SRC + parse.urlencode(params)
+    url = SRC_PIREPS + parse.urlencode(params)
     return url
 
 
@@ -43,8 +43,10 @@ def fetch(url: str) -> pd.DataFrame:
 def parse(row: pd.DataFrame) -> pd.DataFrame:
     from pirep.defs.report import PilotReport, ReportError
     from pirep.defs.location import CodeError
-    from pirep.defs.altitude import Altitude
+    from pirep.defs.altitude import Altitude, AltitudeError
     import traceback
+
+    print(row["Report"], end="\r")
 
     try:
         report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
@@ -60,7 +62,7 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
         row["Turbulence"] = report.turbulence
 
         return row
-    except (ReportError, CodeError):
+    except (ReportError, CodeError, AltitudeError):
         return row
 
     except Exception:
@@ -69,11 +71,14 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
 
 
 def parse_all(table: pd.DataFrame, drop_no_turbulence: bool = True) -> pd.DataFrame:
+    # TODO: use the drop_no_turbulence parameter
+
     reports: pd.DataFrame = table.apply(parse, axis=1)
     return (
         reports.drop(columns=["Lat", "Lon"])
         .explode(column="Turbulence")
         .dropna(subset=["Turbulence"])
+        # .drop(reports["Altitude"].apply(lambda alt: alt.err == Altitude.Error.UNKN))
     )
 
 
@@ -95,20 +100,15 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
         intensity = turbulence.intensity
         if turbulence.intensity == Turbulence.Intensity.EXT:
             intensity = Turbulence.Intensity.SEV
-        # if turbulence.intensity != Turbulence.Intensity.EXT:
-        #     turbulence_index = TURBULENCE_INDEXES[aircraft][turbulence.intensity]
-        # else:
-        #     turbulence_index = TURBULENCE_INDEXES[aircraft][Turbulence.Intensity.SEV]
 
-        ## TODO UNKN not handled here and results in an error
         turbulence_index = TURBULENCE_INDEXES.get(
-            aircraft, TURBULENCE_INDEXES[Aircraft.MED]
-        )[intensity]  # TODO be careful of MED default
-        # turbulence_index = TURBULENCE_INDEXES[aircraft][intensity]
+            aircraft, TURBULENCE_INDEXES[Aircraft.LGT]
+        )[intensity]  # WARNING be careful of LGT default
 
         from pirep.consts import AREA_OF_EFFECT
         from utils.convert import convert_coord as convert
 
+        # TODO fix gridding (no AOE and fix altitudes)
         grid[
             convert(loc.lat, "LAT") - AREA_OF_EFFECT : convert(loc.lat, "LAT")
             + AREA_OF_EFFECT,
