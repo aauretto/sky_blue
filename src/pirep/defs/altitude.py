@@ -48,11 +48,10 @@ class Altitude(BaseModel):
             m = ALT_SINGLE.match(src).groupdict()
 
             match src:
-                case "UNKN":
-                    raise AltitudeError()
-
-                case "DURC" | "DURD":
+                case "UNKN" | "DURC" | "DURD":
+                    # TODO: Fix DURC/DURD cases
                     err = Altitude.Error(src)
+                    raise AltitudeError()
 
                 case alt:
                     err = None

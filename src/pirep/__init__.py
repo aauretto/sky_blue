@@ -78,7 +78,6 @@ def parse_all(table: pd.DataFrame, drop_no_turbulence: bool = True) -> pd.DataFr
         reports.drop(columns=["Lat", "Lon"])
         .explode(column="Turbulence")
         .dropna(subset=["Turbulence"])
-        # .drop(reports["Altitude"].apply(lambda alt: alt.err == Altitude.Error.UNKN))
     )
 
 
