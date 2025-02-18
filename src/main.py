@@ -29,7 +29,6 @@ if __name__ == "__main__":
 
     # Initialize satellites
     sat_east = GOES(satellite=16, product="ABI", domain="C")
-    sat_west = GOES(satellite=18, product="ABI", domain="C")
     band = 14
 
     # Fetch satellite data and project onto grid
