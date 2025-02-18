@@ -9,6 +9,10 @@ def fetch(timestamp: dt.datetime, satellite: GOES) -> Dataset:
     return satellite.nearesttime(timestamp, download=False)
 
 
+def fetch_range(start: dt.datetime, end: dt.datetime, satellite: GOES) -> Dataset:
+    return satellite.timerange(start, end, return_as="xarray")
+
+
 def fetch_band(data: Dataset, band: int) -> DataArray:
     return data[f"CMI_C{band:02d}"].data
 
@@ -66,7 +70,7 @@ def calculate_coordinates(data: Dataset) -> tuple[npt.ArrayLike, npt.ArrayLike]:
 def project(
     lat: npt.ArrayLike | npt.DTypeLike,
     lon: npt.ArrayLike | npt.DTypeLike,
-    temp: npt.ArrayLike | npt.DTypeLike,
+    temps: npt.ArrayLike | npt.DTypeLike,
 ) -> npt.ArrayLike | npt.DTypeLike:
     from consts import MAP_RANGE, GRID_RANGE
     from utils.convert import convert_coord as convert
@@ -79,11 +83,11 @@ def project(
     # Map to grid coordinates
     rows = convert(lat[mask], "LAT")
     cols = convert(lon[mask], "LON")
-    temps = temp[mask]
+    temps = temps[:, mask]
 
     # Shape data into grid
-    data = np.zeros((GRID_RANGE["LAT"], GRID_RANGE["LON"]))
-    data[rows, cols] = temps
+    data = np.zeros((temps.shape[0], GRID_RANGE["LAT"], GRID_RANGE["LON"]))
+    data[:, rows, cols] = temps
 
     return data
 
