@@ -13,8 +13,12 @@ def fetch_range(start: dt.datetime, end: dt.datetime, satellite: GOES) -> Datase
     return satellite.timerange(start, end, return_as="xarray")
 
 
-def fetch_band(data: Dataset, band: int) -> DataArray:
-    return data[f"CMI_C{band:02d}"].data
+def fetch_bands(data: Dataset, bands: list[int]) -> DataArray:
+    return (
+        data[[f"CMI_C{band:02d}" for band in bands]]
+        .to_dataarray(dim="band")
+        .transpose("t", "y", "x", "band")
+    )
 
 
 # Code pulled from the NOAA Documentation for the AWS Bucket
@@ -86,8 +90,10 @@ def project(
     temps = temps[:, mask]
 
     # Shape data into grid
-    data = np.zeros((temps.shape[0], GRID_RANGE["LAT"], GRID_RANGE["LON"]))
-    data[:, rows, cols] = temps
+    data = np.zeros(
+        (temps.shape[0], GRID_RANGE["LAT"], GRID_RANGE["LON"], temps.shape[-1])
+    )
+    data[:, rows, cols, :] = temps
 
     return data
 
