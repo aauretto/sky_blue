@@ -1,5 +1,6 @@
 from goes2go import GOES
-from sklearn.model_selection import train_test_split
+
+# from sklearn.model_selection import train_test_split
 import datetime as dt
 import numpy as np
 import pandas as pd
@@ -27,6 +28,8 @@ if __name__ == "__main__":
     band_data = st.fetch_bands(data, bands)
     data = st.smooth(st.project(lats, lons, band_data.data))
 
+    # TODO: take the timestamp associated with each frame, and choose the relevant PIREPs for each frame before binning them per-frame.
+    print(f"Frames: {data.shape[0]}")
     assert data.shape[1:] == (
         consts.GRID_RANGE["LAT"],
         consts.GRID_RANGE["LON"],
@@ -53,10 +56,11 @@ if __name__ == "__main__":
         }
     )
 
-    # TODO: Spread the PIREPs
+    # TODO: Spread the PIREPs here
     labels = np.sum(grids["Grid"].apply(lambda x: x[0]).to_numpy(), axis=0)
 
     assert labels.shape == (
+        # data.shape[0],
         consts.GRID_RANGE["LAT"],
         consts.GRID_RANGE["LON"],
         consts.GRID_RANGE["ALT"],  # TODO: Change when the altitude range is modified
@@ -67,9 +71,9 @@ if __name__ == "__main__":
     # Input: some kind of time series
     X = data
     y = labels
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.33, random_state=42
-    )
+    # X_train, X_test, y_train, y_test = train_test_split(
+    #     X, y, test_size=0.33, random_state=42
+    # )
     # Model parameters
     num_classes = 2
     input_shape = (3, 1500, 2500, 6)
