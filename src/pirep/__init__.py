@@ -3,7 +3,6 @@ import pandas as pd
 import numpy as np
 import numpy.typing as npt
 
-
 def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
     from urllib import parse
     from pirep.sources import SRC_PIREPS
@@ -46,7 +45,7 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
     from pirep.defs.altitude import Altitude, AltitudeError
     import traceback
 
-    print(row["Report"], end="\r")
+    print(f"\x1b[1K\r{row["Report"]}", end="")
 
     try:
         report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
@@ -73,6 +72,7 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
 def parse_all(table: pd.DataFrame, drop_no_turbulence: bool = True) -> pd.DataFrame:
     # TODO: use the drop_no_turbulence parameter
 
+    # TODO need the dataframe to reindex after dropping
     reports: pd.DataFrame = table.apply(parse, axis=1)
     return (
         reports.drop(columns=["Lat", "Lon"])
@@ -82,9 +82,9 @@ def parse_all(table: pd.DataFrame, drop_no_turbulence: bool = True) -> pd.DataFr
 
 
 def compute_grid(report: pd.DataFrame) -> npt.NDArray:
-    from consts import GRID_RANGE
+    from consts import GRID_RANGE, MAP_RANGE
 
-    grid = np.zeros((GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]))
+    grid = np.full((GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan)
 
     from pirep.defs.report import Location, Altitude, Aircraft, Turbulence
 
@@ -108,13 +108,23 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
         from utils.convert import convert_coord as convert
 
         # TODO fix gridding (no AOE and fix altitudes)
+        alt_min_idx = np.abs(np.array(MAP_RANGE["ALT"]["RANGE"]) - alt.min).argmin()
+        if MAP_RANGE["ALT"]["RANGE"][alt_min_idx] > alt.min:
+            alt_min_idx = max(alt_min_idx - 1, 0)
+        
+        alt_max_idx = np.abs(np.array(MAP_RANGE["ALT"]["RANGE"]) - alt.max).argmin()
+        if MAP_RANGE["ALT"]["RANGE"][alt_max_idx] < alt.max:
+            alt_max_idx = min(alt_max_idx + 1, len(MAP_RANGE["ALT"]["RANGE"]))
+
         grid[
             convert(loc.lat, "LAT") - AREA_OF_EFFECT : convert(loc.lat, "LAT")
             + AREA_OF_EFFECT,
             convert(loc.lon, "LON") - AREA_OF_EFFECT : convert(loc.lon, "LON")
             + AREA_OF_EFFECT,
-            (alt.min // 500) : (alt.max // 500) + 1,
+            alt_min_idx : alt_max_idx + 1,
         ] = turbulence_index
+
+        print(report)
 
         return (grid, aircraft, intensity)
     else:
