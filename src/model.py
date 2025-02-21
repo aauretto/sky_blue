@@ -18,14 +18,15 @@ if __name__ == "__main__":
 
     # Fetch satellite data
     data = st.fetch_range(
-        start=dt.datetime(2025, 1, 19, 23, 59),
-        end=dt.datetime(2025, 1, 20, 00, 14),
+        start=dt.datetime(2024, 11, 6, 23, 54),
+        end=dt.datetime(2024, 11, 7, 00, 14),
         satellite=sat_east,
     )
 
     # Project data onto grid
     lats, lons = st.calculate_coordinates(data)
     band_data = st.fetch_bands(data, bands)
+    timestamps = pd.to_datetime(band_data.coords["t"])
     data = st.smooth(st.project(lats, lons, band_data.data))
 
     # TODO: take the timestamp associated with each frame, and choose the relevant PIREPs for each frame before binning them per-frame.
@@ -43,7 +44,7 @@ if __name__ == "__main__":
         pr.fetch(
             pr.url(
                 date_s=dt.datetime(2024, 11, 6, 23, 54, 0, tzinfo=dt.timezone.utc),
-                date_e=dt.datetime(2024, 11, 7, 0, 4, 0, tzinfo=dt.timezone.utc),
+                date_e=dt.datetime(2024, 11, 7, 0, 14, 0, tzinfo=dt.timezone.utc),
             )
         )
     )
@@ -55,12 +56,37 @@ if __name__ == "__main__":
             "Grid": reports.apply(pr.compute_grid, axis=1),
         }
     )
+    print(
+        [
+            abs((grids["Timestamp"] - timestamp) / pd.Timedelta(minutes=1))
+            for timestamp in timestamps
+        ]
+    )
 
     # TODO: Spread the PIREPs here
-    labels = np.sum(grids["Grid"].apply(lambda x: x[0]).to_numpy(), axis=0)
+    # labels = np.zeros(
+    #     (
+    #         data.shape[0],
+    #         consts.GRID_RANGE["LAT"],
+    #         consts.GRID_RANGE["LON"],
+    #         consts.GRID_RANGE["ALT"],
+    #     )
+    # )
+    labels = np.array(
+        [
+            np.max(
+                grids[(grids["Timestamp"] - timestamp) / pd.Timedelta(minutes=1)][
+                    "Grid"
+                ].to_numpy(),
+                axis=0,
+            )
+            for timestamp in timestamps
+        ]
+    )
+    print(labels.shape)
 
     assert labels.shape == (
-        # data.shape[0],
+        data.shape[0],
         consts.GRID_RANGE["LAT"],
         consts.GRID_RANGE["LON"],
         consts.GRID_RANGE["ALT"],  # TODO: Change when the altitude range is modified
@@ -98,8 +124,9 @@ if __name__ == "__main__":
     )
 
     model.summary()
-
-    model.fit(X, y, epochs=..., batch_size=...)
+    print(X.shape)
+    print(y.shape)
+    model.fit(X, y, epochs=10, batch_size=32)
 
     # model.evaluate(): To calculate the loss values for the input data
     # model.predict(): To generate network output for the input data

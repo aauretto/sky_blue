@@ -3,6 +3,7 @@ import pandas as pd
 import numpy as np
 import numpy.typing as npt
 
+
 def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
     from urllib import parse
     from pirep.sources import SRC_PIREPS
@@ -45,7 +46,7 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
     from pirep.defs.altitude import Altitude, AltitudeError
     import traceback
 
-    print(f"\x1b[1K\r{row["Report"]}", end="")
+    # print(f"\x1b[1K\r{row['Report']}", end="")
 
     try:
         report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
@@ -111,7 +112,7 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
         alt_min_idx = np.abs(np.array(MAP_RANGE["ALT"]["RANGE"]) - alt.min).argmin()
         if MAP_RANGE["ALT"]["RANGE"][alt_min_idx] > alt.min:
             alt_min_idx = max(alt_min_idx - 1, 0)
-        
+
         alt_max_idx = np.abs(np.array(MAP_RANGE["ALT"]["RANGE"]) - alt.max).argmin()
         if MAP_RANGE["ALT"]["RANGE"][alt_max_idx] < alt.max:
             alt_max_idx = min(alt_max_idx + 1, len(MAP_RANGE["ALT"]["RANGE"]))
@@ -124,7 +125,7 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
             alt_min_idx : alt_max_idx + 1,
         ] = turbulence_index
 
-        print(report)
+        # print(report)
 
         return (grid, aircraft, intensity)
     else:

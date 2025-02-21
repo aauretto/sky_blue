@@ -1,5 +1,6 @@
 from pydantic import BaseModel
 from scipy import constants as u
+import pandas as pd
 from math import radians, degrees, sin, cos, asin, atan2
 import re
 from ..sources import SRC_AIRPORTS, SRC_NAVAIDS
@@ -45,6 +46,9 @@ DIRECTIONS = {
     "NW": 315,
     "NNW": 337.5,
 }
+
+AIRPORT_CODES = pd.read_csv(SRC_AIRPORTS)
+NAVAID_CODES = pd.read_csv(SRC_NAVAIDS)
 
 
 class CodeError(Exception):
@@ -99,29 +103,24 @@ class Location(BaseModel):
 
     @staticmethod
     def convert_code(code: str):
-        import pandas as pd
-
-        airport_codes = pd.read_csv(SRC_AIRPORTS)
-        navaid_codes = pd.read_csv(SRC_NAVAIDS)
-
         match len(code):
             case 3:
-                results = airport_codes[
-                    (airport_codes["iata_code"] == code)
-                    | (airport_codes["local_code"] == code)
+                results = AIRPORT_CODES[
+                    (AIRPORT_CODES["iata_code"] == code)
+                    | (AIRPORT_CODES["local_code"] == code)
                 ]
 
             case 4:
-                results = airport_codes[
-                    (airport_codes["icao_code"] == code)
-                    | (airport_codes["gps_code"] == code)
+                results = AIRPORT_CODES[
+                    (AIRPORT_CODES["icao_code"] == code)
+                    | (AIRPORT_CODES["gps_code"] == code)
                 ]
 
             case _:
                 raise CodeError(code)
 
         if len(results) == 0:
-            results = navaid_codes[navaid_codes["ident"] == code]
+            results = NAVAID_CODES[NAVAID_CODES["ident"] == code]
 
         if len(results) == 0:
             raise CodeError(code)
