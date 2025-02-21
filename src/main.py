@@ -31,21 +31,17 @@ if __name__ == "__main__":
         }
     )
 
-
     grid, aircraft, intensity = grids["Grid"][1]
     vertical_spread(grid, intensity)
     fig = plt.figure()
     vals = np.argwhere(~np.isnan(grid))
 
-    vals = vals[vals[:,2].argsort()]
+    vals = vals[vals[:, 2].argsort()]
     points = [grid[*val] for val in vals]
     plt.plot(vals[:, 2], points)
 
     plt.savefig("./vertical_spread.png", dpi=300, bbox_inches="tight")
     print(reports[1])
-
-
-
 
     # # Initialize satellites
     # sat_east = GOES(satellite=16, product="ABI", domain="C")
