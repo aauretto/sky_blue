@@ -1,3 +1,6 @@
+# Chosen as shown for now, #TODO decide if this is any good
+BACKGROUND_RISK = 0.0001 # smallest lookup turb risk = .1, smallest scale value for that is 1% so .001, then we said 10% of that
+
 # Map Range
 
 MAP_RANGE = {

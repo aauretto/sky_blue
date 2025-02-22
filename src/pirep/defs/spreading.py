@@ -2,28 +2,19 @@ import numpy as np
 from consts import MAP_RANGE
 from scipy import constants as u
 
-"""
-How are we gonna spread?
-
-1 fx for each severity {NONE, LIGHT, MOD, SEVERE} based on colorful graphs from paper that WxExt sent us (in dis)
-
-Each function takes:
-    (grid , aircraft type , severity) => implies compute_grid needs to return this tuple or aircraft/severity needs to come from elsewhere.
-
-That funciton:
-1) looks into the grid for the point that is nonzero, ie contains the risk val from the lookup table in
-   the locaiton the pirep was reported.
-2) Define some mathematical curve that depends on distance from the src point (from (1)) in x and z
-3) apply that curve to each point on the grid
-
-
-ALSO we want to define three regions in latitude that each have their own unit conversion from DEG => KM to account for wonky we live on a sphere stuff
-
-"""
-
 # Data Source: https://journals.ametsoc.org/view/journals/bams/aop/BAMS-D-23-0142.1/BAMS-D-23-0142.1.pdf
 
 ### Altitudinal Computations ### Taken from the page 14 graphs of the source above
+
+from pirep.defs.generate_spreading_arrays import create_radial_grid
+
+# Disks that represent risk of turbulence relative to the point the pirep was reported at.
+RADIAL_KERNELS = {
+    'NEG' : create_radial_grid('NEG'),
+    'LGT' : create_radial_grid('LGT'),
+    'MOD' : create_radial_grid('MOD'),
+    'SEV' : create_radial_grid("SEV")
+}
 
 ALT_RISKS = {
 
@@ -60,7 +51,6 @@ def vertical_spread(grid, intensity):
     base_risk = grid[lat][lon][alt_min_idx]
 
     for i in range(len(MAP_RANGE["ALT"]["RANGE"])):
-        print(i, alt_min_idx, alt_max_idx)
         if i < alt_min_idx:   # Spread down
             # i => (ft -> km) => Risk (from table, snap to ceil)
             dist_km = (MAP_RANGE["ALT"]["RANGE"][i] - MAP_RANGE["ALT"]["RANGE"][alt_min_idx]) * (u.foot / u.kilo)
@@ -69,11 +59,49 @@ def vertical_spread(grid, intensity):
             dist_km = (MAP_RANGE["ALT"]["RANGE"][i] - MAP_RANGE["ALT"]["RANGE"][alt_max_idx]) * (u.foot / u.kilo)
         else:                 # In alt band contained in pirep, dont modify turb risk
             continue
-        print(f"{dist_km=} ")
         idx = np.abs(ALT_RISKS[intensity][0] - dist_km).argmin()
         if ALT_RISKS[intensity][0][idx] < dist_km:
             idx = idx + 1
         
         grid[lat][lon][i] = ALT_RISKS[intensity][1][idx] * base_risk
-    print(grid[lat][lon][:])
 
+
+
+def radial_spread(grid, intensity):
+    kernel = RADIAL_KERNELS[intensity]
+    vals = np.argwhere(~np.isnan(grid))
+    # All vals are in a vertical column so pos of pirep in lat,lon is same across all vals
+    lat, lon, _ = vals[0]
+
+    # max sizes of axes for grid we are modifying and kernel we are applying to it
+    g_lat_shp, g_lon_shp, g_alt_shp = grid.shape
+    k_lat_shp, k_lon_shp = kernel.shape
+
+    k_lat_center, k_lon_center = k_lat_shp // 2, k_lon_shp // 2
+
+    
+    # Slicing bounds on the grid
+    g_lat_min = max(0        , lat - k_lat_shp // 2)
+    g_lat_max = min(g_lat_shp, lat + k_lat_shp // 2 + 1)
+    g_lon_min = max(0        , lon - k_lon_shp // 2)
+    g_lon_max = min(g_lon_shp, lon + k_lon_shp // 2 + 1)
+
+    # Slicing bounds for kernel
+    k_lat_min = k_lat_center - (lat - g_lat_min)
+    k_lat_max = k_lat_center + (g_lat_max - lat)
+    k_lon_min = k_lon_center - (lon - g_lon_min)
+    k_lon_max = k_lon_center + (g_lon_max - lon)
+
+    # apply radial spread to each altitude level with a risk value in it
+    for val in vals:
+        alt = val[2]
+        risk = grid[*val]
+        grid[g_lat_min:g_lat_max, g_lon_min:g_lon_max, alt] = risk * kernel[k_lat_min:k_lat_max, k_lon_min:k_lon_max]
+        
+
+
+
+
+    
+
+    
