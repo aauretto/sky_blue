@@ -13,7 +13,7 @@ RUN apt update
 RUN apt -y install software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt update
-RUN apt -y install python3.13-full
+RUN apt -y install python3.12-full
 
 # RUN rm -rf /var/lib/apt/lists/*
 
@@ -27,8 +27,8 @@ WORKDIR /skyblue
 COPY . /skyblue
 
 # Install pip requirements
-RUN python3.13 -m ensurepip --upgrade
-RUN python3.13 -m pip install -r requirements.txt
+RUN python3.12 -m ensurepip --upgrade
+RUN python3.12 -m pip install -r requirements.txt
 
 # During debugging, this entry point will be overridden. For more information, please refer to https://aka.ms/vscode-docker-python-debug
 # CMD ["python", "src\main.py"]
