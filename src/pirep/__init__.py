@@ -104,7 +104,6 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
             aircraft, TURBULENCE_INDEXES[Aircraft.LGT]
         )[intensity]  # WARNING be careful of LGT default
 
-        from pirep.consts import AREA_OF_EFFECT
         from utils.convert import convert_coord as convert
 
         # TODO fix gridding (no AOE and fix altitudes)
@@ -117,10 +116,8 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
             alt_max_idx = min(alt_max_idx + 1, len(MAP_RANGE["ALT"]["RANGE"]))
 
         grid[
-            convert(loc.lat, "LAT") - AREA_OF_EFFECT : convert(loc.lat, "LAT")
-            + AREA_OF_EFFECT,
-            convert(loc.lon, "LON") - AREA_OF_EFFECT : convert(loc.lon, "LON")
-            + AREA_OF_EFFECT,
+            convert(loc.lat, "LAT") : convert(loc.lat, "LAT") + 1,
+            convert(loc.lon, "LON") : convert(loc.lon, "LON") + 1,
             alt_min_idx : alt_max_idx + 1,
         ] = turbulence_index
 

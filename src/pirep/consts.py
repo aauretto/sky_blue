@@ -1,9 +1,7 @@
 from pirep.defs.turbulence import Turbulence
 from pirep.defs.aircraft import Aircraft
 
-# Turbulence Index Lookup Table11
-
-TIME_OF_RELEVANCE = 15 # minutes
+# Turbulence Index Lookup Table
 
 TURBULENCE_INDEXES = {
     Aircraft.LGT: {
