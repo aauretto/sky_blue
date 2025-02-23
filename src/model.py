@@ -1,6 +1,6 @@
 from goes2go import GOES
 
-# from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split
 import datetime as dt
 import numpy as np
 from numpy import typing as npt
@@ -9,20 +9,17 @@ import keras
 import pirep as pr
 import satellite as st
 import consts as consts
+import tensorflow as tf
 
-if __name__ == "__main__":
-    # INPUT DATA
 
-    # Initialize satellite and bands
-    sat_east = GOES(satellite=16, product="ABI", domain="C")
-    bands = [8, 9, 10, 13, 14, 15]
-
+def get_data(
+    start: dt.datetime,
+    end: dt.datetime,
+    sat: GOES = GOES(satellite=16, product="ABI", domain="C"),
+    bands: list[int] = [8, 9, 10, 13, 14, 15],
+) -> tuple[npt.NDArray, npt.ArrayLike]:
     # Fetch satellite data
-    data = st.fetch_range(
-        start=dt.datetime(2024, 11, 6, 23, 54),
-        end=dt.datetime(2024, 11, 7, 00, 14),
-        satellite=sat_east,
-    )
+    data = st.fetch_range(start, end, satellite=sat)
 
     # Project data onto grid
     lats, lons = st.calculate_coordinates(data)
@@ -36,17 +33,17 @@ if __name__ == "__main__":
         len(bands),
     )
 
-    # INPUT LABELS
+    return data, timestamps
 
+
+def get_labels(
+    start: dt.datetime,
+    end: dt.datetime,
+    num_frames: int,
+    timestamps: npt.ArrayLike,
+) -> npt.NDArray:
     # Retrieve PIREPs
-    reports: pd.DataFrame = pr.parse_all(
-        pr.fetch(
-            pr.url(
-                date_s=dt.datetime(2024, 11, 6, 23, 54, 0, tzinfo=dt.timezone.utc),
-                date_e=dt.datetime(2024, 11, 7, 0, 14, 0, tzinfo=dt.timezone.utc),
-            )
-        )
-    )
+    reports: pd.DataFrame = pr.parse_all(pr.fetch(pr.url(start, end)))
 
     # Convert reports to grids
     grids = pd.DataFrame(
@@ -56,10 +53,9 @@ if __name__ == "__main__":
         }
     )
 
-    # TODO: Spread the PIREPs here
     labels = np.zeros(
         (
-            data.shape[0],
+            num_frames,
             consts.GRID_RANGE["LAT"],
             consts.GRID_RANGE["LON"],
             consts.GRID_RANGE["ALT"],
@@ -68,51 +64,98 @@ if __name__ == "__main__":
     for i, timestamp in enumerate(timestamps[:1]):
         mask = np.abs((grids["Timestamp"] - timestamp) / pd.Timedelta(minutes=1)) <= 15
         window = np.array(grids.loc[mask]["Grid"].tolist())
-        binned_window = np.max(window, axis=0)
+        binned_window = np.max(window, axis=0)  # TODO: Spread the PIREPs here
         labels[i] = binned_window
 
     assert labels.shape == (
-        data.shape[0],
+        num_frames,
         consts.GRID_RANGE["LAT"],
         consts.GRID_RANGE["LON"],
         consts.GRID_RANGE["ALT"],  # TODO: Change when the altitude range is modified
     )
 
-    # MODEL TRAINING
+    return labels
 
-    # Input: some kind of time series
-    X = data
-    y = labels
-    # X_train, X_test, y_train, y_test = train_test_split(
-    #     X, y, test_size=0.33, random_state=42
-    # )
 
+def get_windows(data: npt.NDArray, width: int, offset: int):
+    # data.shape = (n, 1500, 2500, 6)
+    # data_output.shape = (k, (w, 1500, 2500, 6))
+    num_frames = data.shape[0]
+    num_windows = (num_frames - width) // offset + 1
+    data_windows = np.array(
+        [data[idx * offset : idx * offset + width, :] for idx in range(num_windows)]
+    )
+
+    return data_windows
+
+
+def model_initializer():
     # Model parameters
-    num_classes = 2
-    input_shape = (3, 1500, 2500, 6)
+    num_classes = 14
+    out_steps = 4  # how many time units outward to predict
 
     model = keras.Sequential(
         [
-            keras.layers.Input(shape=input_shape),
-            # keras.layers.Conv2D(64, kernel_size=(3, 3), activation="relu"),
-            # keras.layers.Conv2D(64, kernel_size=(3, 3), activation="relu"),
-            # keras.layers.MaxPooling2D(pool_size=(2, 2)),
-            # keras.layers.Conv2D(128, kernel_size=(3, 3), activation="relu"),
-            # keras.layers.Conv2D(128, kernel_size=(3, 3), activation="relu"),
-            # keras.layers.GlobalAveragePooling2D(),
-            # keras.layers.Dropout(0.5),
-            keras.layers.Dense(num_classes, activation="softmax"),
+            # Shape => [batch, out_steps, lats * lons * alts].
+            keras.layers.Reshape(
+                [
+                    out_steps,
+                    consts.GRID_RANGE["LAT"] * consts.GRID_RANGE["LON"] * 6,
+                ]
+            ),
+            # Shape [batch, time, features] => [batch, lstm_units].
+            # Adding more `lstm_units` just overfits more quickly.
+            keras.layers.LSTM(
+                units=consts.GRID_RANGE["LAT"] * consts.GRID_RANGE["LON"] * num_classes
+            ),
+            # Shape => [batch, out_steps*features].
+            keras.layers.Dense(
+                consts.GRID_RANGE["LAT"] * consts.GRID_RANGE["LON"] * num_classes,
+                kernel_initializer=tf.zeros_initializer(),
+            ),
+            # Shape => [batch, out_steps, features].
+            keras.layers.Reshape(
+                [
+                    out_steps,
+                    consts.GRID_RANGE["LAT"],
+                    consts.GRID_RANGE["LON"],
+                    num_classes,
+                ]
+            ),
         ]
     )
 
     # Compile the model
     model.compile(
-        optimizer="adam", loss="categorical_crossentropy", metrics=["accuracy"]
+        loss=keras.losses.MeanSquaredError(),
+        optimizer=keras.optimizers.Adam(),
+        metrics=[keras.metrics.MeanAbsoluteError()],
     )
 
-    model.summary()
+    # model.summary()
+    return model
+
+
+if __name__ == "__main__":
+    start = dt.datetime(2024, 11, 6, 0, 0)
+    end = dt.datetime(2024, 11, 6, 1, 0)
+
+    data, timestamps = get_data(start, end)
+    labels = get_labels(start, end, data.shape[0], timestamps)
+
+    data_windows = get_windows(data, 4, 2)
+    label_windows = get_windows(labels, 4, 2)
+
+    # MODEL TRAINING
+    X = data_windows
+    y = label_windows
+    X_train, X_test, y_train, y_test = train_test_split(
+        X, y, test_size=0.33, random_state=42
+    )
+
+    model = model_initializer()
     print(f"X: {X.shape}, y: {y.shape}")
-    model.fit(X, y, epochs=10, batch_size=32)
+    model.fit(X_train, y_train, epochs=10, batch_size=32)
 
     # model.evaluate(): To calculate the loss values for the input data
     # model.predict(): To generate network output for the input data
