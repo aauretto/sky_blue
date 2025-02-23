@@ -5,7 +5,7 @@ import pandas as pd
 import pirep as pr
 import satellite as st
 from goes2go import GOES
-from pirep.defs.spreading import vertical_spread
+from pirep.defs.spreading import vertical_spread, radial_spread
 import numpy as np
 from matplotlib import pyplot as plt
 
@@ -31,17 +31,39 @@ if __name__ == "__main__":
         }
     )
 
-    grid, aircraft, intensity = grids["Grid"][1]
-    vertical_spread(grid, intensity)
-    fig = plt.figure()
-    vals = np.argwhere(~np.isnan(grid))
+    grid, _aircraft, intensity = grids["Grid"].iloc[0]
 
-    vals = vals[vals[:, 2].argsort()]
-    points = [grid[*val] for val in vals]
-    plt.plot(vals[:, 2], points)
+    vertical_spread(grid, 'SEV')
+    radial_spread(grid, 'SEV')
 
-    plt.savefig("./vertical_spread.png", dpi=300, bbox_inches="tight")
-    print(reports[1])
+    x, y, z = np.indices(grid.shape)
+    x, y, z, values = x.flatten(), y.flatten(), z.flatten(), grid.flatten()
+
+
+    fig = plt.figure(figsize=(8, 8))
+    ax = fig.add_subplot(111, projection='3d')
+    sc = ax.scatter(x, y, z, c=values, cmap='viridis', s=1, alpha=.5)  # Adjust alpha for transparency
+    ax.set_facecolor('black')
+    ax.tick_params(axis='x', colors='white')  
+    ax.tick_params(axis='y', colors='white') 
+    ax.tick_params(axis='z', colors='white')
+    # ax.set_xlim(0, 1500)
+    # ax.set_ylim(0, 2500)
+
+
+    # Add color bar
+    plt.colorbar(sc)
+
+    plt.show()
+
+    # fig = plt.figure()
+    # vals = np.argwhere(~np.isnan(grid))
+
+    # vals = vals[vals[:, 2].argsort()]
+    # points = [grid[*val] for val in vals]
+    # plt.plot(vals[:, 2], points)
+
+    # plt.savefig("./vertical_spread.png", dpi=300, bbox_inches="tight")
 
     # # Initialize satellites
     # sat_east = GOES(satellite=16, product="ABI", domain="C")
