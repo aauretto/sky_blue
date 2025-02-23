@@ -87,4 +87,26 @@ if __name__ == "__main__":
     print("Fetched Bands")
     lats, lons = st.calculate_coordinates(data)
     print("Calced Coords")
-    projected_data = st.smooth(st.project(lats, lons, band_data.data))
+    unsmoothed_data = st.project(lats, lons, band_data.data)
+    print(f"{unsmoothed_data.shape=}")
+    datum = unsmoothed_data[0, :, :, 0]
+    print(f"{datum.shape=}")
+
+
+
+
+    projected_data = st.smooth(datum)
+    fig = plt.figure(figsize=(15, 12))
+    ax_east = fig.add_subplot(1, 1, 1)
+    ax_east.pcolormesh(projected_data)
+    plt.show()
+    plt.clf()
+
+    # print(f"{projected_data.shape=}")
+    # num_bands = projected_data.shape[3]
+    # for i in range(num_bands):
+    #     fig = plt.figure(figsize=(15, 12))
+    #     ax_east = fig.add_subplot(1, 1, 1)
+    #     ax_east.pcolormesh(projected_data[0][:, :][i])
+    #     plt.show()
+    #     plt.clear()

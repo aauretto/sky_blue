@@ -98,19 +98,36 @@ def project(
     print("Returning Projection")
     return data
 
-#TODO verify that the output is still correct now that we have mutli bands and multi files
+#TODO verify that the output is still correct now that we have multi bands and multi files
 def smooth(data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike:
     from scipy.ndimage import distance_transform_edt
-    num_files = data.shape[0]
 
-    for i in range(num_files):
-        empty_mask = data[i] <= 0
-        indices = distance_transform_edt(
-            empty_mask, return_distances=False, return_indices=True
-        )
-        data[i][empty_mask] = data[i][tuple(indices[:, empty_mask])]
+    empty_mask = data <= 0
+    filled = data.copy()
+    indices = distance_transform_edt(
+        empty_mask, return_distances=False, return_indices=True
+    )
+    filled[empty_mask] = data[tuple(indices[:, empty_mask])]
+    return filled
+    
+    num_files = data.shape[0] 
+    num_bands = data.shape[3]
 
-    return data
+    # for file in range(num_files):
+    #     for band in range(num_bands):
+    #         print(data[file][:, :, band].shape)
+    #         empty_mask = data[file][:, :, band] <= 0
+    #         print(f'{empty_mask.shape=}')
+    #         indices = distance_transform_edt(
+    #             empty_mask, return_distances=False, return_indices=True
+    #         )
+    #         print(f"{indices.shape=}")
+    #         # data[file][empty_mask, band] = data[file][tuple(indices[:, empty_mask]), band]
+    #         slices = indices[:, empty_mask]
+    #         print(f"{slices.shape=}")
+    #         data[file][empty_mask, band] = data[file][slices, band]
+
+    return filled
 
 
 def union_sat_data(
