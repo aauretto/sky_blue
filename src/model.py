@@ -71,7 +71,7 @@ def get_labels(
         num_frames,
         consts.GRID_RANGE["LAT"],
         consts.GRID_RANGE["LON"],
-        consts.GRID_RANGE["ALT"],  # TODO: Change when the altitude range is modified
+        consts.GRID_RANGE["ALT"],  # TODO: Change when the altitude range is modified (Note from Simon: it has been modified, but this line should still work)
     )
 
     return labels
