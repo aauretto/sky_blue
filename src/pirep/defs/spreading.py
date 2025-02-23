@@ -36,6 +36,13 @@ ALT_RISKS = {
 ])
 }
 
+
+def spread_pirep(grid, intensity):
+    vertical_spread(grid, intensity)
+    radial_spread(grid, intensity)
+
+
+
 # Expects a grid of shape (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"])
 # where every cell is np.nan except a single vertical column
 def vertical_spread(grid, intensity):
