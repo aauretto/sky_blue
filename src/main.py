@@ -18,7 +18,7 @@ if __name__ == "__main__":
         pr.fetch(
             pr.url(
                 date_s=dt.datetime(2024, 11, 6, 23, 54, 0),
-                date_e=dt.datetime(2024, 11, 7, 0, 0, 0),
+                date_e=dt.datetime(2024, 11, 7, 0, 0, 0)
             )
         )
     )
@@ -76,10 +76,15 @@ if __name__ == "__main__":
         dt.datetime(2024, 11, 6, 1, 0),
         sat_east,
     )
+    #Work
+    # data = st.fetch_range(
+    #     dt.datetime(2025, 1, 19, 23, 59),
+    #     dt.datetime(2025, 1, 20, 00, 14),
+    #     sat_east,
+    # )
     print("Fetched Range")
     band_data = st.fetch_bands(data, bands)
     print("Fetched Bands")
     lats, lons = st.calculate_coordinates(data)
     print("Calced Coords")
     projected_data = st.smooth(st.project(lats, lons, band_data.data))
-    print(projected_data.shape)
