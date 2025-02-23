@@ -11,11 +11,8 @@ def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
     # URL parameters
     params = {
         # Convert dates to Zulu time
-         # TODO QUOI the change (BUG)
-        # "sts": date_s.isoformat() + "Z",
-        # "ets": date_e.isoformat() + "Z",
-        "sts": date_s.isoformat().replace("+00:00", "Z"),
-        "ets": date_e.isoformat().replace("+00:00", "Z"),
+        "sts": date_s.isoformat() + "Z",
+        "ets": date_e.isoformat() + "Z",
         "artcc": "_ALL",  # Fetch from all ATCs
         "fmt": "csv",
     }
@@ -107,10 +104,8 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
             aircraft, TURBULENCE_INDEXES[Aircraft.LGT]
         )[intensity]  # WARNING be careful of LGT default
 
-        from pirep.consts import AREA_OF_EFFECT
         from utils.convert import convert_coord as convert
 
-        # TODO fix gridding (no AOE and fix altitudes)
         alt_min_idx = np.abs(np.array(MAP_RANGE["ALT"]["RANGE"]) - alt.min).argmin()
         if MAP_RANGE["ALT"]["RANGE"][alt_min_idx] > alt.min:
             alt_min_idx = max(alt_min_idx - 1, 0)
@@ -120,10 +115,8 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
             alt_max_idx = min(alt_max_idx + 1, len(MAP_RANGE["ALT"]["RANGE"]))
 
         grid[
-            convert(loc.lat, "LAT") - AREA_OF_EFFECT : convert(loc.lat, "LAT")
-            + AREA_OF_EFFECT,
-            convert(loc.lon, "LON") - AREA_OF_EFFECT : convert(loc.lon, "LON")
-            + AREA_OF_EFFECT,
+            convert(loc.lat, "LAT") : convert(loc.lat, "LAT"),
+            convert(loc.lon, "LON") : convert(loc.lon, "LON"),
             alt_min_idx : alt_max_idx + 1,
         ] = turbulence_index
 

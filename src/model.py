@@ -44,7 +44,7 @@ def get_labels(
 ) -> npt.NDArray:
     # Retrieve PIREPs
     reports: pd.DataFrame = pr.parse_all(pr.fetch(pr.url(start, end)))
-    print("WE DID NOT CRASH")
+    print("Parsed reports")
     # Convert reports to grids
     grids = pd.DataFrame(
         {
@@ -52,7 +52,8 @@ def get_labels(
             "Grid": reports.apply(pr.compute_grid, axis=1).apply(lambda x: x[0]),
         }
     )
-
+    # TODO: Spread the PIREPs here
+    print("Computed grids")
     labels = np.zeros(
         (
             num_frames,
@@ -61,17 +62,18 @@ def get_labels(
             consts.GRID_RANGE["ALT"],
         )
     )
+    print("zeroed numpy")
     for i, timestamp in enumerate(timestamps[:1]):
-        mask = np.abs((grids["Timestamp"] - timestamp) / pd.Timedelta(minutes=1)) <= 15
+        mask = np.abs((grids["Timestamp"] - timestamp) / pd.Timedelta(minutes=1)) <= 15 #todo why 15 what is this
         window = np.array(grids.loc[mask]["Grid"].tolist())
-        binned_window = np.max(window, axis=0)  # TODO: Spread the PIREPs here
+        binned_window = np.max(window, axis=0)  # TODO: Merge the PIREPs here
         labels[i] = binned_window
-
+    print("enumerated timestamps")
     assert labels.shape == (
         num_frames,
         consts.GRID_RANGE["LAT"],
         consts.GRID_RANGE["LON"],
-        consts.GRID_RANGE["ALT"],  # TODO: Change when the altitude range is modified (Note from Simon: it has been modified, but this line should still work)
+        consts.GRID_RANGE["ALT"],  
     )
 
     return labels

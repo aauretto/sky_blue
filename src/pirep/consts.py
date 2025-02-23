@@ -1,12 +1,9 @@
 from pirep.defs.turbulence import Turbulence
 from pirep.defs.aircraft import Aircraft
 
-# Prediction Parameters
+# Turbulence Index Lookup Table11
 
-TIME_OF_EFFECT = 5  # minutes, ±
-AREA_OF_EFFECT = 5  # grid cells
-
-# Turbulence Index Lookup Table
+TIME_OF_RELEVANCE = 15 # minutes
 
 TURBULENCE_INDEXES = {
     Aircraft.LGT: {
