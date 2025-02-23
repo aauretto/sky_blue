@@ -9,7 +9,7 @@ To build our image from the top level of the GitHub Repository (aka skyblue) do 
 To run the container, do this command: `docker run -it --rm -v ${PWD}:/skyblue/ skyblue_dev:latest`
 The above command needs to be run from the skyblue directory on your computer and will sync the container files with local ones
 
-If there build problems try running `docker system prune` -- Should never be the problem but its basically free to try.
+If there are build problems try running `docker system prune` -- Should never be the problem but its basically free to try.
 
 When we run our code on the HPC, we need to push to Docker Hub so that we can then pull the latest version
 on the HPC. The Tufts HPC uses singularity instead of docker, so we need to run singularity pull docker://papillonlibre/tufts_capstone_skyblue:latest.

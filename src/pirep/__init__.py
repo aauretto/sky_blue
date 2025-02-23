@@ -11,8 +11,11 @@ def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
     # URL parameters
     params = {
         # Convert dates to Zulu time
-        "sts": date_s.isoformat() + "Z",
-        "ets": date_e.isoformat() + "Z",
+         # TODO QUOI the change (BUG)
+        # "sts": date_s.isoformat() + "Z",
+        # "ets": date_e.isoformat() + "Z",
+        "sts": date_s.isoformat().replace("+00:00", "Z"),
+        "ets": date_e.isoformat().replace("+00:00", "Z"),
         "artcc": "_ALL",  # Fetch from all ATCs
         "fmt": "csv",
     }
@@ -73,7 +76,6 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
 def parse_all(table: pd.DataFrame, drop_no_turbulence: bool = True) -> pd.DataFrame:
     # TODO: use the drop_no_turbulence parameter
 
-    # TODO need the dataframe to reindex after dropping
     reports: pd.DataFrame = table.apply(parse, axis=1)
     return (
         reports.drop(columns=["Lat", "Lon"])

@@ -44,7 +44,7 @@ def get_labels(
 ) -> npt.NDArray:
     # Retrieve PIREPs
     reports: pd.DataFrame = pr.parse_all(pr.fetch(pr.url(start, end)))
-
+    print("WE DID NOT CRASH")
     # Convert reports to grids
     grids = pd.DataFrame(
         {
@@ -141,11 +141,12 @@ if __name__ == "__main__":
     end = dt.datetime(2024, 11, 6, 1, 0)
 
     data, timestamps = get_data(start, end)
+    print("DATA has been retrieved")
     labels = get_labels(start, end, data.shape[0], timestamps)
-
+    print("LABELS have been retrieved")
     data_windows = get_windows(data, 4, 2)
     label_windows = get_windows(labels, 4, 2)
-
+    print("WINDOWS have been retrieved")
     # MODEL TRAINING
     X = data_windows
     y = label_windows

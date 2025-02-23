@@ -78,7 +78,7 @@ def project(
 ) -> npt.ArrayLike | npt.DTypeLike:
     from consts import MAP_RANGE, GRID_RANGE
     from utils.convert import convert_coord as convert
-
+    print("Starting Projection")
     # Create coordinate mask
     lat_mask = (lat >= MAP_RANGE["LAT"]["MIN"]) & (lat <= MAP_RANGE["LAT"]["MAX"])
     lon_mask = (lon >= MAP_RANGE["LON"]["MIN"]) & (lon <= MAP_RANGE["LON"]["MAX"])
@@ -95,20 +95,33 @@ def project(
     )
     data[:, rows, cols, :] = temps
 
+    print("Returning Projection")
     return data
 
-
+#TODO verify that the output is still correct now that we have mutli bands and multi files
 def smooth(data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike:
     from scipy.ndimage import distance_transform_edt
+    print(f"Starting Smooth {data.shape=}")
+    num_files = data.shape[0]
 
-    empty_mask = data <= 0
-    filled_data = data.copy()
-    indices = distance_transform_edt(
-        empty_mask, return_distances=False, return_indices=True
-    )
-    filled_data[empty_mask] = data[tuple(indices[:, empty_mask])]
+    #TODO remove timing
+    import time
+    start = time.perf_counter()
 
-    return filled_data
+    for i in range(num_files):
+        empty_mask = data[i] <= 0
+        print("Starting Dist Transform")
+        indices = distance_transform_edt(
+            empty_mask, return_distances=False, return_indices=True
+        )
+        print("Ended Dist Transform")
+        data[i][empty_mask] = data[i][tuple(indices[:, empty_mask])]
+
+    end = time.perf_counter()
+    elapsed_time = end - start  # Compute duration
+    print(f"Elapsed time: {elapsed_time} seconds")
+    print("Returning Smooth")
+    return data
 
 
 def union_sat_data(

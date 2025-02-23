@@ -65,16 +65,26 @@ if __name__ == "__main__":
 
     # plt.savefig("./vertical_spread.png", dpi=300, bbox_inches="tight")
 
-    # # Initialize satellites
-    # sat_east = GOES(satellite=16, product="ABI", domain="C")
-    # bands = [8, 9, 10, 13, 14, 15]
+    # Initialize satellites
+    sat_east = GOES(satellite=16, product="ABI", domain="C")
+    bands = [8, 9, 10, 13, 14, 15]
 
-    # # Fetch satellite data and project onto grid
+    # Fetch satellite data and project onto grid
+    print("About to Fetch Range")
+    data = st.fetch_range(
+        dt.datetime(2024, 11, 6, 0, 30),
+        dt.datetime(2024, 11, 6, 1, 0),
+        sat_east,
+    )
+    #Work
     # data = st.fetch_range(
     #     dt.datetime(2025, 1, 19, 23, 59),
     #     dt.datetime(2025, 1, 20, 00, 14),
     #     sat_east,
     # )
-    # band_data = st.fetch_bands(data, bands)
-    # lats, lons = st.calculate_coordinates(data)
-    # projected_data = st.smooth(st.project(lats, lons, band_data.data))
+    print("Fetched Range")
+    band_data = st.fetch_bands(data, bands)
+    print("Fetched Bands")
+    lats, lons = st.calculate_coordinates(data)
+    print("Calced Coords")
+    projected_data = st.smooth(st.project(lats, lons, band_data.data))
