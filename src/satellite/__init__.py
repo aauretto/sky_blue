@@ -101,26 +101,15 @@ def project(
 #TODO verify that the output is still correct now that we have mutli bands and multi files
 def smooth(data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike:
     from scipy.ndimage import distance_transform_edt
-    print(f"Starting Smooth {data.shape=}")
     num_files = data.shape[0]
-
-    #TODO remove timing
-    import time
-    start = time.perf_counter()
 
     for i in range(num_files):
         empty_mask = data[i] <= 0
-        print("Starting Dist Transform")
         indices = distance_transform_edt(
             empty_mask, return_distances=False, return_indices=True
         )
-        print("Ended Dist Transform")
         data[i][empty_mask] = data[i][tuple(indices[:, empty_mask])]
 
-    end = time.perf_counter()
-    elapsed_time = end - start  # Compute duration
-    print(f"Elapsed time: {elapsed_time} seconds")
-    print("Returning Smooth")
     return data
 
 
