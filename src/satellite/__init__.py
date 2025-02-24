@@ -99,16 +99,29 @@ def project(
     return data
 
 #TODO verify that the output is still correct now that we have multi bands and multi files
+# TODO it is not
 def smooth(data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike:
     from scipy.ndimage import distance_transform_edt
 
     empty_mask = data <= 0
-    filled = data.copy()
     indices = distance_transform_edt(
-        empty_mask, return_distances=False, return_indices=True
-    )
-    filled[empty_mask] = data[tuple(indices[:, empty_mask])]
-    return filled
+            empty_mask, return_distances=False, return_indices=True
+        )
+    data[empty_mask] = data[tuple(indices[:, empty_mask])]
+    return data
+
+    band_num = data.shape[2]
+    for band in range(band_num):
+        datum = data[:, :, band]
+        print(f"{datum.shape=}")
+        print(band)
+        empty_mask = datum <= 0
+        indices = distance_transform_edt(
+            empty_mask, return_distances=False, return_indices=True
+        )
+        datum[empty_mask] = datum[tuple(indices[:, empty_mask])]
+        data[:, :, band] = datum
+    return data
     
     num_files = data.shape[0] 
     num_bands = data.shape[3]

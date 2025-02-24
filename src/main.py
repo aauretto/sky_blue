@@ -76,12 +76,7 @@ if __name__ == "__main__":
         dt.datetime(2024, 11, 6, 1, 0),
         sat_east,
     )
-    #Work
-    # data = st.fetch_range(
-    #     dt.datetime(2025, 1, 19, 23, 59),
-    #     dt.datetime(2025, 1, 20, 00, 14),
-    #     sat_east,
-    # )
+
     print("Fetched Range")
     band_data = st.fetch_bands(data, bands)
     print("Fetched Bands")
