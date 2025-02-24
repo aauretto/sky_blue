@@ -14,7 +14,6 @@ RUN apt -y install software-properties-common
 RUN add-apt-repository ppa:deadsnakes/ppa
 RUN apt update
 RUN apt -y install python3.12-full
-
 # RUN rm -rf /var/lib/apt/lists/*
 
 # Keeps Python from generating .pyc files in the container
