@@ -99,17 +99,34 @@ def project(
     return data
 
 #TODO verify that the output is still correct now that we have multi bands and multi files
-# TODO it is not
-def smooth(data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike:
+# Currently this smooths a single band in a single file *(MAY NOT WORK ON EVERY BAND)
+# Expects 1500 x 2500
+# want (F, 1500, 2500, b)
+#   F - num files
+#   B - num Bands
+# Seems like when we get multiple bands we are smoothing across multiple bands :(
+def smooth(all_data):
+    n_files = all_data.shape[0]
+    n_bands = all_data.shape[3]
+
+    for f in range(n_files):
+        for b in range(n_bands):
+            all_data[f, :, :, b] = smooth_single_band(all_data[f, :, :, b])
+    return all_data
+
+def smooth_single_band(data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike:
     from scipy.ndimage import distance_transform_edt
 
-    empty_mask = data <= 0
+    ## runs after projection, gets points that are in between buckets from 
+    #  projection AND things that are not inside frame of GOES E
+    empty_mask = data <= 0     # If band data is lt 0 then it may not work
     indices = distance_transform_edt(
             empty_mask, return_distances=False, return_indices=True
         )
     data[empty_mask] = data[tuple(indices[:, empty_mask])]
     return data
 
+    # SIMONS ATTEMPTS TO GET IT TO WORK WITH MULTIPLE BANDS
     band_num = data.shape[2]
     for band in range(band_num):
         datum = data[:, :, band]
@@ -123,6 +140,8 @@ def smooth(data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike
         data[:, :, band] = datum
     return data
     
+
+    # IF you get rid of the bands stuff it works for multiple files
     num_files = data.shape[0] 
     num_bands = data.shape[3]
 
