@@ -9,6 +9,8 @@ To build our image from the top level of the GitHub Repository (aka skyblue) do 
 To run the container, do this command: `docker run -it --rm -v ${PWD}:/skyblue/ skyblue_dev:latest`
 The above command needs to be run from the skyblue directory on your computer and will sync the container files with local ones
 
+To run, do python3.12 <fileName> to use the version of Python supported by the container.
+
 If there are build problems try running `docker system prune` -- Should never be the problem but its basically free to try.
 
 When we run our code on the HPC, we need to push to Docker Hub so that we can then pull the latest version
