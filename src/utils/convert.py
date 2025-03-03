@@ -7,7 +7,7 @@ import numpy.typing as npt
 def convert_coord(
     values: npt.ArrayLike | npt.DTypeLike, axis: str
 ) -> npt.ArrayLike | npt.DTypeLike:
-    from consts import MAP_RANGE, GRID_RANGE
+    from consts import GRID_RANGE, MAP_RANGE
 
     # Normalize the latitude values to the range [0, 1]
     normalized = (values - MAP_RANGE[axis]["MIN"]) / (

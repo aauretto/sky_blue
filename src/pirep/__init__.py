@@ -1,11 +1,13 @@
 import datetime as dt
-import pandas as pd
+
 import numpy as np
 import numpy.typing as npt
+import pandas as pd
 
 
 def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
     from urllib import parse
+
     from pirep.sources import SRC_PIREPS
 
     # URL parameters
@@ -41,10 +43,11 @@ def fetch(url: str) -> pd.DataFrame:
 
 
 def parse(row: pd.DataFrame) -> pd.DataFrame:
-    from pirep.defs.report import PilotReport, ReportError
-    from pirep.defs.location import CodeError
-    from pirep.defs.altitude import Altitude, AltitudeError
     import traceback
+
+    from pirep.defs.altitude import Altitude, AltitudeError
+    from pirep.defs.location import CodeError
+    from pirep.defs.report import PilotReport, ReportError
 
     # print(f"\x1b[1K\r{row['Report']}", end="")
 
@@ -86,7 +89,7 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
 
     grid = np.full((GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan)
 
-    from pirep.defs.report import Location, Altitude, Aircraft, Turbulence
+    from pirep.defs.report import Aircraft, Altitude, Location, Turbulence
 
     loc: Location = report["Location"]
     alt: Altitude = report["Altitude"]

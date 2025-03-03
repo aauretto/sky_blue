@@ -1,8 +1,9 @@
-import numpy as np
 import datetime as dt
-from goes2go import GOES
-from xarray import Dataset, DataArray
+
+import numpy as np
 import numpy.typing as npt
+from goes2go import GOES
+from xarray import DataArray, Dataset
 
 
 def fetch(timestamp: dt.datetime, satellite: GOES) -> Dataset:
@@ -76,7 +77,7 @@ def project(
     lon: npt.ArrayLike | npt.DTypeLike,
     temps: npt.ArrayLike | npt.DTypeLike,
 ) -> npt.ArrayLike | npt.DTypeLike:
-    from consts import MAP_RANGE, GRID_RANGE
+    from consts import GRID_RANGE, MAP_RANGE
     from utils.convert import convert_coord as convert
     print("Starting Projection")
     # Create coordinate mask

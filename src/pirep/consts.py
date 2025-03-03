@@ -1,5 +1,5 @@
-from pirep.defs.turbulence import Turbulence
 from pirep.defs.aircraft import Aircraft
+from pirep.defs.turbulence import Turbulence
 
 # Turbulence Index Lookup Table
 

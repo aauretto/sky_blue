@@ -1,7 +1,8 @@
-from pydantic import BaseModel, NonNegativeInt
-from typing import Optional
-from enum import StrEnum
 import re
+from enum import StrEnum
+from typing import Optional
+
+from pydantic import BaseModel, NonNegativeInt
 
 ALT_MINABV = re.compile(r"ABV\s*(?P<alt1>[0-9]{3})")  # Go up 2500ft
 ALT_MAXBLO = re.compile(r"BLO\s*(?P<alt2>[0-9]{3})")  # Go down 2500ft

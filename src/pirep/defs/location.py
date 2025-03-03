@@ -1,8 +1,10 @@
+import re
+from math import asin, atan2, cos, degrees, radians, sin
+
+import pandas as pd
 from pydantic import BaseModel
 from scipy import constants as u
-import pandas as pd
-from math import radians, degrees, sin, cos, asin, atan2
-import re
+
 from ..sources import SRC_AIRPORTS, SRC_NAVAIDS
 
 LOC_LATLON = re.compile(

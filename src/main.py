@@ -1,14 +1,15 @@
 #!/usr/bin/env python3
 
 import datetime as dt
-import pandas as pd
-import pirep as pr
-import satellite as st
-from goes2go import GOES
-from pirep.defs.spreading import vertical_spread, radial_spread
+
 import numpy as np
+import pandas as pd
+from goes2go import GOES
 from matplotlib import pyplot as plt
 
+import pirep as pr
+import satellite as st
+from pirep.defs.spreading import radial_spread, vertical_spread
 
 # from utils.compute_grid import compute_grid
 

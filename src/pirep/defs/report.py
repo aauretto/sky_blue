@@ -1,11 +1,12 @@
-from pydantic import BaseModel
-from datetime import datetime, UTC
-from enum import StrEnum
 import re
+from datetime import UTC, datetime
+from enum import StrEnum
 
-from pirep.defs.location import Location
-from pirep.defs.altitude import Altitude
+from pydantic import BaseModel
+
 from pirep.defs.aircraft import Aircraft
+from pirep.defs.altitude import Altitude
+from pirep.defs.location import Location
 from pirep.defs.turbulence import Turbulence
 
 FULL = re.compile(

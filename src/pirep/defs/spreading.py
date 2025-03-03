@@ -1,11 +1,10 @@
 import numpy as np
-from consts import MAP_RANGE
 from scipy import constants as u
 
+from consts import MAP_RANGE
+
 # Data Source: https://journals.ametsoc.org/view/journals/bams/aop/BAMS-D-23-0142.1/BAMS-D-23-0142.1.pdf
-
 ### Altitudinal Computations ### Taken from the page 14 graphs of the source above
-
 from pirep.defs.generate_spreading_arrays import create_radial_grid
 
 # Disks that represent risk of turbulence relative to the point the pirep was reported at.

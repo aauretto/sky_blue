@@ -1,5 +1,6 @@
-from consts import MAP_RANGE, GRID_RANGE
 import numpy as np
+
+from consts import GRID_RANGE, MAP_RANGE
 
 # Conversion constants for converting grid cells to KM
 KM_PER_NM = 1.852

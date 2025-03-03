@@ -1,15 +1,16 @@
-from goes2go import GOES
-
-from sklearn.model_selection import train_test_split
 import datetime as dt
-import numpy as np
-from numpy import typing as npt
-import pandas as pd
+
 import keras
+import numpy as np
+import pandas as pd
+import tensorflow as tf
+from goes2go import GOES
+from numpy import typing as npt
+from sklearn.model_selection import train_test_split
+
+import consts as consts
 import pirep as pr
 import satellite as st
-import consts as consts
-import tensorflow as tf
 
 
 def get_data(

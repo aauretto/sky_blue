@@ -1,6 +1,8 @@
 from enum import StrEnum
-from ..sources import SRC_AIRCRAFT
+
 import pandas as pd
+
+from ..sources import SRC_AIRCRAFT
 
 CODES = (
     pd.read_csv(SRC_AIRCRAFT)[["type", "size"]]
