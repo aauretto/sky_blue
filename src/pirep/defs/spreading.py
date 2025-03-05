@@ -108,7 +108,7 @@ def radial_spread(grid, intensity):
         grid[g_lat_min:g_lat_max, g_lon_min:g_lon_max, alt] = risk * kernel[k_lat_min:k_lat_max, k_lon_min:k_lon_max]
         
 # Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
-# TODO: Handle negative turbulence case
+# TODO: Handle negative turbulence case and use aircraft
 def concatenate_all_pireps(reports):
     
     # make final grid and temp grid

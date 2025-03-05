@@ -95,6 +95,7 @@ def fetch_parse_and_drop_irrelevant(date_s: dt.datetime, date_e: dt.datetime) ->
             reports["Location"].apply(lambda loc: MAP_RANGE["LAT"]["MIN"] <= loc.lat <= MAP_RANGE['LAT']['MAX'] and
                                                 MAP_RANGE['LON']['MIN'] <= loc.lon <= MAP_RANGE['LON']['MAX'])
             ]
+
 def compute_grid(report: pd.DataFrame) -> npt.NDArray:
     from consts import GRID_RANGE, MAP_RANGE
 
