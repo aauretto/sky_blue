@@ -12,7 +12,6 @@ import consts as consts
 import pirep as pr
 import satellite as st
 
-
 def get_data(
     start: dt.datetime,
     end: dt.datetime,
@@ -36,7 +35,7 @@ def get_data(
 
     return data, timestamps
 
-
+# TODO make this a full and complete wrapper
 def get_labels(
     start: dt.datetime,
     end: dt.datetime,
@@ -64,8 +63,9 @@ def get_labels(
         )
     )
     print("zeroed numpy")
+    # TODO: make a wrapper that does this
     for i, timestamp in enumerate(timestamps[:1]):
-        mask = np.abs((grids["Timestamp"] - timestamp) / pd.Timedelta(minutes=1)) <= 15 #todo why 15 what is this
+        mask = np.abs((grids["Timestamp"] - timestamp) / pd.Timedelta(minutes=1)) <= consts.PIREP_RELEVANCE_DURATION
         window = np.array(grids.loc[mask]["Grid"].tolist())
         binned_window = np.max(window, axis=0)  # TODO: Merge the PIREPs here
         labels[i] = binned_window

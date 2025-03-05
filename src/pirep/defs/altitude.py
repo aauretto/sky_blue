@@ -50,13 +50,13 @@ class Altitude(BaseModel):
 
             match src:
                 case "UNKN" | "DURC" | "DURD":
-                    # TODO: Fix DURC/DURD cases
+                    # TODO: Fix DURC/DURD cases (maybe just leave dropping them)
                     err = Altitude.Error(src)
                     raise AltitudeError()
 
                 case alt:
                     err = None
-                    alt_min = max(0, int(alt) * 100 - 5000)
+                    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
                     alt_max = min(int(alt) * 100 + 5000, 45_000)
 
         # Add 5000 ft to the altitude window

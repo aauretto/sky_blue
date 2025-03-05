@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 import pirep as pr
 import satellite as st
-from pirep.defs.spreading import concatenate_all_pireps
+from pirep.defs.spreading import concatenate_all_pireps, spread_pirep
 
 if __name__ == "__main__":
     # Retrieve PIREPs
@@ -21,18 +21,30 @@ if __name__ == "__main__":
             )
         )
     )
-
-    # # Convert reports to grids
-    # grids = pd.DataFrame(
-    #     {
-    #         "Timestamp": reports["Timestamp"],
-    #         "Grid": reports.apply(pr.compute_grid, axis=1),
-    #     }
-    # )
-
-    grid = concatenate_all_pireps(reports)
-
-    # grid, _aircraft, intensity = grids["Grid"]
+    #TODO not dropping PIREPS outside the box
+    print("RETREIVED")
+    # Convert reports to grids
+    grids = pd.DataFrame(
+        {
+            "Timestamp": reports["Timestamp"],
+            "Grid": reports.apply(pr.compute_grid, axis=1),
+        }
+    )
+    print("COMPUTED")
+    # grid = concatenate_all_pireps(reports)
+    see_vals = {"Timestamp" : [],
+                "Places"    : []}
+    for i in range(len(grids)):
+        see_vals["Timestamp"].append(grids["Timestamp"].iloc[i])
+        grid, aircraft, intensity = grids["Grid"].iloc[i]
+        see_vals["Places"].append((aircraft, intensity, np.argwhere(~np.isnan(grid))))
+    print("SEEN")
+    see_vals = pd.DataFrame(see_vals)
+    see_vals.to_csv('./grids.csv')
+    grid, aircraft, intensity = grids["Grid"].iloc[0]
+    spread_pirep(grid, intensity)
+    print(f"PIREP of {aircraft} aircraft and {intensity} intensity")
+    print(f"has values in {np.argwhere(~np.isnan(grid))}")
 
     x, y, z = np.indices(grid.shape)
     x, y, z, values = x.flatten(), y.flatten(), z.flatten(), grid.flatten()
@@ -52,8 +64,8 @@ if __name__ == "__main__":
     # Add color bar
     plt.colorbar(sc)
 
-    plt.savefig("/skyblue/spread.png")
-
+    # plt.savefig("/skyblue/spread.png")
+    plt.show()
     # fig = plt.figure()
     # vals = np.argwhere(~np.isnan(grid))
 
@@ -63,48 +75,56 @@ if __name__ == "__main__":
 
     # plt.savefig("./vertical_spread.png", dpi=300, bbox_inches="tight")
 
-    # Initialize satellites
-    sat_east = GOES(satellite=16, product="ABI", domain="C")
-    bands = [8, 9, 10, 13, 14, 15]
 
-    # Fetch satellite data and project onto grid
-    print("About to Fetch Range")
-    data = st.fetch_range(
-        dt.datetime(2024, 11, 6, 0, 30),
-        dt.datetime(2024, 11, 6, 1, 0),
-        sat_east,
-    )
 
-    print("Fetched Range")
-    band_data = st.fetch_bands(data, bands)
-    print("Fetched Bands")
-    lats, lons = st.calculate_coordinates(data)
-    print("Calced Coords")
-    unsmoothed_data = st.project(lats, lons, band_data.data) # Project might not be working
-    print(f"{unsmoothed_data.shape=}")
 
-    projected_data = st.smooth(unsmoothed_data)
-    fig = plt.figure(figsize=(15, 12))
-    ax_east = fig.add_subplot(2, 3, 1)
-    ax_east.pcolormesh(projected_data[0, :, :, 0])
-    ax_east = fig.add_subplot(2, 3, 2)
-    ax_east.pcolormesh(projected_data[0, :, :, 1])
-    ax_east = fig.add_subplot(2, 3, 3)
-    ax_east.pcolormesh(projected_data[0, :, :, 2])
-    ax_east = fig.add_subplot(2, 3, 4)
-    ax_east.pcolormesh(projected_data[0, :, :, 3])
-    ax_east = fig.add_subplot(2, 3, 5)
-    ax_east.pcolormesh(projected_data[0, :, :, 4])
-    ax_east = fig.add_subplot(2, 3, 6)
-    ax_east.pcolormesh(projected_data[0, :, :, 5])
-    plt.savefig("/skyblue/satellite.png")
-    plt.clf()
+###### Satellite Stuff ############
 
-    # print(f"{projected_data.shape=}")
-    # num_bands = projected_data.shape[3]
-    # for i in range(num_bands):
-    #     fig = plt.figure(figsize=(15, 12))
-    #     ax_east = fig.add_subplot(1, 1, 1)
-    #     ax_east.pcolormesh(projected_data[0][:, :][i])
-    #     plt.show()
-    #     plt.clear()
+
+
+    # # Initialize satellites
+    # sat_east = GOES(satellite=16, product="ABI", domain="C")
+    # bands = [8, 9, 10, 13, 14, 15]
+
+    # # Fetch satellite data and project onto grid
+    # print("About to Fetch Range")
+    # data = st.fetch_range(
+    #     dt.datetime(2024, 11, 6, 0, 30),
+    #     dt.datetime(2024, 11, 6, 1, 0),
+    #     sat_east,
+    # )
+
+    # print("Fetched Range")
+    # band_data = st.fetch_bands(data, bands)
+    # print("Fetched Bands")
+    # lats, lons = st.calculate_coordinates(data)
+    # print("Calced Coords")
+    # unsmoothed_data = st.project(lats, lons, band_data.data) # Project might not be working
+    # print(f"{unsmoothed_data.shape=}")
+
+    # projected_data = st.smooth(unsmoothed_data)
+    # fig = plt.figure(figsize=(15, 12))
+    # ax_east = fig.add_subplot(2, 3, 1)
+    # ax_east.pcolormesh(projected_data[0, :, :, 0])
+    # ax_east = fig.add_subplot(2, 3, 2)
+    # ax_east.pcolormesh(projected_data[0, :, :, 1])
+    # ax_east = fig.add_subplot(2, 3, 3)
+    # ax_east.pcolormesh(projected_data[0, :, :, 2])
+    # ax_east = fig.add_subplot(2, 3, 4)
+    # ax_east.pcolormesh(projected_data[0, :, :, 3])
+    # ax_east = fig.add_subplot(2, 3, 5)
+    # ax_east.pcolormesh(projected_data[0, :, :, 4])
+    # ax_east = fig.add_subplot(2, 3, 6)
+    # ax_east.pcolormesh(projected_data[0, :, :, 5])
+    # # plt.savefig("/skyblue/satellite.png")
+    # plt.show()
+    # plt.clf()
+
+    # # print(f"{projected_data.shape=}")
+    # # num_bands = projected_data.shape[3]
+    # # for i in range(num_bands):
+    # #     fig = plt.figure(figsize=(15, 12))
+    # #     ax_east = fig.add_subplot(1, 1, 1)
+    # #     ax_east.pcolormesh(projected_data[0][:, :][i])
+    # #     plt.show()
+    # #     plt.clear()

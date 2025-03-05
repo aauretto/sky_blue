@@ -74,14 +74,18 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
 
 
 def parse_all(table: pd.DataFrame, drop_no_turbulence: bool = True) -> pd.DataFrame:
-    # TODO: use the drop_no_turbulence parameter
-
     reports: pd.DataFrame = table.apply(parse, axis=1)
-    return (
-        reports.drop(columns=["Lat", "Lon"])
-        .explode(column="Turbulence")
-        .dropna(subset=["Turbulence"])
-    )
+    if drop_no_turbulence:
+        return (
+            reports.drop(columns=["Lat", "Lon"])
+            .explode(column="Turbulence")
+            .dropna(subset=["Turbulence"])
+        )
+    else:
+        return (
+            reports.drop(columns=["Lat", "Lon"])
+            .explode(column="Turbulence")
+        )
 
 
 def compute_grid(report: pd.DataFrame) -> npt.NDArray:
@@ -105,11 +109,10 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
 
         turbulence_index = TURBULENCE_INDEXES.get(
             aircraft, TURBULENCE_INDEXES[Aircraft.LGT]
-        )[intensity]  # WARNING be careful of LGT default
+        )[intensity]  # TODO WARNING be careful of LGT default
 
         from utils.convert import convert_coord as convert
 
-        # TODO fix gridding (no AOE and fix altitudes)
         alt_min_idx = np.abs(np.array(MAP_RANGE["ALT"]["RANGE"]) - alt.min).argmin()
         if MAP_RANGE["ALT"]["RANGE"][alt_min_idx] > alt.min:
             alt_min_idx = max(alt_min_idx - 1, 0)
@@ -124,7 +127,18 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
             alt_min_idx : alt_max_idx + 1,
         ] = turbulence_index
 
-        # print(report)
+        # TODO remove debugging
+        if len(np.argwhere(~np.isnan(grid))) == 0:
+            print('\n*************************************')
+            print('Failed to input grid')
+            print(f"{alt_min_idx=}")
+            print(f"{alt_max_idx=}")
+            print(f"{turbulence_index=}")
+            print(f"{loc.lat=}")
+            print(f"{convert(loc.lat, "LAT")=}")
+            print(f"{loc.lon=}")
+            print(f"{convert(loc.lon, "LON")=}")
+            print('*************************************')
 
         return (grid, aircraft, intensity)
     else:
