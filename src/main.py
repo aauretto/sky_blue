@@ -33,7 +33,7 @@ if __name__ == "__main__":
     see_vals = pd.DataFrame(see_vals)
     see_vals.to_csv('./grids.csv')
     grid, aircraft, intensity = grids["Grid"].iloc[0]
-    spread_pirep(grid, intensity)
+    spread_pirep(grid, aircraft, intensity)
     print(f"PIREP of {aircraft} aircraft and {intensity} intensity")
     print(f"has values in {np.argwhere(~np.isnan(grid))}")
 
