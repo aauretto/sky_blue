@@ -3,6 +3,7 @@ import datetime as dt
 import numpy as np
 import numpy.typing as npt
 import pandas as pd
+from consts import MAP_RANGE
 
 
 def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
@@ -86,8 +87,14 @@ def parse_all(table: pd.DataFrame, drop_no_turbulence: bool = True) -> pd.DataFr
             reports.drop(columns=["Lat", "Lon"])
             .explode(column="Turbulence")
         )
-
-
+    
+# performs in place dropping of reports containing lats and/or lons outside of range
+def fetch_parse_and_drop_irrelevant(date_s: dt.datetime, date_e: dt.datetime) -> pd.DataFrame:
+    reports = parse_all(fetch(url(date_s, date_e)))
+    return reports[
+            reports["Location"].apply(lambda loc: MAP_RANGE["LAT"]["MIN"] <= loc.lat <= MAP_RANGE['LAT']['MAX'] and
+                                                MAP_RANGE['LON']['MIN'] <= loc.lon <= MAP_RANGE['LON']['MAX'])
+            ]
 def compute_grid(report: pd.DataFrame) -> npt.NDArray:
     from consts import GRID_RANGE, MAP_RANGE
 
@@ -130,6 +137,7 @@ def compute_grid(report: pd.DataFrame) -> npt.NDArray:
         # TODO remove debugging
         if len(np.argwhere(~np.isnan(grid))) == 0:
             print('\n*************************************')
+            print(report)
             print('Failed to input grid')
             print(f"{alt_min_idx=}")
             print(f"{alt_max_idx=}")

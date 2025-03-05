@@ -10,19 +10,10 @@ from matplotlib import pyplot as plt
 import pirep as pr
 import satellite as st
 from pirep.defs.spreading import concatenate_all_pireps, spread_pirep
+from consts import MAP_RANGE
 
 if __name__ == "__main__":
-    # Retrieve PIREPs
-    reports: pd.DataFrame = pr.parse_all(
-        pr.fetch(
-            pr.url(
-                date_s=dt.datetime(2024, 11, 6, 23, 54, 0),
-                date_e=dt.datetime(2024, 11, 7, 0, 0, 0)
-            )
-        )
-    )
-    #TODO not dropping PIREPS outside the box
-    print("RETREIVED")
+    reports = pr.fetch_parse_and_drop_irrelevant(dt.datetime(2024, 11, 6, 23, 54, 0), dt.datetime(2024, 11, 7, 0, 0, 0))
     # Convert reports to grids
     grids = pd.DataFrame(
         {
@@ -64,8 +55,7 @@ if __name__ == "__main__":
     # Add color bar
     plt.colorbar(sc)
 
-    # plt.savefig("/skyblue/spread.png")
-    plt.show()
+    plt.savefig("/skyblue/spread.png")
     # fig = plt.figure()
     # vals = np.argwhere(~np.isnan(grid))
 
