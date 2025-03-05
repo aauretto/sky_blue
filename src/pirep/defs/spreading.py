@@ -52,7 +52,6 @@ def vertical_spread(grid, intensity):
 
     # Need to make sure everything is in order to get min and max
     
-    # TODO: Before we get here make sure we drop all pireps that arent there
     vals = vals[vals[:, 2].argsort()]
     lat, lon = vals[0][:2]
     alt_min_idx = vals[0][-1]
