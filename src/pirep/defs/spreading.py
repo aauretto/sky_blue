@@ -1,7 +1,9 @@
 import numpy as np
 from scipy import constants as u
 
-from consts import MAP_RANGE
+from consts import MAP_RANGE, GRID_RANGE
+
+import utils.merge as merge
 
 # Data Source: https://journals.ametsoc.org/view/journals/bams/aop/BAMS-D-23-0142.1/BAMS-D-23-0142.1.pdf
 ### Altitudinal Computations ### Taken from the page 14 graphs of the source above
@@ -35,7 +37,7 @@ ALT_RISKS = {
 ])
 }
 
-
+# Wrapper so we can call spread_pirep instead of both vert then horiz
 def spread_pirep(grid, intensity):
     vertical_spread(grid, intensity)
     radial_spread(grid, intensity)
@@ -49,6 +51,8 @@ def vertical_spread(grid, intensity):
     vals = np.argwhere(~np.isnan(grid))
 
     # Need to make sure everything is in order to get min and max
+    
+    # TODO: Before we get here make sure we drop all pireps that arent there
     vals = vals[vals[:, 2].argsort()]
     lat, lon = vals[0][:2]
     alt_min_idx = vals[0][-1]
@@ -104,10 +108,26 @@ def radial_spread(grid, intensity):
         risk = grid[*val]
         grid[g_lat_min:g_lat_max, g_lon_min:g_lon_max, alt] = risk * kernel[k_lat_min:k_lat_max, k_lon_min:k_lon_max]
         
+# Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
+# TODO: Handle negative turbulence case
+def concatenate_all_pireps(reports):
+    
+    # make final grid and temp grid
+    finalGrid = np.full((GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan)
 
+    import pirep as pr
+    for row in range (len(reports)):
+        print(f"{type(reports.iloc[row])=}\n{reports.iloc[row]}", "\n============================================================")
+        tmpGrid, aircraft, intensity = pr.compute_grid(reports.iloc[row])
 
+        # spread pirep in temp grid
+        vertical_spread(tmpGrid, intensity)
+        radial_spread(tmpGrid, intensity)
 
+        # merge temp grid with final grid
+        finalGrid = merge.merge_max([finalGrid, tmpGrid])
 
+    return finalGrid
     
 
     

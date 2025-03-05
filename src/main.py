@@ -9,9 +9,7 @@ from matplotlib import pyplot as plt
 
 import pirep as pr
 import satellite as st
-from pirep.defs.spreading import radial_spread, vertical_spread
-
-# from utils.compute_grid import compute_grid
+from pirep.defs.spreading import concatenate_all_pireps
 
 if __name__ == "__main__":
     # Retrieve PIREPs
@@ -24,18 +22,17 @@ if __name__ == "__main__":
         )
     )
 
-    # Convert reports to grids
-    grids = pd.DataFrame(
-        {
-            "Timestamp": reports["Timestamp"],
-            "Grid": reports.apply(pr.compute_grid, axis=1),
-        }
-    )
+    # # Convert reports to grids
+    # grids = pd.DataFrame(
+    #     {
+    #         "Timestamp": reports["Timestamp"],
+    #         "Grid": reports.apply(pr.compute_grid, axis=1),
+    #     }
+    # )
 
-    grid, _aircraft, intensity = grids["Grid"].iloc[0]
+    grid = concatenate_all_pireps(reports)
 
-    vertical_spread(grid, 'SEV')
-    radial_spread(grid, 'SEV')
+    # grid, _aircraft, intensity = grids["Grid"]
 
     x, y, z = np.indices(grid.shape)
     x, y, z, values = x.flatten(), y.flatten(), z.flatten(), grid.flatten()
