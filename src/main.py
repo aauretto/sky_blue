@@ -45,8 +45,8 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111, projection='3d')
     sc = ax.scatter(x, y, z, c=values, cmap='viridis', s=1, alpha=.5)  # Adjust alpha for transparency
     ax.set_facecolor('black')
-    ax.tick_params(axis='x', colors='white')  
-    ax.tick_params(axis='y', colors='white') 
+    ax.tick_params(axis='x', colors='white')
+    ax.tick_params(axis='y', colors='white')
     ax.tick_params(axis='z', colors='white')
     # ax.set_xlim(0, 1500)
     # ax.set_ylim(0, 2500)

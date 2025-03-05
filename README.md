@@ -16,5 +16,4 @@ on the HPC. The Tufts HPC uses singularity instead of docker, so we need to run 
 
 
 ### PIREP GRID FORMAT ###
-When the pireps are placed on their grid, the grid is np.nan everywhere else and NEG events are set to the background risk
-and will be later 0ed during spreading
+When the pireps are placed on their grid, the grid is `np.nan` everywhere else and NEG events are set to the background risk and will be later 0ed during spreading
