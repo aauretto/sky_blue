@@ -44,19 +44,15 @@ class Altitude(BaseModel):
             if "alt2" in m.keys():
                 alt_max = int(m["alt2"]) * 100
 
-        # TODO do something with abv/blo and durc/durd
         if alt_min is None and alt_max is None and re.match(ALT_SINGLE, src):
-            m = ALT_SINGLE.match(src).groupdict()
-
             match src:
                 case "UNKN" | "DURC" | "DURD":
-                    # TODO: Fix DURC/DURD cases
                     err = Altitude.Error(src)
                     raise AltitudeError()
 
                 case alt:
                     err = None
-                    alt_min = max(0, int(alt) * 100 - 5000)
+                    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
                     alt_max = min(int(alt) * 100 + 5000, 45_000)
 
         # Add 5000 ft to the altitude window

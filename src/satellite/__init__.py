@@ -99,7 +99,6 @@ def project(
     print("Returning Projection")
     return data
 
-#TODO verify that the output is still correct now that we have multi bands and multi files
 # Currently this smooths a single band in a single file *(MAY NOT WORK ON EVERY BAND)
 # Expects 1500 x 2500
 # want (F, 1500, 2500, b)
@@ -126,42 +125,6 @@ def smooth_single_band(data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | n
         )
     data[empty_mask] = data[tuple(indices[:, empty_mask])]
     return data
-
-    # SIMONS ATTEMPTS TO GET IT TO WORK WITH MULTIPLE BANDS
-    band_num = data.shape[2]
-    for band in range(band_num):
-        datum = data[:, :, band]
-        print(f"{datum.shape=}")
-        print(band)
-        empty_mask = datum <= 0
-        indices = distance_transform_edt(
-            empty_mask, return_distances=False, return_indices=True
-        )
-        datum[empty_mask] = datum[tuple(indices[:, empty_mask])]
-        data[:, :, band] = datum
-    return data
-    
-
-    # IF you get rid of the bands stuff it works for multiple files
-    num_files = data.shape[0] 
-    num_bands = data.shape[3]
-
-    # for file in range(num_files):
-    #     for band in range(num_bands):
-    #         print(data[file][:, :, band].shape)
-    #         empty_mask = data[file][:, :, band] <= 0
-    #         print(f'{empty_mask.shape=}')
-    #         indices = distance_transform_edt(
-    #             empty_mask, return_distances=False, return_indices=True
-    #         )
-    #         print(f"{indices.shape=}")
-    #         # data[file][empty_mask, band] = data[file][tuple(indices[:, empty_mask]), band]
-    #         slices = indices[:, empty_mask]
-    #         print(f"{slices.shape=}")
-    #         data[file][empty_mask, band] = data[file][slices, band]
-
-    return filled
-
 
 def union_sat_data(
     west: npt.ArrayLike | npt.DTypeLike, east: npt.ArrayLike | npt.DTypeLike

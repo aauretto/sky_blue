@@ -4,14 +4,14 @@ from scipy.ndimage import maximum_filter
 
 def merge_max(pireps):
     """This is a naive merge function. It just takes the max value at each point"""
-    return np.maximum.reduce(pireps)
+    return np.nanmax(pireps, axis=0)
 
 
 # =================== Helper Functions for merge spread =======================
 def compute_overlap(arrays):
     """Computes the number of nonzero contributors at each (x, y) position."""
     stacked = np.stack(arrays, axis=0)  # Shape: (N, X, Y, Z)
-    overlap = np.count_nonzero(stacked, axis=0)  # Count nonzero elements along N
+    overlap = np.sum(~np.isnan(stacked), axis=0)  # Count non-NaN values
     return overlap
 
 def get_spread_radius(overlap):
@@ -21,31 +21,46 @@ def get_spread_radius(overlap):
         spread_map[overlap >= i] = i - 1  # If at least 2 overlaps, use (i-1)x(i-1) spread
     return spread_map
 
-# TODO: Note the dimension of the spreading might be wrong. Does not spread in first size
-def spread_max_values(merged, overlap_map):
+def spread_max_values(merged, overlap_map, spread=2):
     """Applies spreading to max values based on overlap map."""
     spread_radius = get_spread_radius(overlap_map)
-    output = merged.copy()
+    safe_merged = np.where(np.isnan(merged), -np.inf, merged)   # TODO: Replace with background risk instead of negative infinity
+    output = safe_merged.copy()
     
     # Apply max filtering with different spread sizes
     for radius in np.unique(spread_radius):
         if radius > 0:
             mask = (spread_radius == radius)
-            filtered = maximum_filter(merged, size=(1, 2 * radius + 1, 2 * radius + 1))
+            filtered = maximum_filter(safe_merged, size=(spread * radius + 1, spread * radius + 1, 1))
             output[mask] = filtered[mask]
     return output
 
 
 # =================== Max Merge Spread (max merge 2.0) =======================
-# TODO: Note the dimension of the spreading might be wrong. Check spread_max_values()
-def merge_max_spread(pireps):
+def merge_max_spread(pireps, spread=2):
     """ Merge with a spread function that accounts for overlap.
     More overlap means the it will pull the max from a wider area.
     On purpose does not spread in the alititude dimension."""
-    merged = np.maximum.reduce(pireps)  # Step 1: Element-wise max
+    merged = merge_max(pireps)  # Step 1: Element-wise max
     overlap_map = compute_overlap(pireps)  # Step 2: Compute overlap
-    spread_merged = spread_max_values(merged, overlap_map)  # Step 3 & 4: Spread
-    return spread_merged
+    if np.any(overlap_map > 1):  # Step 3: Spread if overlap exists
+        return spread_max_values(merged, overlap_map, spread)
+    else:
+        print("No Overlap...")
+        return merged
+
+
+def merge_overlap_spread(max_map, overlap_map, spread=2):
+    """ Merge with a spread function that accounts for overlap.
+    More overlap means the it will pull the max from a wider area.
+    On purpose does not spread in the alititude dimension.
+    Note: This does the same as above but takes the max and overlap array as
+    inputs instead of calculating them."""
+    if np.any(overlap_map > 1):
+        return spread_max_values(max_map, overlap_map, spread)
+    else:
+        print("No Overlap...")
+        return max_map
 
 
 # ============================ Test Cases =====================================

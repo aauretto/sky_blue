@@ -24,9 +24,6 @@
         - Band 5
         - Band 11
 
-## TODO
-REBASE PYTHON
-
 ## Resources
 
 [Band Source](https://rammb2.cira.colostate.edu/training/visit/quick_reference/#tab17)
