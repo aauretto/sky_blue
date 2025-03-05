@@ -1,5 +1,6 @@
 import numpy as np
 from scipy import constants as u
+from pirep.defs.aircraft import Aircraft
 
 from consts import MAP_RANGE, GRID_RANGE
 
@@ -37,8 +38,31 @@ ALT_RISKS = {
 ])
 }
 
+PIREP_INT_CRAFT_TO_SPREAD_INT ={
+    Aircraft.LGT : {
+        'NEG' : 'NEG',
+        'LGT' : 'LGT',
+        'MOD' : 'MOD',
+        'SEV' : 'MOD'
+    },
+    Aircraft.MED : {
+        'NEG' : 'LGT',
+        'LGT' : 'MOD',
+        'MOD' : 'MOD',
+        'SEV' : 'SEV'
+    },
+    Aircraft.HVY : {
+        'NEG' : 'MOD',
+        'LGT' : 'SEV',
+        'MOD' : 'SEV',
+        'SEV' : 'SEV'
+    }
+
+}
+
 # Wrapper so we can call spread_pirep instead of both vert then horiz
-def spread_pirep(grid, intensity):
+def spread_pirep(grid, aircraft, intensity):
+    intensity = PIREP_INT_CRAFT_TO_SPREAD_INT[aircraft][intensity]
     vertical_spread(grid, intensity)
     radial_spread(grid, intensity)
 
