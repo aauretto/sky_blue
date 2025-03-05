@@ -9,8 +9,8 @@ from matplotlib import pyplot as plt
 
 import pirep as pr
 import satellite as st
-from pirep.defs.spreading import concatenate_all_pireps, spread_pirep
 from consts import MAP_RANGE
+from pirep.defs.spreading import concatenate_all_pireps, spread_pirep
 
 if __name__ == "__main__":
     reports = pr.fetch_parse_and_drop_irrelevant(dt.datetime(2024, 11, 6, 23, 54, 0), dt.datetime(2024, 11, 7, 0, 0, 0))
@@ -45,8 +45,8 @@ if __name__ == "__main__":
     ax = fig.add_subplot(111, projection='3d')
     sc = ax.scatter(x, y, z, c=values, cmap='viridis', s=1, alpha=.5)  # Adjust alpha for transparency
     ax.set_facecolor('black')
-    ax.tick_params(axis='x', colors='white')  
-    ax.tick_params(axis='y', colors='white') 
+    ax.tick_params(axis='x', colors='white')
+    ax.tick_params(axis='y', colors='white')
     ax.tick_params(axis='z', colors='white')
     # ax.set_xlim(0, 1500)
     # ax.set_ylim(0, 2500)
@@ -70,51 +70,11 @@ if __name__ == "__main__":
 
 ###### Satellite Stuff ############
 
-
-
-    # # Initialize satellites
-    # sat_east = GOES(satellite=16, product="ABI", domain="C")
-    # bands = [8, 9, 10, 13, 14, 15]
-
-    # # Fetch satellite data and project onto grid
-    # print("About to Fetch Range")
-    # data = st.fetch_range(
-    #     dt.datetime(2024, 11, 6, 0, 30),
-    #     dt.datetime(2024, 11, 6, 1, 0),
-    #     sat_east,
-    # )
-
-    # print("Fetched Range")
-    # band_data = st.fetch_bands(data, bands)
-    # print("Fetched Bands")
-    # lats, lons = st.calculate_coordinates(data)
-    # print("Calced Coords")
-    # unsmoothed_data = st.project(lats, lons, band_data.data) # Project might not be working
-    # print(f"{unsmoothed_data.shape=}")
-
-    # projected_data = st.smooth(unsmoothed_data)
-    # fig = plt.figure(figsize=(15, 12))
-    # ax_east = fig.add_subplot(2, 3, 1)
-    # ax_east.pcolormesh(projected_data[0, :, :, 0])
-    # ax_east = fig.add_subplot(2, 3, 2)
-    # ax_east.pcolormesh(projected_data[0, :, :, 1])
-    # ax_east = fig.add_subplot(2, 3, 3)
-    # ax_east.pcolormesh(projected_data[0, :, :, 2])
-    # ax_east = fig.add_subplot(2, 3, 4)
-    # ax_east.pcolormesh(projected_data[0, :, :, 3])
-    # ax_east = fig.add_subplot(2, 3, 5)
-    # ax_east.pcolormesh(projected_data[0, :, :, 4])
-    # ax_east = fig.add_subplot(2, 3, 6)
-    # ax_east.pcolormesh(projected_data[0, :, :, 5])
-    # # plt.savefig("/skyblue/satellite.png")
-    # plt.show()
-    # plt.clf()
-
-    # # print(f"{projected_data.shape=}")
-    # # num_bands = projected_data.shape[3]
-    # # for i in range(num_bands):
-    # #     fig = plt.figure(figsize=(15, 12))
-    # #     ax_east = fig.add_subplot(1, 1, 1)
-    # #     ax_east.pcolormesh(projected_data[0][:, :][i])
-    # #     plt.show()
-    # #     plt.clear()
+# print(f"{projected_data.shape=}")
+# num_bands = projected_data.shape[3]
+# for i in range(num_bands):
+#     fig = plt.figure(figsize=(15, 12))
+#     ax_east = fig.add_subplot(1, 1, 1)
+#     ax_east.pcolormesh(projected_data[0][:, :][i])
+#     plt.show()
+#     plt.clear()
