@@ -133,13 +133,13 @@ def radial_spread(grid, intensity):
         
 # Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
 # TODO: Handle negative turbulence case and use aircraft
-def concatenate_all_pireps(reports):
+def concatenate_all_pireps(reports: list[dict]):
     
     # make final grid and temp grid
     finalGrid = np.full((GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan)
 
     import pirep as pr
-    for row in range (len(reports)):
+    for row in range (len(reports)): # TODO COMMENT IMMINENTLY
         print(f"{type(reports.iloc[row])=}\n{reports.iloc[row]}", "\n============================================================")
         tmpGrid, aircraft, intensity = pr.compute_grid(reports.iloc[row])
 

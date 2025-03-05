@@ -25,7 +25,7 @@ def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
     return url
 
 
-def fetch(url: str) -> pd.DataFrame:
+def fetch(url: str) -> list[dict]:
     df = pd.read_csv(url)
 
     # Fix dataframe columns
@@ -39,11 +39,10 @@ def fetch(url: str) -> pd.DataFrame:
         }
     )
     df["Timestamp"] = pd.to_datetime(df["Timestamp"], format="%Y%m%d%H%M")
+    return df.to_dict(orient="records")
 
-    return df
 
-
-def parse(row: pd.DataFrame) -> pd.DataFrame:
+def parse(row: dict) -> dict:
     import traceback
 
     from pirep.defs.altitude import Altitude, AltitudeError
@@ -74,29 +73,35 @@ def parse(row: pd.DataFrame) -> pd.DataFrame:
         return row
 
 
-def parse_all(table: pd.DataFrame, drop_no_turbulence: bool = True) -> pd.DataFrame:
-    reports: pd.DataFrame = table.apply(parse, axis=1)
-    if drop_no_turbulence:
-        return (
-            reports.drop(columns=["Lat", "Lon"])
-            .explode(column="Turbulence")
-            .dropna(subset=["Turbulence"])
-        )
-    else:
-        return (
-            reports.drop(columns=["Lat", "Lon"])
-            .explode(column="Turbulence")
-        )
-    
-# performs in place dropping of reports containing lats and/or lons outside of range
-def fetch_parse_and_drop_irrelevant(date_s: dt.datetime, date_e: dt.datetime) -> pd.DataFrame:
-    reports = parse_all(fetch(url(date_s, date_e)))
-    return reports[
-            reports["Location"].apply(lambda loc: MAP_RANGE["LAT"]["MIN"] <= loc.lat <= MAP_RANGE['LAT']['MAX'] and
-                                                MAP_RANGE['LON']['MIN'] <= loc.lon <= MAP_RANGE['LON']['MAX'])
-            ]
+def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
+    reports: list[dict] = [parse(row) for row in table]
+    reports = [{k: row[k] for k in row.keys() if k not in ["Lat", "Lon"]} for row in table]
+    exploded_reports = []
+    for report in reports:
+        if drop_no_turbulence and "Turbulence" not in report.keys():
+            continue
 
-def compute_grid(report: pd.DataFrame) -> npt.NDArray:
+        if not (MAP_RANGE["LAT"]["MIN"] <= report["Location"].lat <= MAP_RANGE['LAT']['MAX'] and MAP_RANGE['LON']['MIN'] <= report["Location"].lon <= MAP_RANGE['LON']['MAX']):
+            continue
+        if not drop_no_turbulence and len(report["Turbulence"]) == 0:
+            exploded_reports.append(report)
+            continue
+
+        for turbulence in report["Turbulence"]:
+            new_report = report
+            new_report["Turbulence"] = turbulence
+            exploded_reports.append(new_report)
+    return exploded_reports
+
+# performs in place dropping of reports containing lats and/or lons outside of range
+# def fetch_parse_and_drop_irrelevant(date_s: dt.datetime, date_e: dt.datetime) -> pd.DataFrame:
+#     reports = parse_all(fetch(url(date_s, date_e)))
+#     return reports[
+#             reports["Location"].apply(lambda loc: MAP_RANGE["LAT"]["MIN"] <= loc.lat <= MAP_RANGE['LAT']['MAX'] and
+#                                                 MAP_RANGE['LON']['MIN'] <= loc.lon <= MAP_RANGE['LON']['MAX'])
+            # ]
+
+def compute_grid(report: dict) -> npt.NDArray:
     from consts import GRID_RANGE, MAP_RANGE
 
     grid = np.full((GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan)

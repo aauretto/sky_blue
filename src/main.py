@@ -13,26 +13,29 @@ from consts import MAP_RANGE
 from pirep.defs.spreading import concatenate_all_pireps, spread_pirep
 
 if __name__ == "__main__":
-    reports = pr.fetch_parse_and_drop_irrelevant(dt.datetime(2024, 11, 6, 23, 54, 0), dt.datetime(2024, 11, 7, 0, 0, 0))
+    reports = pr.parse_all(pr.fetch(pr.url(dt.datetime(2024, 11, 6, 23, 54, 0), dt.datetime(2024, 11, 7, 0, 0, 0))))
+    print(reports[0])
     # Convert reports to grids
-    grids = pd.DataFrame(
-        {
-            "Timestamp": reports["Timestamp"],
-            "Grid": reports.apply(pr.compute_grid, axis=1),
-        }
-    )
+    # grids = pd.DataFrame(
+    #     {
+    #         "Timestamp": reports["Timestamp"],
+    #         "Grid": reports.apply(pr.compute_grid, axis=1),
+    #     }
+    # )
+    grids = list(map(lambda row: {"Timestamp": row["Timestamp"], "Grid": pr.compute_grid(row)}, reports))
     print("COMPUTED")
     # grid = concatenate_all_pireps(reports)
     see_vals = {"Timestamp" : [],
                 "Places"    : []}
     for i in range(len(grids)):
-        see_vals["Timestamp"].append(grids["Timestamp"].iloc[i])
-        grid, aircraft, intensity = grids["Grid"].iloc[i]
+        see_vals["Timestamp"].append(grids[i]["Timestamp"])
+        grid, aircraft, intensity = grids[i]["Grid"]
         see_vals["Places"].append((aircraft, intensity, np.argwhere(~np.isnan(grid))))
     print("SEEN")
     see_vals = pd.DataFrame(see_vals)
     see_vals.to_csv('./grids.csv')
-    grid, aircraft, intensity = grids["Grid"].iloc[0]
+    grid, aircraft, intensity = grids[0]["Grid"]
+    print(aircraft, intensity)
     spread_pirep(grid, aircraft, intensity)
     print(f"PIREP of {aircraft} aircraft and {intensity} intensity")
     print(f"has values in {np.argwhere(~np.isnan(grid))}")
