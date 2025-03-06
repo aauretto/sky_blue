@@ -18,8 +18,6 @@ def create_cache(start, end):
 
     # Need timestamps and spread grids
 
-    print(type(reports[0]["Timestamp"]))
-
     # Rip out timestamps for each report
     timestamps = list(map(lambda r : r["Timestamp"], reports))
 
@@ -47,5 +45,13 @@ def create_cache(start, end):
 if __name__ == "__main__":
     start = dt.datetime(2024, 11, 6, 23, 30, 0) 
     end   = dt.datetime(2024, 11, 7,  0,  0, 0) 
-    
+    # Intialize csv for appending later
+    df = pd.DataFrame({
+        "Timestamp" : [],
+        "Data"      : []
+    })
+    df.to_csv(CSV_FANME, mode = "w", header=True, index=False)
     create_cache(start, end)
+
+    df = pd.read_csv(CSV_FANME)
+    print(df)
