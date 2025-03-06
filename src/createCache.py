@@ -44,17 +44,24 @@ def create_cache(start, end):
     df.to_csv(CSV_FANME, mode = "a", header=False, index=False)
 
 if __name__ == "__main__":
+    if '--load' not in sys.argv:
+        start = dt.datetime(2024, 11, 7,  0,  0, 0) 
+        end   = dt.datetime(2024, 11, 7,  0, 30, 0) 
+        # Intialize csv for appending later
+        if '--init' in sys.argv:
+            df = pd.DataFrame({
+                "Timestamp" : [],
+                "Data"      : []
+            })
+            df.to_csv(CSV_FANME, mode = "w", header=True, index=False)
+        create_cache(start, end)
 
-    start = dt.datetime(2024, 11, 7,  0,  0, 0) 
-    end   = dt.datetime(2024, 11, 7,  0, 30, 0) 
-    # Intialize csv for appending later
-    if '--init' in sys.argv:
-        df = pd.DataFrame({
-            "Timestamp" : [],
-            "Data"      : []
-        })
-        df.to_csv(CSV_FANME, mode = "w", header=True, index=False)
-    create_cache(start, end)
+        df = pd.read_csv(CSV_FANME)
+        print(df)
+    else:
+        df = pd.read_csv(CSV_FANME)
+        for i in range(len(df)):
+            time = pd.to_datetime(df['Timestamp'].iloc[i]).to_pydatetime()
+            print(f"Report at time {time} of type {type(time)}")
 
-    df = pd.read_csv(CSV_FANME)
-    print(df)
+    
