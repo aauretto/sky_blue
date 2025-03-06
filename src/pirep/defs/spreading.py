@@ -149,7 +149,7 @@ def concatenate_all_pireps(reports: list[dict], BACKGROUND_RISK : int):
         spread_pirep(tmpGrid, aircraft, intensity, BACKGROUND_RISK)
 
         # merge temp grid with final grid
-        finalGrid = merge.merge_max([finalGrid, tmpGrid])
+        finalGrid = merge.merge_max([finalGrid, tmpGrid]) #TODO change which spread we want
 
     return finalGrid
     
