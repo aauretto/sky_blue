@@ -120,9 +120,11 @@ def compute_grid(report: dict) -> npt.NDArray:
         if turbulence.intensity == Turbulence.Intensity.EXT:
             intensity = Turbulence.Intensity.SEV
 
-        turbulence_index = TURBULENCE_INDEXES.get(
-            aircraft, TURBULENCE_INDEXES[Aircraft.LGT]
-        )[intensity]  # TODO WARNING be careful of LGT default
+        # TODO WARNING be careful of LGT default
+        if aircraft == Aircraft.UNKN:
+            aircraft = Aircraft.LGT
+
+        turbulence_index = TURBULENCE_INDEXES[aircraft][intensity]  
 
         from utils.convert import convert_coord as convert
 
