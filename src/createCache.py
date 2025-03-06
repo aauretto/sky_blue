@@ -4,6 +4,7 @@ import datetime as dt
 from pirep.defs.aircraft import Aircraft
 from pirep.defs.spreading import spread_pirep
 import numpy as np
+import sys
 
 ### STEPS ###
 # 1) Read all pireps in date range
@@ -43,14 +44,16 @@ def create_cache(start, end):
     df.to_csv(CSV_FANME, mode = "a", header=False, index=False)
 
 if __name__ == "__main__":
-    start = dt.datetime(2024, 11, 6, 23, 30, 0) 
-    end   = dt.datetime(2024, 11, 7,  0,  0, 0) 
+
+    start = dt.datetime(2024, 11, 7,  0,  0, 0) 
+    end   = dt.datetime(2024, 11, 7,  0, 30, 0) 
     # Intialize csv for appending later
-    df = pd.DataFrame({
-        "Timestamp" : [],
-        "Data"      : []
-    })
-    df.to_csv(CSV_FANME, mode = "w", header=True, index=False)
+    if '--init' in sys.argv:
+        df = pd.DataFrame({
+            "Timestamp" : [],
+            "Data"      : []
+        })
+        df.to_csv(CSV_FANME, mode = "w", header=True, index=False)
     create_cache(start, end)
 
     df = pd.read_csv(CSV_FANME)
