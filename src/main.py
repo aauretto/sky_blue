@@ -9,7 +9,7 @@ from matplotlib import pyplot as plt
 
 import pirep as pr
 import satellite as st
-from consts import MAP_RANGE
+from consts import MAP_RANGE, BACKGROUND_RISK
 from pirep.defs.spreading import concatenate_all_pireps, spread_pirep
 
 if __name__ == "__main__":
@@ -34,9 +34,9 @@ if __name__ == "__main__":
     print("SEEN")
     see_vals = pd.DataFrame(see_vals)
     see_vals.to_csv('./grids.csv')
-    grid, aircraft, intensity = grids[0]["Grid"]
+    grid, aircraft, intensity = grids[2]["Grid"]
     print(aircraft, intensity)
-    spread_pirep(grid, aircraft, intensity)
+    spread_pirep(grid, aircraft, intensity, BACKGROUND_RISK)
     print(f"PIREP of {aircraft} aircraft and {intensity} intensity")
     print(f"has values in {np.argwhere(~np.isnan(grid))}")
 

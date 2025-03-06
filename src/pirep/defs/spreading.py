@@ -61,16 +61,15 @@ PIREP_INT_CRAFT_TO_SPREAD_INT ={
 }
 
 # Wrapper so we can call spread_pirep instead of both vert then horiz
-def spread_pirep(grid, aircraft, intensity):
+def spread_pirep(grid, aircraft, intensity, BACKGROUND_RISK):
     intensity = PIREP_INT_CRAFT_TO_SPREAD_INT[aircraft][intensity]
-    vertical_spread(grid, intensity)
-    radial_spread(grid, intensity)
-
+    vertical_spread(grid, intensity, BACKGROUND_RISK)
+    radial_spread(grid, intensity, BACKGROUND_RISK)
 
 
 # Expects a grid of shape (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"])
 # where every cell is np.nan except a single vertical column
-def vertical_spread(grid, intensity):
+def vertical_spread(grid, intensity, BACKGROUND_RISK):
     # Get indicies where grid is not NaN
     vals = np.argwhere(~np.isnan(grid))
 
@@ -82,6 +81,8 @@ def vertical_spread(grid, intensity):
     alt_max_idx = vals[-1][-1]
 
     base_risk = grid[lat][lon][alt_min_idx]
+    if intensity == 'NEG':
+        base_risk = BACKGROUND_RISK
 
     for i in range(len(MAP_RANGE["ALT"]["RANGE"])):
         if i < alt_min_idx:   # Spread down
@@ -100,7 +101,7 @@ def vertical_spread(grid, intensity):
 
 
 
-def radial_spread(grid, intensity):
+def radial_spread(grid, intensity, BACKGROUND_RISK):
     kernel = RADIAL_KERNELS[intensity]
     vals = np.argwhere(~np.isnan(grid))
     # All vals are in a vertical column so pos of pirep in lat,lon is same across all vals
@@ -129,6 +130,8 @@ def radial_spread(grid, intensity):
     for val in vals:
         alt = val[2]
         risk = grid[*val]
+        if intensity == 'NEG':
+            risk = BACKGROUND_RISK
         grid[g_lat_min:g_lat_max, g_lon_min:g_lon_max, alt] = risk * kernel[k_lat_min:k_lat_max, k_lon_min:k_lon_max]
         
 # Function that takes reports and spreads all PIREPS and smooshes everything together iteratively

@@ -76,12 +76,11 @@ def create_radial_grid(intensity):
                 grid[x][y] = calc_risk_from_dist(dist, risks)
                 
                 # Ensures the actual location of the source risk stay the same
-                # or is set to 0 for NEG event
                 if ((x, y) == (center_x, center_y)):
                     if intensity == 'NEG':
                         grid[x][y] = 0
                     else:
                         grid[x][y] = 1
-            except:
-                print(x, y)
+            except Exception as e:
+                raise RuntimeError(f"Failure to create radial spreading grid at point {x, y}. Error was:\n{e}")
     return grid
