@@ -69,19 +69,27 @@ def parse(row: dict) -> dict:
         return row
 
     except Exception:
+        print(f"Failed to parse PIREP: {row['Report']}")
         print(traceback.format_exc())
         return row
 
 
 def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
     reports: list[dict] = [parse(row) for row in table]
-    reports = [{k: row[k] for k in row.keys() if k not in ["Lat", "Lon"]} for row in table]
+    reports = [
+        {k: row[k] for k in row.keys() if k not in ["Lat", "Lon"]} for row in table
+    ]
     exploded_reports = []
     for report in reports:
         if drop_no_turbulence and "Turbulence" not in report.keys():
             continue
 
-        if not (MAP_RANGE["LAT"]["MIN"] <= report["Location"].lat <= MAP_RANGE['LAT']['MAX'] and MAP_RANGE['LON']['MIN'] <= report["Location"].lon <= MAP_RANGE['LON']['MAX']):
+        if not (
+            MAP_RANGE["LAT"]["MIN"] <= report["Location"].lat <= MAP_RANGE["LAT"]["MAX"]
+            and MAP_RANGE["LON"]["MIN"]
+            <= report["Location"].lon
+            <= MAP_RANGE["LON"]["MAX"]
+        ):
             continue
         if not drop_no_turbulence and len(report["Turbulence"]) == 0:
             exploded_reports.append(report)
@@ -93,13 +101,15 @@ def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
             exploded_reports.append(new_report)
     return exploded_reports
 
+
 # performs in place dropping of reports containing lats and/or lons outside of range
 # def fetch_parse_and_drop_irrelevant(date_s: dt.datetime, date_e: dt.datetime) -> pd.DataFrame:
 #     reports = parse_all(fetch(url(date_s, date_e)))
 #     return reports[
 #             reports["Location"].apply(lambda loc: MAP_RANGE["LAT"]["MIN"] <= loc.lat <= MAP_RANGE['LAT']['MAX'] and
 #                                                 MAP_RANGE['LON']['MIN'] <= loc.lon <= MAP_RANGE['LON']['MAX'])
-            # ]
+# ]
+
 
 def compute_grid(report: dict) -> npt.NDArray:
     from consts import GRID_RANGE, MAP_RANGE
@@ -124,7 +134,7 @@ def compute_grid(report: dict) -> npt.NDArray:
         if aircraft == Aircraft.UNKN:
             aircraft = Aircraft.LGT
 
-        turbulence_index = TURBULENCE_INDEXES[aircraft][intensity]  
+        turbulence_index = TURBULENCE_INDEXES[aircraft][intensity]
 
         from utils.convert import convert_coord as convert
 
@@ -141,20 +151,6 @@ def compute_grid(report: dict) -> npt.NDArray:
             convert(loc.lon, "LON") : convert(loc.lon, "LON") + 1,
             alt_min_idx : alt_max_idx + 1,
         ] = turbulence_index
-
-        # TODO remove debugging
-        if len(np.argwhere(~np.isnan(grid))) == 0:
-            print('\n*************************************')
-            print(report)
-            print('Failed to input grid')
-            print(f"{alt_min_idx=}")
-            print(f"{alt_max_idx=}")
-            print(f"{turbulence_index=}")
-            print(f"{loc.lat=}")
-            print(f"{convert(loc.lat, "LAT")=}")
-            print(f"{loc.lon=}")
-            print(f"{convert(loc.lon, "LON")=}")
-            print('*************************************')
 
         return (grid, aircraft, intensity)
     else:

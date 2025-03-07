@@ -2,7 +2,6 @@ import datetime as dt
 
 import keras
 import numpy as np
-import pandas as pd
 import tensorflow as tf
 from goes2go import GOES
 from numpy import typing as npt
@@ -11,6 +10,10 @@ from sklearn.model_selection import train_test_split
 import consts as consts
 import pirep as pr
 import satellite as st
+from pirep.defs.spreading import concatenate_all_pireps
+
+BACKGROUND_RISK = 0.01
+
 
 def get_data(
     start: dt.datetime,
@@ -35,25 +38,8 @@ def get_data(
 
     return data, timestamps
 
-# TODO make this a full and complete wrapper
-def get_labels(
-    start: dt.datetime,
-    end: dt.datetime,
-    num_frames: int,
-    timestamps: npt.ArrayLike,
-) -> npt.NDArray:
-    # Retrieve PIREPs
-    reports: pd.DataFrame = pr.parse_all(pr.fetch(pr.url(start, end)))
-    print("Parsed reports")
-    # Convert reports to grids
-    grids = pd.DataFrame(
-        {
-            "Timestamp": reports["Timestamp"].to_numpy(),
-            "Grid": reports.apply(pr.compute_grid, axis=1).apply(lambda x: x[0]),
-        }
-    )
-    # TODO: Spread the PIREPs here
-    print("Computed grids")
+
+def bin_labels(frames: dict, num_frames: int, timestamps: npt.ArrayLike) -> npt.NDArray:
     labels = np.zeros(
         (
             num_frames,
@@ -62,22 +48,43 @@ def get_labels(
             consts.GRID_RANGE["ALT"],
         )
     )
-    print("zeroed numpy")
-    # TODO: make a wrapper that does this
+
     for i, timestamp in enumerate(timestamps[:1]):
-        mask = np.abs((grids["Timestamp"] - timestamp) / pd.Timedelta(minutes=1)) <= consts.PIREP_RELEVANCE_DURATION
-        window = np.array(grids.loc[mask]["Grid"].tolist())
-        binned_window = np.max(window, axis=0)  # TODO: Merge the PIREPs here
+        filtered_frames = {
+            frame_timestamp: frame
+            for frame_timestamp, frame in frames.items()
+            if (frame_timestamp - timestamp) / dt.timedelta(minutes=1)
+            <= consts.PIREP_RELEVANCE_DURATION
+        }
+
+        window = list(filtered_frames.values())
+        binned_window = concatenate_all_pireps(window, BACKGROUND_RISK)
         labels[i] = binned_window
-    print("enumerated timestamps")
+
+    return labels
+
+
+# TODO make this a full and complete wrapper
+def get_labels(
+    start: dt.datetime,
+    end: dt.datetime,
+    num_frames: int,
+    timestamps: npt.ArrayLike,
+) -> npt.NDArray:
+    # Retrieve PIREPs
+    reports: list[dict] = pr.parse_all(pr.fetch(pr.url(start, end)))
+    print("Parsed reports")
+    # Convert reports to grids
+    frames = dict(map(lambda row: (row["Timestamp"], row), reports))
+    labels = bin_labels(frames, num_frames, timestamps)
     assert labels.shape == (
         num_frames,
         consts.GRID_RANGE["LAT"],
         consts.GRID_RANGE["LON"],
-        consts.GRID_RANGE["ALT"],  
+        consts.GRID_RANGE["ALT"],
     )
 
-    return labels
+    return labels.reshape(num_frames, -1)
 
 
 def get_windows(data: npt.NDArray, width: int, offset: int):
@@ -156,6 +163,7 @@ if __name__ == "__main__":
     X_train, X_test, y_train, y_test = train_test_split(
         X, y, test_size=0.33, random_state=42
     )
+    print("TRAIN-TEST-SPLIT created")
 
     model = model_initializer()
     print(f"X: {X.shape}, y: {y.shape}")
