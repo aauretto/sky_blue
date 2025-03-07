@@ -21,7 +21,7 @@ def get_spread_radius(overlap):
         spread_map[overlap >= i] = i - 1  # If at least 2 overlaps, use (i-1)x(i-1) spread
     return spread_map
 
-def spread_max_values(merged, overlap_map, spread=2):
+def spread_max_values(merged, overlap_map, spread=1):
     """Applies spreading to max values based on overlap map."""
     spread_radius = get_spread_radius(overlap_map)
     safe_merged = np.where(np.isnan(merged), -np.inf, merged)   # TODO: Replace with background risk instead of negative infinity
@@ -31,13 +31,13 @@ def spread_max_values(merged, overlap_map, spread=2):
     for radius in np.unique(spread_radius):
         if radius > 0:
             mask = (spread_radius == radius)
-            filtered = maximum_filter(safe_merged, size=(spread * radius + 1, spread * radius + 1, 1))
+            filtered = maximum_filter(safe_merged, size=(2 * spread * radius + 1, spread * radius + 1, 1))
             output[mask] = filtered[mask]
     return output
 
 
 # =================== Max Merge Spread (max merge 2.0) =======================
-def merge_max_spread(pireps, spread=2):
+def merge_max_spread(pireps, spread=1):
     """ Merge with a spread function that accounts for overlap.
     More overlap means the it will pull the max from a wider area.
     On purpose does not spread in the alititude dimension."""
@@ -50,7 +50,7 @@ def merge_max_spread(pireps, spread=2):
         return merged
 
 
-def merge_overlap_spread(max_map, overlap_map, spread=2):
+def merge_overlap_spread(max_map, overlap_map, spread=1):
     """ Merge with a spread function that accounts for overlap.
     More overlap means the it will pull the max from a wider area.
     On purpose does not spread in the alititude dimension.
