@@ -12,7 +12,8 @@ import pirep as pr
 import satellite as st
 from pirep.defs.spreading import concatenate_all_pireps
 
-BACKGROUND_RISK = 0.01
+BACKGROUND_RISKS = [0.01, 0.03, 0.05, 0.07]
+BACKGROUND_RISK = BACKGROUND_RISKS[0]
 
 
 def get_data(
