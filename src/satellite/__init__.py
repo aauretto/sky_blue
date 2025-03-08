@@ -79,7 +79,7 @@ def project(
 ) -> npt.ArrayLike | npt.DTypeLike:
     from consts import GRID_RANGE, MAP_RANGE
     from utils.convert import convert_coord as convert
-    print("Starting Projection")
+
     # Create coordinate mask
     lat_mask = (lat >= MAP_RANGE["LAT"]["MIN"]) & (lat <= MAP_RANGE["LAT"]["MAX"])
     lon_mask = (lon >= MAP_RANGE["LON"]["MIN"]) & (lon <= MAP_RANGE["LON"]["MAX"])
@@ -96,8 +96,8 @@ def project(
     )
     data[:, rows, cols, :] = temps
 
-    print("Returning Projection")
     return data
+
 
 # Currently this smooths a single band in a single file *(MAY NOT WORK ON EVERY BAND)
 # Expects 1500 x 2500
@@ -114,17 +114,21 @@ def smooth(all_data):
             all_data[f, :, :, b] = smooth_single_band(all_data[f, :, :, b])
     return all_data
 
-def smooth_single_band(data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike:
+
+def smooth_single_band(
+    data: npt.ArrayLike | npt.DTypeLike,
+) -> npt.ArrayLike | npt.DTypeLike:
     from scipy.ndimage import distance_transform_edt
 
-    ## runs after projection, gets points that are in between buckets from 
+    ## runs after projection, gets points that are in between buckets from
     #  projection AND things that are not inside frame of GOES E
-    empty_mask = data <= 0     # If band data is lt 0 then it may not work
+    empty_mask = data <= 0  # If band data is lt 0 then it may not work
     indices = distance_transform_edt(
-            empty_mask, return_distances=False, return_indices=True
-        )
+        empty_mask, return_distances=False, return_indices=True
+    )
     data[empty_mask] = data[tuple(indices[:, empty_mask])]
     return data
+
 
 def union_sat_data(
     west: npt.ArrayLike | npt.DTypeLike, east: npt.ArrayLike | npt.DTypeLike

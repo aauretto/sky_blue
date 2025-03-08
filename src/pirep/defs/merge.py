@@ -14,31 +14,37 @@ def compute_overlap(arrays):
     overlap = np.sum(~np.isnan(stacked), axis=0)  # Count non-NaN values
     return overlap
 
+
 def get_spread_radius(overlap):
     """Maps an overlap count to a spread radius. Radius = count - 1."""
     spread_map = np.zeros_like(overlap, dtype=int)
     for i in range(2, np.max(overlap)):
-        spread_map[overlap >= i] = i - 1  # If at least 2 overlaps, use (i-1)x(i-1) spread
+        spread_map[overlap >= i] = (
+            i - 1
+        )  # If at least 2 overlaps, use (i-1)x(i-1) spread
     return spread_map
+
 
 def spread_max_values(merged, overlap_map, spread=1):
     """Applies spreading to max values based on overlap map."""
     spread_radius = get_spread_radius(overlap_map)
-    safe_merged = np.where(np.isnan(merged), -np.inf, merged)   # TODO: Replace with background risk instead of negative infinity
+    safe_merged = np.where(np.isnan(merged), -np.inf, merged)
     output = safe_merged.copy()
-    
+
     # Apply max filtering with different spread sizes
     for radius in np.unique(spread_radius):
         if radius > 0:
-            mask = (spread_radius == radius)
-            filtered = maximum_filter(safe_merged, size=(2 * spread * radius + 1, spread * radius + 1, 1))
+            mask = spread_radius == radius
+            filtered = maximum_filter(
+                safe_merged, size=(2 * spread * radius + 1, spread * radius + 1, 1)
+            )
             output[mask] = filtered[mask]
     return output
 
 
 # =================== Max Merge Spread (max merge 2.0) =======================
 def merge_max_spread(pireps, spread=1):
-    """ Merge with a spread function that accounts for overlap.
+    """Merge with a spread function that accounts for overlap.
     More overlap means the it will pull the max from a wider area.
     On purpose does not spread in the alititude dimension."""
     merged = merge_max(pireps)  # Step 1: Element-wise max
@@ -51,7 +57,7 @@ def merge_max_spread(pireps, spread=1):
 
 
 def merge_overlap_spread(max_map, overlap_map, spread=1):
-    """ Merge with a spread function that accounts for overlap.
+    """Merge with a spread function that accounts for overlap.
     More overlap means the it will pull the max from a wider area.
     On purpose does not spread in the alititude dimension.
     Note: This does the same as above but takes the max and overlap array as
@@ -67,14 +73,32 @@ def merge_overlap_spread(max_map, overlap_map, spread=1):
 # Testing and example usage of merge max:
 test_merge_max = False
 if test_merge_max:
-    array1 = np.array([[[1, 0, 0], [1, 0, 0], [1, 0, 0]], [[1, 0, 0], [1, 0, 0], [1, 0, 0]], [[1, 0, 0], [1, 0, 0], [1, 0, 0]]])
-    array2 = np.array([[[1, 2, 0], [1, 2, 0], [1, 2, 0]], [[0, 0, 0], [0, 0, 0], [0, 0, 0]], [[0, 0, 0], [0, 0, 0], [0, 0, 0]]])
-    array3 = np.array([[[0, 0, 0], [0, 0, 0], [0, 0, 0]], [[0, 0, 0], [0, 0, 0], [3, 3, 3]], [[3, 3, 3], [3, 3, 3], [3, 3, 3]]])
+    array1 = np.array(
+        [
+            [[1, 0, 0], [1, 0, 0], [1, 0, 0]],
+            [[1, 0, 0], [1, 0, 0], [1, 0, 0]],
+            [[1, 0, 0], [1, 0, 0], [1, 0, 0]],
+        ]
+    )
+    array2 = np.array(
+        [
+            [[1, 2, 0], [1, 2, 0], [1, 2, 0]],
+            [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+            [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+        ]
+    )
+    array3 = np.array(
+        [
+            [[0, 0, 0], [0, 0, 0], [0, 0, 0]],
+            [[0, 0, 0], [0, 0, 0], [3, 3, 3]],
+            [[3, 3, 3], [3, 3, 3], [3, 3, 3]],
+        ]
+    )
 
     merged_array = merge_max([array1, array2, array3])
     print(merged_array)
-    
-# Testing and example usage of merge max spread. 
+
+# Testing and example usage of merge max spread.
 test_merge_max_spread = False
 if test_merge_max_spread:
     array1 = np.zeros((5, 4, 3))
@@ -89,7 +113,7 @@ if test_merge_max_spread:
 
     array1[0, 0, :] = 1
     array2[0, 0, :2] = 1
-    array3[0, 0, :1] = 1 # Overlap at (0,0), spreading should activate
+    array3[0, 0, :1] = 1  # Overlap at (0,0), spreading should activate
 
     array1[0, 1, 0] = 2
     array1[0, 2, 0] = 3

@@ -10,7 +10,9 @@ from sklearn.model_selection import train_test_split
 import consts as consts
 import pirep as pr
 import satellite as st
-from pirep.defs.spreading import concatenate_all_pireps
+
+from generator import Generator
+import keras_tuner as kt
 
 BACKGROUND_RISKS = [0.01, 0.03, 0.05, 0.07]
 BACKGROUND_RISK = BACKGROUND_RISKS[0]
@@ -37,114 +39,92 @@ def get_data(
         len(bands),
     )
 
-    return data, timestamps
+    return dict(zip(timestamps, data)), timestamps
 
 
-def bin_labels(frames: dict, num_frames: int, timestamps: npt.ArrayLike) -> npt.NDArray:
-    labels = np.zeros(
-        (
-            num_frames,
-            consts.GRID_RANGE["LAT"],
-            consts.GRID_RANGE["LON"],
-            consts.GRID_RANGE["ALT"],
-        )
-    )
-
-    for i, timestamp in enumerate(timestamps[:1]):
-        filtered_frames = {
-            frame_timestamp: frame
-            for frame_timestamp, frame in frames.items()
-            if (frame_timestamp - timestamp) / dt.timedelta(minutes=1)
-            <= consts.PIREP_RELEVANCE_DURATION
-        }
-
-        window = list(filtered_frames.values())
-        binned_window = concatenate_all_pireps(window, BACKGROUND_RISK)
-        labels[i] = binned_window
-
-    return labels
-
-
-# TODO make this a full and complete wrapper
 def get_labels(
     start: dt.datetime,
     end: dt.datetime,
-    num_frames: int,
-    timestamps: npt.ArrayLike,
-) -> npt.NDArray:
+) -> dict:
     # Retrieve PIREPs
     reports: list[dict] = pr.parse_all(pr.fetch(pr.url(start, end)))
     print("Parsed reports")
     # Convert reports to grids
-    frames = dict(map(lambda row: (row["Timestamp"], row), reports))
-    labels = bin_labels(frames, num_frames, timestamps)
-    assert labels.shape == (
-        num_frames,
-        consts.GRID_RANGE["LAT"],
-        consts.GRID_RANGE["LON"],
-        consts.GRID_RANGE["ALT"],
-    )
+    labels = dict(map(lambda row: (row["Timestamp"], row), reports))
 
-    return labels.reshape(num_frames, -1)
+    return labels
 
 
-def get_windows(data: npt.NDArray, width: int, offset: int):
-    # data.shape = (n, 1500, 2500, 6)
-    # data_output.shape = (k, (w, 1500, 2500, 6))
-    num_frames = data.shape[0]
-    num_windows = (num_frames - width) // offset + 1
-    data_windows = np.array(
-        [data[idx * offset : idx * offset + width, :] for idx in range(num_windows)]
-    )
-
-    return data_windows
-
-
-def model_initializer():
+def model_initializer(hp):
     # Model parameters
     num_classes = 14
     out_steps = 4  # how many time units outward to predict
+    lat_size = consts.GRID_RANGE["LAT"]
+    lon_size = consts.GRID_RANGE["LON"]
 
-    model = keras.Sequential(
-        [
-            # Shape => [batch, out_steps, lats * lons * alts].
-            keras.layers.Reshape(
-                [
-                    out_steps,
-                    consts.GRID_RANGE["LAT"] * consts.GRID_RANGE["LON"] * 6,
-                ]
-            ),
-            # Shape [batch, time, features] => [batch, lstm_units].
-            # Adding more `lstm_units` just overfits more quickly.
-            keras.layers.LSTM(
-                units=consts.GRID_RANGE["LAT"] * consts.GRID_RANGE["LON"] * num_classes
-            ),
-            # Shape => [batch, out_steps*features].
-            keras.layers.Dense(
-                consts.GRID_RANGE["LAT"] * consts.GRID_RANGE["LON"] * num_classes,
-                kernel_initializer=tf.zeros_initializer(),
-            ),
-            # Shape => [batch, out_steps, features].
-            keras.layers.Reshape(
-                [
-                    out_steps,
-                    consts.GRID_RANGE["LAT"],
-                    consts.GRID_RANGE["LON"],
-                    num_classes,
-                ]
-            ),
-        ]
+    model = keras.Sequential()
+    model.add(
+        keras.layers.ConvLSTM2D(
+            filters=hp.Int("filters", min_value=16, max_value=64, step=16),
+            kernel_size=(3, 3),
+            padding="same",
+            return_sequences=True,
+            input_shape=(out_steps, lat_size, lon_size, 6),
+        )
+    )
+
+    # Dropout for regularization
+    model.add(
+        keras.layers.Dropout(
+            rate=hp.Float("dropout_rate", min_value=0.2, max_value=0.5, step=0.1)
+        )
+    )
+
+    # 1x1 Conv2D to reduce feature map to num_classes
+    model.add(
+        keras.layers.Conv3D(
+            filters=num_classes,
+            kernel_size=(1, 1, 1),
+            activation="linear",
+            padding="same",
+        )
     )
 
     # Compile the model
     model.compile(
         loss=keras.losses.MeanSquaredError(),
-        optimizer=keras.optimizers.Adam(),
+        optimizer=keras.optimizers.Adam(
+            learning_rate=hp.Float(
+                "learning_rate", min_value=1e-4, max_value=1e-2, sampling="LOG"
+            )
+        ),
         metrics=[keras.metrics.MeanAbsoluteError()],
     )
 
     # model.summary()
     return model
+
+
+def run_hyperparameter_tuning(
+    train_dataset: keras.utils.PyDataset,
+    val_dataset: keras.utils.PyDataset,
+):
+    tuner = kt.Hyperband(
+        model_initializer,
+        objective="val_loss",  # Minimize validation loss
+        max_epochs=10,  # Maximum number of epochs per trial
+        factor=3,  # The factor by which the number of trials decreases
+        directory="kt_tuning",  # Directory to save results
+        project_name="hyperparameter_tuning",
+    )
+
+    tuner.search(train_dataset, epochs=10, validation_data=val_dataset)
+
+    best_model = tuner.get_best_models(num_models=1)[0]
+    best_hyperparameters = tuner.oracle.get_best_trials(num_trials=1)[0].hyperparameters
+
+    print("Best Hyperparameters:", best_hyperparameters.values)
+    return best_model
 
 
 if __name__ == "__main__":
@@ -153,23 +133,27 @@ if __name__ == "__main__":
 
     data, timestamps = get_data(start, end)
     print("DATA has been retrieved")
-    labels = get_labels(start, end, data.shape[0], timestamps)
+    labels = get_labels(start, end)
     print("LABELS have been retrieved")
-    data_windows = get_windows(data, 4, 2)
-    label_windows = get_windows(labels, 4, 2)
-    print("WINDOWS have been retrieved")
-    # MODEL TRAINING
-    X = data_windows
-    y = label_windows
-    print("Windowed data assigned")
-    X_train, X_test, y_train, y_test = train_test_split(
-        X, y, test_size=0.33, random_state=42
+
+    t_train, t_test = train_test_split(timestamps, test_size=0.33, random_state=42)
+
+    # print("TRAIN-TEST-SPLIT created")
+    t_train, t_val = train_test_split(t_train, test_size=0.2, random_state=42)
+
+    # print("TRAIN-VAL-SPLIT created")
+    train_dataset = Generator(
+        data, labels, t_train, 4, 1, 2, BACKGROUND_RISK
+    )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
+    test_dataset = Generator(data, labels, t_test, 4, 1, 2, BACKGROUND_RISK)
+    val_dataset = Generator(data, labels, t_val, 4, 1, 2, BACKGROUND_RISK)
+
+    print(
+        f"train: {len(train_dataset)}, test: {len(test_dataset)}, val: {len(val_dataset)}"
     )
-    print("TRAIN-TEST-SPLIT created")
 
-    model = model_initializer()
-    print(f"X: {X.shape}, y: {y.shape}")
-    model.fit(X_train, y_train, epochs=10, batch_size=32)
-
-    # model.evaluate(): To calculate the loss values for the input data
-    # model.predict(): To generate network output for the input data
+    best_model = run_hyperparameter_tuning(train_dataset, val_dataset)
+    best_model.summary()
+    best_model.fit(train_dataset, epochs=10, batch_size=32)
+    # final_loss, final_mae = best_model.evaluate(X_test, y_test)
+    # print(f"Test Loss: {final_loss}, Test MAE: {final_mae}")

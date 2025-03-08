@@ -4,3 +4,4 @@
 **/.nova
 **/.venv
 **/.ruff_cache
+**/kt_tuning
