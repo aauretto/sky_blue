@@ -31,11 +31,18 @@ The HPC container should be pushed to a remote repo so it can be pulled on the H
 2) Rename docker image to whatever you want it to be named in the repo: `docker tag <local_image>:<tag> <desired_name>:<desired_tag>`
 3) Push to repo: `docker push <desired_name>:<desired_tag>`
 
-# How to pull Docker image on HPC
+# How to pull Docker image on HPC:
 1) Log into a HPC node
-2) Use Singularity to pull, convert, and the docker image
+2) module load singularity
+3) Use Singularity to pull, convert, and the docker image
    `singularity pull docker://<username>/<container_name>`
-3)
+4) This creates a .sif file that acts as a runnable image using the below steps:
+
+# How to run the model training script on the HPC:
+1) Locate the .sif from the previous section
+2) Run the file using:
+   `singularity shell --bind <Output dir on hpc>:/skyblue/model_weights skyblue_dev_latest.sif`
+
 
 ### PIREP GRID FORMAT ###
 When the pireps are placed on their grid, the grid is `np.nan` everywhere else and NEG events are set to the background risk and will be later 0ed during spreading
