@@ -13,7 +13,7 @@ To build the image from the top level of the GitHub Repository (aka skyblue) do 
 `docker build -t <image_name>:latest -f ./<Dockerfile> .`
 
 To run the dev container:
-Do this command: `docker run -it --rm -v ${PWD}:/skyblue/ <image_name>:latest`
+Do this command: `docker run --gpus all -it --rm -v ${PWD}:/skyblue/ <image_name>:latest`
 The above command needs to be run from the skyblue directory on your computer and will sync the container files with local ones
 
 To run, do python3.12 <fileName> to use the version of Python supported by the container.
