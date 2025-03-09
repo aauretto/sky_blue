@@ -59,7 +59,9 @@ class Generator(keras.utils.PyDataset):
                 ]
             )  # Shape (time, lat, lon, num_classes)
             print("SHAPE YS:", ys.shape)
-
+            if xs.shape[0] == 0 or ys.shape[0] == 0:
+                print(f"Skipping empty sequence at batch {index}")
+                continue  # Skip empty data
             batch_x.append(xs)
             batch_y.append(ys)
 
