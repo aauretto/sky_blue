@@ -5,7 +5,7 @@ import numpy as np
 import tensorflow as tf
 from goes2go import GOES
 from numpy import typing as npt
-from sklearn.model_selection import train_test_split
+from sklearn.model_selection import train_test_split, RandomizedSearchCV
 
 import consts as consts
 import pirep as pr
@@ -13,6 +13,7 @@ import satellite as st
 
 from generator import Generator
 import keras_tuner as kt
+from memory_profiler import profile
 
 BACKGROUND_RISKS = [0.01, 0.03, 0.05, 0.07]
 BACKGROUND_RISK = BACKGROUND_RISKS[0]
@@ -104,7 +105,7 @@ def model_initializer(hp):
     # model.summary()
     return model
 
-
+@profile
 def run_hyperparameter_tuning(
     train_dataset: keras.utils.PyDataset,
     val_dataset: keras.utils.PyDataset,
@@ -117,15 +118,53 @@ def run_hyperparameter_tuning(
         directory="kt_tuning",  # Directory to save results
         project_name="hyperparameter_tuning",
     )
-
-    tuner.search(train_dataset, epochs=10, validation_data=val_dataset)
-
+    print("About to do the tuner search")
+    tuner.search(train_dataset, epochs=1, validation_data=val_dataset)
+    print("a best model has been retrieved")
     best_model = tuner.get_best_models(num_models=1)[0]
     best_hyperparameters = tuner.oracle.get_best_trials(num_trials=1)[0].hyperparameters
 
     print("Best Hyperparameters:", best_hyperparameters.values)
     return best_model
 
+
+def run_hyperparameter_tuning_skelarn(
+    train_dataset: keras.utils.PyDataset,
+    val_dataset: keras.utils.PyDataset,
+):
+    print("Splitting data for train")
+    X_train, y_train = train_dataset
+    print("Splitting data for test")
+    X_val, y_val = val_dataset
+    "Initializing"
+    model = model_initializer()
+    print("About to do the tuner search")
+    param_distributions = {
+        'batch_size': [16, 32, 64],
+        'epochs': [5, 10, 20],
+        'optimizer': ['adam', 'rmsprop'],
+        'learning_rate': [0.001, 0.01, 0.1],
+    }
+    
+    # Run random search
+    tuner = RandomizedSearchCV(
+        estimator=model,
+        param_distributions=param_distributions,
+        n_iter=10,  # Number of different settings to try
+        scoring='neg_mean_squared_error',  # Optimization metric
+        cv=3,  # Cross-validation folds
+        verbose=1,
+        n_jobs=-1
+    )
+    print("Starting hyperparameter search...")
+    tuner.fit(X_train, y_train, validation_data=(X_val, y_val))
+    
+    print("Best model retrieved")
+    best_model = tuner.best_estimator_
+    best_hyperparameters = tuner.best_params_
+    
+    print("Best Hyperparameters:", best_hyperparameters)
+    return best_model
 
 if __name__ == "__main__":
     start = dt.datetime(2024, 11, 6, 0, 0)
@@ -137,21 +176,30 @@ if __name__ == "__main__":
     print("LABELS have been retrieved")
 
     t_train, t_test = train_test_split(timestamps, test_size=0.33, random_state=42)
+    print(f"Number of training samples{len(t_train)}") # 8 
+    print(f"Number of testing samples{len(t_test)}") # 4
 
     # print("TRAIN-TEST-SPLIT created")
     t_train, t_val = train_test_split(t_train, test_size=0.2, random_state=42)
-
+    print(f"Number of training samples{len(t_train)}") #  6
+    print(f"Number of validation samples{len(t_val)}") # 2
     # print("TRAIN-VAL-SPLIT created")
+    print("TRAINING GENERATOR")
     train_dataset = Generator(
         data, labels, t_train, 4, 1, 2, BACKGROUND_RISK
     )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
+    print(f"Length of train dataset: {len(train_dataset)}")
+    print("TESTING GENERATOR")
     test_dataset = Generator(data, labels, t_test, 4, 1, 2, BACKGROUND_RISK)
+    print(f"Length of test dataset: {len(test_dataset)}")
+    print("VALIDATION GENERATIOB")
     val_dataset = Generator(data, labels, t_val, 4, 1, 2, BACKGROUND_RISK)
+    print(f"Length of val dataset: {len(val_dataset)}")
 
     print(
         f"train: {len(train_dataset)}, test: {len(test_dataset)}, val: {len(val_dataset)}"
     )
-
+    print("About to run the hyperparameter tuning loop")
     best_model = run_hyperparameter_tuning(train_dataset, val_dataset)
     best_model.summary()
     best_model.fit(train_dataset, epochs=10, batch_size=32)
