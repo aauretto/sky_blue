@@ -18,4 +18,3 @@ RUN python3.12 -m pip install -r requirements.txt
 
 # Run main when we spin up container
 # CMD ["python", "/skyblue/src/main.py"]
-CMD ["sh", "-c", "cd /skyblue && python3.12 /skyblue/src/model.py"]

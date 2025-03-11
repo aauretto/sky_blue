@@ -188,14 +188,14 @@ if __name__ == "__main__":
     best_model = run_hyperparameter_tuning(train_dataset, val_dataset)
     best_model.summary()
 
-    # checkpoint_path = "persistent_files/best_model_checkpoint.h5"
-    # checkpoint_callback = keras.callbacks.ModelCheckpoint(
-    #     filepath=checkpoint_path,
-    #     monitor="val_loss",  # Monitor validation loss
-    #     save_best_only=True,  # Save only the best model
-    #     save_weights_only=False,  # Save entire model (structure + weights)
-    #     verbose=1,
-    # )
+    checkpoint_path = "persistent_files/best_model_checkpoint.h5"
+    checkpoint_callback = keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_path,
+        monitor="val_loss",  # Monitor validation loss
+        save_best_only=True,  # Save only the best model
+        save_weights_only=False,  # Save entire model (structure + weights)
+        verbose=1,
+    )
 
     # best_model.fit(train_dataset, epochs=10, checkpoint_callback=[checkpoint_callback])
     # final_loss, final_mae = best_model.evaluate(X_test, y_test)
