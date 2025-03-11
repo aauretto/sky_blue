@@ -109,21 +109,30 @@ def run_hyperparameter_tuning(
     train_dataset: keras.utils.Sequence,
     val_dataset: keras.utils.Sequence,
 ):
-    tuner = kt.Hyperband(
+    # tuner = kt.Hyperband(
+    #     model_initializer,
+    #     objective="val_loss",  # Minimize validation loss
+    #     max_epochs=10,  # Maximum number of epochs per trial
+    #     factor=3,  # The factor by which the number of trials decreases
+    #     directory="kt_tuning",  # Directory to save results
+    #     project_name="hyperparameter_tuning",
+    # )
+    tuner = kt.RandomSearch(
         model_initializer,
         objective="val_loss",  # Minimize validation loss
-        max_epochs=10,  # Maximum number of epochs per trial
-        factor=3,  # The factor by which the number of trials decreases
+        max_trials=5,  # Maximum number of epochs per trial
         directory="kt_tuning",  # Directory to save results
         project_name="hyperparameter_tuning",
     )
     print("About to do the tuner search")
-    tuner.search(train_dataset, epochs=10, validation_data=val_dataset)
+    tuner.search(train_dataset, epochs=10, validation_data=val_dataset, verbose=2)
     print("a best model has been retrieved")
-    best_hyperparameters = tuner.get_best_hyperparameters(num_trials=1)[0].hyperparameters
+    best_hyperparameters = tuner.get_best_hyperparameters(num_trials=1)[
+        0
+    ].hyperparameters
     print(best_hyperparameters.values)
     best_model = tuner.get_best_models(num_models=1)
-    print(  best_model[0].summary())
+    print(best_model[0].summary())
     return best_model
 
 
@@ -160,19 +169,34 @@ if __name__ == "__main__":
     print(
         f"train: {len(train_dataset)}, test: {len(test_dataset)}, val: {len(val_dataset)}"
     )
+    # Code to test the model initializer
+    # test_hp = kt.HyperParameters()
+    # test_model = model_initializer(test_hp)
+    # test_model.summary()
+
+    # Code to test the data
+    # sample_x, sample_y = train_dataset[0]
+    # print("Sample X Shape", sample_x)
+    # print("Sample Y Shape", sample_y)
+
+    # Test a single training step
+    # sample_x, sample_y = train_dataset[0]
+    # model = model_initializer(kt.HyperParameters())
+    # model.fit(sample_x, sample_y, epochs=1)
+
     print("About to run the hyperparameter tuning loop")
     best_model = run_hyperparameter_tuning(train_dataset, val_dataset)
     best_model.summary()
 
-    checkpoint_path = "persistent_files/best_model_checkpoint.h5"
-    checkpoint_callback = keras.callbacks.ModelCheckpoint(
-        filepath=checkpoint_path,
-        monitor="val_loss",  # Monitor validation loss
-        save_best_only=True,  # Save only the best model
-        save_weights_only=False,  # Save entire model (structure + weights)
-        verbose=1,
-    )
+    # checkpoint_path = "persistent_files/best_model_checkpoint.h5"
+    # checkpoint_callback = keras.callbacks.ModelCheckpoint(
+    #     filepath=checkpoint_path,
+    #     monitor="val_loss",  # Monitor validation loss
+    #     save_best_only=True,  # Save only the best model
+    #     save_weights_only=False,  # Save entire model (structure + weights)
+    #     verbose=1,
+    # )
 
-    best_model.fit(train_dataset, epochs=10, checkpoint_callback=[checkpoint_callback])
+    # best_model.fit(train_dataset, epochs=10, checkpoint_callback=[checkpoint_callback])
     # final_loss, final_mae = best_model.evaluate(X_test, y_test)
     # print(f"Test Loss: {final_loss}, Test MAE: {final_mae}")
