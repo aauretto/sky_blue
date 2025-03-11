@@ -120,10 +120,10 @@ def run_hyperparameter_tuning(
     print("About to do the tuner search")
     tuner.search(train_dataset, epochs=10, validation_data=val_dataset)
     print("a best model has been retrieved")
-    best_model = tuner.get_best_models(num_models=1)[0]
-    best_hyperparameters = tuner.oracle.get_best_trials(num_trials=1)[0].hyperparameters
-
-    print("Best Hyperparameters:", best_hyperparameters.values)
+    best_hyperparameters = tuner.get_best_hyperparameters(num_trials=1)[0].hyperparameters
+    print(best_hyperparameters.values)
+    best_model = tuner.get_best_models(num_models=1)
+    print(  best_model[0].summary())
     return best_model
 
 
@@ -164,16 +164,15 @@ if __name__ == "__main__":
     best_model = run_hyperparameter_tuning(train_dataset, val_dataset)
     best_model.summary()
 
-    # checkpoint_path = "persistent_files/best_model_checkpoint.h5"
-    # checkpoint_callback = keras.callbacks.ModelCheckpoint(
-    #     filepath=checkpoint_path,
-    #     monitor="val_loss",  # Monitor validation loss
-    #     save_best_only=True,  # Save only the best model
-    #     save_weights_only=False,  # Save entire model (structure + weights)
-    #     verbose=1,
-    # )
+    checkpoint_path = "persistent_files/best_model_checkpoint.h5"
+    checkpoint_callback = keras.callbacks.ModelCheckpoint(
+        filepath=checkpoint_path,
+        monitor="val_loss",  # Monitor validation loss
+        save_best_only=True,  # Save only the best model
+        save_weights_only=False,  # Save entire model (structure + weights)
+        verbose=1,
+    )
 
-    best_model.fit(train_dataset, epochs=10)
-    # best_model.fit(train_dataset, epochs=10, checkpoint_callback=[checkpoint_callback])
+    best_model.fit(train_dataset, epochs=10, checkpoint_callback=[checkpoint_callback])
     # final_loss, final_mae = best_model.evaluate(X_test, y_test)
     # print(f"Test Loss: {final_loss}, Test MAE: {final_mae}")
