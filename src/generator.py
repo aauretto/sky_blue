@@ -3,9 +3,10 @@ import numpy as np
 import keras
 import consts
 from pirep.defs.spreading import concatenate_all_pireps
+from memory_profiler import profile
 
 
-class Generator(keras.utils.PyDataset):
+class Generator(keras.utils.Sequence):
     def __init__(
         self,
         data: dict,
@@ -29,9 +30,9 @@ class Generator(keras.utils.PyDataset):
 
         self.background_risk = background_risk
 
-    def __len__(self):
-        return (len(self.T) - self.offset) // (self.stride * self.width)
-
+    def __len__(self): # this returns the length of the window
+        return (len(self.T) - self.offset) // (self.width - self.offset)
+    @profile
     def __getitem__(self, index):
         batch_x = []
         batch_y = []
@@ -40,7 +41,7 @@ class Generator(keras.utils.PyDataset):
             if time_idx >= len(self.T) - self.offset:
                 break  # Stop if we exceed available time indices
 
-            ts = self.T[time_idx * self.offset : time_idx * self.offset + self.width]
+            ts = self.T[time_idx * self.offset : time_idx * self.offset + self.width : self.stride]
 
             xs = np.array([self.X[t] for t in ts])  # Shape (time, lat, lon, channels)
             print("SHAPE XS:", xs.shape)
@@ -65,13 +66,18 @@ class Generator(keras.utils.PyDataset):
             batch_x.append(xs)
             batch_y.append(ys)
 
-        if len(batch_x) < self.batch_size:
-            print(f"Skipping incomplete batch {index} with size {len(batch_x)}")
-            return self.__getitem__((index + 1) % self.__len__()) 
-        # Convert lists to numpy arrays with batch dimension
-        batch_x = np.array(batch_x)  # Shape (batch_size, time, lat, lon, channels)
-        batch_y = np.array(batch_y)  # Shape (batch_size, time, lat, lon, num_classes)
+        # if len(batch_x) < self.batch_size:
+        #     print(f"Skipping incomplete batch {index} with size {len(batch_x)}")
+        #     return self.__getitem__((index + 1) % self.__len__()) 
+        # # Convert lists to numpy arrays with batch dimension
+        # batch_x = np.array(batch_x)  # Shape (batch_size, time, lat, lon, channels)
+        # batch_y = np.array(batch_y)  # Shape (batch_size, time, lat, lon, num_classes)
 
-        print(f"Batch {index}: X.shape={batch_x.shape}, Y.shape={batch_y.shape}")
-        print(f"Batch X shape is {batch_x.shape} and Batch Y shape is {batch_y.shape} from generator")
-        return batch_x, batch_y
+        # print(f"Batch {index}: X.shape={batch_x.shape}, Y.shape={batch_y.shape}")
+        # print(f"Batch X shape is {batch_x.shape} and Batch Y shape is {batch_y.shape} from generator")
+        # return batch_x, batch_y
+        while len(batch_x) < self.batch_size:
+            batch_x.append(np.zeros_like(batch_x[-1]))
+            batch_y.append(np.zeros_like(batch_y[-1]))
+
+        return np.array(batch_x), np.array(batch_y)

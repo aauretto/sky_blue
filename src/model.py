@@ -107,8 +107,8 @@ def model_initializer(hp):
 
 @profile
 def run_hyperparameter_tuning(
-    train_dataset: keras.utils.PyDataset,
-    val_dataset: keras.utils.PyDataset,
+    train_dataset: keras.utils.Sequence,
+    val_dataset: keras.utils.Sequence,
 ):
     tuner = kt.Hyperband(
         model_initializer,
@@ -119,51 +119,12 @@ def run_hyperparameter_tuning(
         project_name="hyperparameter_tuning",
     )
     print("About to do the tuner search")
-    tuner.search(train_dataset, epochs=1, validation_data=val_dataset)
+    tuner.search(train_dataset, epochs=10, validation_data=val_dataset)
     print("a best model has been retrieved")
     best_model = tuner.get_best_models(num_models=1)[0]
     best_hyperparameters = tuner.oracle.get_best_trials(num_trials=1)[0].hyperparameters
 
     print("Best Hyperparameters:", best_hyperparameters.values)
-    return best_model
-
-
-def run_hyperparameter_tuning_skelarn(
-    train_dataset: keras.utils.PyDataset,
-    val_dataset: keras.utils.PyDataset,
-):
-    print("Splitting data for train")
-    X_train, y_train = train_dataset
-    print("Splitting data for test")
-    X_val, y_val = val_dataset
-    "Initializing"
-    model = model_initializer()
-    print("About to do the tuner search")
-    param_distributions = {
-        'batch_size': [16, 32, 64],
-        'epochs': [5, 10, 20],
-        'optimizer': ['adam', 'rmsprop'],
-        'learning_rate': [0.001, 0.01, 0.1],
-    }
-    
-    # Run random search
-    tuner = RandomizedSearchCV(
-        estimator=model,
-        param_distributions=param_distributions,
-        n_iter=10,  # Number of different settings to try
-        scoring='neg_mean_squared_error',  # Optimization metric
-        cv=3,  # Cross-validation folds
-        verbose=1,
-        n_jobs=-1
-    )
-    print("Starting hyperparameter search...")
-    tuner.fit(X_train, y_train, validation_data=(X_val, y_val))
-    
-    print("Best model retrieved")
-    best_model = tuner.best_estimator_
-    best_hyperparameters = tuner.best_params_
-    
-    print("Best Hyperparameters:", best_hyperparameters)
     return best_model
 
 if __name__ == "__main__":

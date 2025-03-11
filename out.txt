@@ -1,0 +1,68 @@
+ 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110016174_e20243110018558_c20243110019071.nc 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110001174_e20243110003547_c20243110004084.nc 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110006174_e20243110008547_c20243110009063.nc
+ 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110011174_e20243110013547_c20243110014082.nc 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110026174_e20243110028547_c20243110029066.nc 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110021174_e20243110023547_c20243110024082.nc
+
+ 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110031174_e20243110033547_c20243110034063.nc
+ 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110036174_e20243110038547_c20243110039065.nc
+
+
+ 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110046174_e20243110048547_c20243110049067.nc
+ 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110041174_e20243110043547_c20243110044056.nc
+ 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110051174_e20243110053547_c20243110054070.nc
+
+ 👮🏻‍♂️ File already exists. Do not overwrite: /root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110056174_e20243110058547_c20243110059060.nc
+📦 Finished downloading [12] files to [/root/data/noaa-goes16/ABI-L2-MCMIPC].
+📖💽 Reading (1/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110001174_e20243110003547_c20243110004084.nc]. 📖💽 Reading (2/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110006174_e20243110008547_c20243110009063.nc]. 📖💽 Reading (3/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110011174_e20243110013547_c20243110014082.nc]. 📖💽 Reading (4/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110016174_e20243110018558_c20243110019071.nc]. 📖💽 Reading (5/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110021174_e20243110023547_c20243110024082.nc]. 📖💽 Reading (6/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110026174_e20243110028547_c20243110029066.nc]. 📖💽 Reading (7/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110031174_e20243110033547_c20243110034063.nc]. 📖💽 Reading (8/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110036174_e20243110038547_c20243110039065.nc]. 📖💽 Reading (9/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110041174_e20243110043547_c20243110044056.nc]. 📖💽 Reading (10/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110046174_e20243110048547_c20243110049067.nc]. 📖💽 Reading (11/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110051174_e20243110053547_c20243110054070.nc]. 📖💽 Reading (12/12) file from LOCAL COPY [/root/data/noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110056174_e20243110058547_c20243110059060.nc]. concatenate Datasets                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        📚 Finished reading [12] files into xarray.Dataset.
+DATA has been retrieved
+Failed to parse PIREP: MTJ UA /OV MTJ250035/TM 0001/FL250/TP B738/SK TOP 240-250/TB CONT LGT CHOP 250 OCNL MOD/RM ZDVWC-12
+Traceback (most recent call last):
+  File "/skyblue/src/pirep/__init__.py", line 55, in parse
+    report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/report.py", line 73, in parse
+    entries = Turbulence.parse(val, altitude)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/turbulence.py", line 50, in parse
+    altitude = Altitude.parse(m["altitude"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/altitude.py", line 55, in parse
+    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
+                     ^^^^^^^^
+ValueError: invalid literal for int() with base 10: '250 OCNL MOD'
+
+Parsed reports
+LABELS have been retrieved
+Number of training samples8
+Number of testing samples4
+Number of training samples6
+Number of validation samples2
+TRAINING GENERATOR
+Length of train dataset: 2
+TESTING GENERATOR
+Length of test dataset: 1
+VALIDATION GENERATIOB
+Length of val dataset: 0
+train: 2, test: 1, val: 0
+About to run the hyperparameter tuning loop
+Reloading Tuner from kt_tuning/hyperparameter_tuning/tuner0.json
+About to do the tuner search
+
+Search: Running Trial #3
+
+Value             |Best Value So Far |Hyperparameter
+32                |32                |filters
+0.4               |0.2               |dropout_rate
+0.00049034        |0.0027374         |learning_rate
+2                 |2                 |tuner/epochs
+0                 |0                 |tuner/initial_epoch
+2                 |2                 |tuner/bracket
+0                 |0                 |tuner/round
+
+SHAPE XS: (4, 1500, 2500, 6)
+SHAPE YS: (4, 1500, 2500, 14)
+SHAPE XS: (4, 1500, 2500, 6)
+SHAPE YS: (4, 1500, 2500, 14)
+SHAPE XS: (2, 1500, 2500, 6)
+SHAPE YS: (2, 1500, 2500, 14)
+SHAPE XS: (0,)
+SHAPE YS: (0,)
+Skipping empty sequence at batch 0
