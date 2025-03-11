@@ -47,5 +47,8 @@ The HPC container should be pushed to a remote repo so it can be pulled on the H
         can use to save files that need to exist beyond the lifetime of the container. In (3), 
         the second argument will be mounted in as `/skyblue/persistent_files`
 
+### Provision GPU on HPC
+srun -t 0-01:00 -p preempt --gres=gpu:h100:1 --pty bash
+
 ### PIREP GRID FORMAT ###
 When the pireps are placed on their grid, the grid is `np.nan` everywhere else and NEG events are set to the background risk and will be later 0ed during spreading
