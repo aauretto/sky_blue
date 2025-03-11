@@ -164,5 +164,9 @@ def concatenate_all_pireps(reports: list[dict], BACKGROUND_RISK: int):
         finalGrid = merge.merge_max(
             [finalGrid, tmpGrid]
         )  # TODO change which spread we want
-    # TODO replace -infty/NaaN with background risk
+
+    locs = np.where(np.isnan(finalGrid) | np.isneginf(finalGrid))
+    finalGrid[locs] = BACKGROUND_RISK
+
+
     return finalGrid
