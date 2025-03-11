@@ -109,21 +109,15 @@ def run_hyperparameter_tuning(
     train_dataset: keras.utils.Sequence,
     val_dataset: keras.utils.Sequence,
 ):
-    # tuner = kt.Hyperband(
-    #     model_initializer,
-    #     objective="val_loss",  # Minimize validation loss
-    #     max_epochs=10,  # Maximum number of epochs per trial
-    #     factor=3,  # The factor by which the number of trials decreases
-    #     directory="kt_tuning",  # Directory to save results
-    #     project_name="hyperparameter_tuning",
-    # )
-    tuner = kt.RandomSearch(
+    tuner = kt.Hyperband(
         model_initializer,
         objective="val_loss",  # Minimize validation loss
-        max_trials=5,  # Maximum number of epochs per trial
+        max_epochs=10,  # Maximum number of epochs per trial
+        factor=3,  # The factor by which the number of trials decreases
         directory="kt_tuning",  # Directory to save results
         project_name="hyperparameter_tuning",
     )
+
     print("About to do the tuner search")
     tuner.search(train_dataset, epochs=10, validation_data=val_dataset, verbose=2)
     print("a best model has been retrieved")
