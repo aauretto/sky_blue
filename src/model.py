@@ -13,6 +13,12 @@ import consts as consts
 import pirep as pr
 import satellite as st
 from generator import Generator
+import psutil
+import os
+
+def get_memory_usage():
+    process = psutil.Process(os.getpid())
+    return process.memory_info().rss  # Resident Set Size (RSS) in bytes
 
 BACKGROUND_RISKS = [0.01, 0.03, 0.05, 0.07]
 BACKGROUND_RISK = BACKGROUND_RISKS[0]
@@ -47,6 +53,7 @@ def get_labels(
     end: dt.datetime,
 ) -> dict:
     # Retrieve PIREPs
+    print(f"\n\n\n************************* get_labels Mem = {get_memory_usage()}*************************\n\n")
     reports: list[dict] = pr.parse_all(pr.fetch(pr.url(start, end)))
     print("Parsed reports")
     # Convert reports to grids
@@ -109,6 +116,7 @@ def run_hyperparameter_tuning(
     train_dataset: keras.utils.Sequence,
     val_dataset: keras.utils.Sequence,
 ):
+    print(f"\n\n\n************************* Start run_hyperparameter_tuning Mem = {get_memory_usage()}*************************\n\n")
     tuner = kt.Hyperband(
         model_initializer,
         objective="val_loss",  # Minimize validation loss
@@ -117,36 +125,45 @@ def run_hyperparameter_tuning(
         directory="kt_tuning",  # Directory to save results
         project_name="hyperparameter_tuning",
     )
+    print(f"\n\n\n*************************  run_hyperparameter_tuning KT Tuner initialized Mem = {get_memory_usage()}*************************\n\n")
 
     print("About to do the tuner search")
     tuner.search(train_dataset, epochs=10, validation_data=val_dataset, verbose=2)
+    print(f"\n\n\n*************************  KT Tuner Search has run Mem = {get_memory_usage()}*************************\n\n")
     print("a best model has been retrieved")
     best_hyperparameters = tuner.get_best_hyperparameters(num_trials=1)[
         0
     ].hyperparameters
+    print(f"\n\n\n*************************   run_hyperparameter_tuning best hyperparems retrieved Mem = {get_memory_usage()}*************************\n\n")
     print(best_hyperparameters.values)
     best_model = tuner.get_best_models(num_models=1)
+    print(f"\n\n\n*************************   run_hyperparameter_tuning best model retrieved Mem = {get_memory_usage()}*************************\n\n")
     print(best_model[0].summary())
     return best_model
 
 
 if __name__ == "__main__":
+    print(f"\n\n\n************************* Start program Mem = {get_memory_usage()}*************************\n\n")
     multiprocessing.set_start_method("forkserver", force=False)
 
     start = dt.datetime(2024, 11, 6, 0, 0)
     end = dt.datetime(2024, 11, 6, 0, 30)
-
+    print(f"\n\n\n************************* Datetime made Mem = {get_memory_usage()}*************************\n\n")
     data, timestamps = get_data(start, end)
+    print(f"\n\n\n************************* Data retrieved Mem = {get_memory_usage()}*************************\n\n")
     print("DATA has been retrieved")
     labels = get_labels(start, end)
+    print(f"\n\n\n************************* Labels retrieved Mem = {get_memory_usage()}*************************\n\n")
     print("LABELS have been retrieved")
 
     t_train, t_test = train_test_split(timestamps, test_size=0.33, random_state=42)
+    print(f"\n\n\n************************* Train test for train and test split Mem = {get_memory_usage()}*************************\n\n")
     print(f"Number of training samples{len(t_train)}")  # 8
     print(f"Number of testing samples{len(t_test)}")  # 4
 
     # print("TRAIN-TEST-SPLIT created")
     t_train, t_val = train_test_split(t_train, test_size=0.2, random_state=42)
+    print(f"\n\n\n************************* Train test split for train and val Mem = {get_memory_usage()}*************************\n\n")
     print(f"Number of training samples{len(t_train)}")  # 6
     print(f"Number of validation samples{len(t_val)}")  # 2
     # print("TRAIN-VAL-SPLIT created")
@@ -154,12 +171,15 @@ if __name__ == "__main__":
     train_dataset = Generator(
         data, labels, t_train, 2, 1, 1, BACKGROUND_RISK, 2
     )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
+    print(f"\n\n\n************************* Train generator memory check = {get_memory_usage()}*************************\n\n")
     print(f"Length of train dataset: {len(train_dataset)}")
     print("TESTING GENERATOR")
     test_dataset = Generator(data, labels, t_test, 2, 1, 1, BACKGROUND_RISK, 2)
+    print(f"\n\n\n************************* Test generator memory check = {get_memory_usage()}*************************\n\n")
     print(f"Length of test dataset: {len(test_dataset)}")
     print("VALIDATION GENERATIOB")
     val_dataset = Generator(data, labels, t_val, 2, 1, 1, BACKGROUND_RISK, 2)
+    print(f"\n\n\n************************* Val generator memory check = {get_memory_usage()}*************************\n\n")
     print(f"Length of val dataset: {len(val_dataset)}")
 
     print(
@@ -181,10 +201,14 @@ if __name__ == "__main__":
     # model.fit(sample_x, sample_y, epochs=1)
 
     print("About to run the hyperparameter tuning loop")
-    best_model = run_hyperparameter_tuning(train_dataset, val_dataset)
+    print(f"\n\n\n************************* Right before hyperparameter tuning memory check = {get_memory_usage()}*************************\n\n")
+    best_model = run_hyperparameter_tuning(train_dataset, val_dataset) # TODO checkpoint the best model returned by KT Tuner
+    print(f"\n\n\n************************* Right after hyperparameter tuning memory check = {get_memory_usage()}*************************\n\n")
     best_model.summary()
 
+    print(f"\n\n\n************************* Checkpoint about to be created memory check = {get_memory_usage()}*************************\n\n")
     checkpoint_path = "persistent_files/best_model_checkpoint.h5"
+    print(f"\n\n\n************************* Checkpoint path created memory check = {get_memory_usage()}*************************\n\n")
     checkpoint_callback = keras.callbacks.ModelCheckpoint(
         filepath=checkpoint_path,
         monitor="val_loss",  # Monitor validation loss
@@ -192,7 +216,9 @@ if __name__ == "__main__":
         save_weights_only=False,  # Save entire model (structure + weights)
         verbose=1,
     )
+    print(f"\n\n\n************************* Checkpoint callback created memory check = {get_memory_usage()}*************************\n\n")
 
-    # best_model.fit(train_dataset, epochs=10, checkpoint_callback=[checkpoint_callback])
+    best_model.fit(train_dataset, epochs=10, checkpoint_callback=[checkpoint_callback])
+    print(f"\n\n\n************************* Best model has been fit we are done created memory check = {get_memory_usage()}*************************\n\n")
     # final_loss, final_mae = best_model.evaluate(X_test, y_test)
     # print(f"Test Loss: {final_loss}, Test MAE: {final_mae}")

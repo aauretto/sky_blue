@@ -11,8 +11,8 @@ def fetch(timestamp: dt.datetime, satellite: GOES) -> Dataset:
 
 
 def fetch_range(start: dt.datetime, end: dt.datetime, satellite: GOES) -> Dataset:
+    # return satellite.timerange(start, end, return_as="xarray", download=False, max_cpus=1)
     return satellite.timerange(start, end, return_as="xarray")
-
 
 def fetch_bands(data: Dataset, bands: list[int]) -> DataArray:
     return (
