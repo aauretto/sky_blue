@@ -132,7 +132,7 @@ def run_hyperparameter_tuning(
 
 if __name__ == "__main__":
     start = dt.datetime(2024, 11, 6, 0, 0)
-    end = dt.datetime(2024, 11, 6, 2, 0)
+    end = dt.datetime(2024, 11, 6, 0, 30)
 
     data, timestamps = get_data(start, end)
     print("DATA has been retrieved")

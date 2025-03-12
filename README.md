@@ -16,6 +16,8 @@ To run the dev container:
 Do this command: `docker run --gpus all -it --rm -v ${PWD}:/skyblue/ <image_name>:latest`
 The above command needs to be run from the skyblue directory on your computer and will sync the container files with local ones
 
+To run the CUDA dev container with the GPUS: `docker run -it --gpus all --rm -v ${PWD}:/skyblue/ skyblue_cuda_dev:latest`
+
 To run, do python3.12 <fileName> to use the version of Python supported by the container.
 
 If there are build problems try running `docker system prune` -- Should never be the problem but its basically free to try.
@@ -49,6 +51,9 @@ The HPC container should be pushed to a remote repo so it can be pulled on the H
 
 ### Provision GPU on HPC
 srun -t 0-01:00 -p preempt --gres=gpu:h100:1 --pty bash
+
+### HPC Cleanup
+`singularity cache clean --force`
 
 ### PIREP GRID FORMAT ###
 When the pireps are placed on their grid, the grid is `np.nan` everywhere else and NEG events are set to the background risk and will be later 0ed during spreading
