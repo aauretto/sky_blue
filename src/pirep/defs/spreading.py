@@ -5,10 +5,17 @@ from pirep.defs.aircraft import Aircraft
 from consts import MAP_RANGE, GRID_RANGE
 
 import pirep.defs.merge as merge
+import gc
 
 # Data Source: https://journals.ametsoc.org/view/journals/bams/aop/BAMS-D-23-0142.1/BAMS-D-23-0142.1.pdf
 ### Altitudinal Computations ### Taken from the page 14 graphs of the source above
 from pirep.defs.generate_spreading_arrays import create_radial_grid
+import psutil
+import os
+
+def get_memory_usage():
+    process = psutil.Process(os.getpid())
+    return process.memory_info().rss  # Resident Set Size (RSS) in bytes
 
 # Disks that represent risk of turbulence relative to the point the pirep was reported at.
 RADIAL_KERNELS = {
@@ -146,6 +153,7 @@ def radial_spread(grid, intensity, BACKGROUND_RISK):
 
 # Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
 def concatenate_all_pireps(reports: list[dict], BACKGROUND_RISK: int):
+    print(f"\n\n\n************************* concatenate_all start {len(reports)=} Mem = {get_memory_usage()}*************************\n\n")
     # make final grid and temp grid
     finalGrid = np.full(
         (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan
@@ -153,6 +161,7 @@ def concatenate_all_pireps(reports: list[dict], BACKGROUND_RISK: int):
 
     import pirep as pr
 
+    print(f"\n\n\n************************* concatenate_all final grid made Mem = {get_memory_usage()}*************************\n\n")
     for report in reports:
         # print(f"{type(report)=}\n{report}", "\n============================================================")
         tmpGrid, aircraft, intensity = pr.compute_grid(report)
@@ -164,9 +173,12 @@ def concatenate_all_pireps(reports: list[dict], BACKGROUND_RISK: int):
         finalGrid = merge.merge_max(
             [finalGrid, tmpGrid]
         )  # TODO change which spread we want
-
+    del tmpGrid
+    gc.collect()
+    print(f"\n\n\n************************* concatenate_all report loop done Mem = {get_memory_usage()}*************************\n\n")
     locs = np.where(np.isnan(finalGrid) | np.isneginf(finalGrid))
     finalGrid[locs] = BACKGROUND_RISK
+    print(f"\n\n\n************************* concatenate_all done {len(reports)=} Mem = {get_memory_usage()}*************************\n\n")
 
 
     return finalGrid
