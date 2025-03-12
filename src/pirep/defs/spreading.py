@@ -4,6 +4,7 @@ from pirep.defs.aircraft import Aircraft
 
 from consts import MAP_RANGE, GRID_RANGE
 
+import gc
 import pirep.defs.merge as merge
 
 # Data Source: https://journals.ametsoc.org/view/journals/bams/aop/BAMS-D-23-0142.1/BAMS-D-23-0142.1.pdf
@@ -165,8 +166,14 @@ def concatenate_all_pireps(reports: list[dict], BACKGROUND_RISK: int):
             [finalGrid, tmpGrid]
         )  # TODO change which spread we want
 
-    locs = np.where(np.isnan(finalGrid) | np.isneginf(finalGrid))
-    finalGrid[locs] = BACKGROUND_RISK
+    del tmpGrid
+    gc.collect()
+    # locs = np.where(np.isnan(finalGrid) | np.isneginf(finalGrid))
+    # finalGrid[locs] = BACKGROUND_RISK
+    print(f"\n*************************Final Grid About to Create*************************")
+    mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
+    finalGrid[mask] = np.random.uniform(1e-5, 1e-7, size=mask.sum()) #TODO document magic numbers
+    print(f"\n*************************Final Grid Created*************************")
 
 
     return finalGrid
