@@ -134,7 +134,7 @@ if __name__ == "__main__":
     multiprocessing.set_start_method("forkserver", force=False)
 
     start = dt.datetime(2024, 11, 6, 0, 0)
-    end = dt.datetime(2024, 11, 6, 0, 30)
+    end = dt.datetime(2024, 11, 6, 1, 0)
 
     data, timestamps = get_data(start, end)
     print("DATA has been retrieved")
