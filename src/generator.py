@@ -30,6 +30,7 @@ class Generator(keras.utils.Sequence):
         self.background_risk = background_risk
 
     def __len__(self):  # this returns the length of the window
+            # TODO PyDatset docstring says that len method should return the number of batches in the dataset rather than the number of samples
         return (
             (len(self.T) - self.offset) // (self.width - self.offset) // self.batch_size
         )
