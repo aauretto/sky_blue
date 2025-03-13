@@ -37,76 +37,6 @@ def generate_timestamps(
     return timestamps
 
 
-def generate_test_timestamps():
-    """
-    Generates a list of 5 minutes seperated datetimes starting on minute 3
-    of 2025 ending on 2025-12-31
-
-    Returns
-    -------
-    a list of datetimes in the range
-    """
-    years = [2025, 2026]
-    months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    times = []
-    for y in years:
-        for m in months:
-            current = dt.datetime(y, m, 1, 0, 3, 0)
-
-            next_month = m + 1
-            next_year = y
-            if next_month > 12:
-                next_month = 1
-                next_year += 1
-            next_month_start = dt.datetime(next_year, next_month, 1, 0, 0)
-            recent_file_time = dt.datetime.now() - dt.timedelta(
-                days=1
-            )  # 24 window for NOAA to upload the data to the AWS bucket
-            if next_month_start > recent_file_time:
-                next_month_start = recent_file_time
-            while current < next_month_start:
-                times.append(current)
-                current = current + dt.timedelta(minutes=5)
-    return times
-
-
-def get_data(
-    start: dt.datetime,
-    end: dt.datetime,
-    sat: GOES = GOES(satellite=16, product="ABI", domain="C"),
-    bands: list[int] = [8, 9, 10, 13, 14, 15],
-) -> tuple[npt.NDArray, npt.ArrayLike]:
-    # Fetch satellite data
-    data = st.fetch_range(start, end, satellite=sat)
-
-    # Project data onto grid
-    lats, lons = st.calculate_coordinates(data)
-    band_data = st.fetch_bands(data, bands)
-    timestamps = np.array(band_data.coords["t"], dtype=np.datetime64)
-    data = st.smooth(st.project(lats, lons, band_data.data))
-
-    assert data.shape[1:] == (
-        consts.GRID_RANGE["LAT"],
-        consts.GRID_RANGE["LON"],
-        len(bands),
-    )
-
-    return dict(zip(timestamps, data)), timestamps
-
-
-def get_labels(
-    start: dt.datetime,
-    end: dt.datetime,
-) -> dict:
-    # Retrieve PIREPs
-    reports: list[dict] = pr.parse_all(pr.fetch(pr.url(start, end)))
-    print("Parsed reports")
-    # Convert reports to grids
-    labels = dict(map(lambda row: (row["Timestamp"], row), reports))
-
-    return labels
-
-
 def model_initializer(hp, frame_size: int = 9):
     # Model parameters
     num_classes = 14
@@ -229,11 +159,6 @@ if __name__ == "__main__":
     print("About to run the hyperparameter tuning loop")
     best_model = run_hyperparameter_tuning(train_generator, val_generator)
     best_model.summary()
-    # ******************************************************************#
-    exit(0)
-    # ******************************************************************#
-
-    # ******************************************************************#
 
     checkpoint_path = "persistent_files/best_model_checkpoint.h5"
     checkpoint_callback = keras.callbacks.ModelCheckpoint(
@@ -244,6 +169,8 @@ if __name__ == "__main__":
         verbose=1,
     )
 
-    # best_model.fit(train_dataset, epochs=10, checkpoint_callback=[checkpoint_callback])
+    best_model.fit(
+        train_generator, epochs=10, checkpoint_callback=[checkpoint_callback]
+    )
     # final_loss, final_mae = best_model.evaluate(X_test, y_test)
     # print(f"Test Loss: {final_loss}, Test MAE: {final_mae}")
