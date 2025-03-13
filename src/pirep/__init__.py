@@ -14,8 +14,8 @@ def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
     # URL parameters
     params = {
         # Convert dates to Zulu time
-        "sts": date_s.isoformat() + "Z",
-        "ets": date_e.isoformat() + "Z",
+        "sts": date_s.astimezone(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
+        "ets": date_e.astimezone(dt.UTC).strftime("%Y-%m-%dT%H:%M:%SZ"),
         "artcc": "_ALL",  # Fetch from all ATCs
         "fmt": "csv",
     }
