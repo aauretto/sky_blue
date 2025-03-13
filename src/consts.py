@@ -1,7 +1,4 @@
-# Chosen as shown for now, #TODO parametrize
-BACKGROUND_RISK = 0.0001 # smallest lookup turb risk = .1, smallest scale value for that is 1% so .001, then we said 10% of that
-
-PIREP_RELEVANCE_DURATION = 15 # mins
+PIREP_RELEVANCE_DURATION = 15  # mins
 
 # Map Range
 
@@ -15,7 +12,22 @@ MAP_RANGE = {
         "MAX": -66,  # degrees E
     },
     "ALT": {
-        "RANGE" : [1000, 3000, 6000, 9000, 12000, 15000, 18000, 21000, 24000, 27000, 30000, 36000, 42000, 48000] #TODO maybe a 0
+        "RANGE": [
+            1000,
+            3000,
+            6000,
+            9000,
+            12000,
+            15000,
+            18000,
+            21000,
+            24000,
+            27000,
+            30000,
+            36000,
+            42000,
+            48000,
+        ]  # TODO maybe a 0
         # "MIN": 0,  # ft
         # "MAX": 45_000,  # ft
     },
@@ -24,7 +36,7 @@ MAP_RANGE = {
 # Grid Range
 
 GRID_RANGE = {
-    "LAT": 1500, # number of rows
-    "LON": 2500, # number of cols
-    "ALT": len(MAP_RANGE["ALT"]["RANGE"]),   # number of z layers
+    "LAT": 1500,  # number of rows
+    "LON": 2500,  # number of cols
+    "ALT": len(MAP_RANGE["ALT"]["RANGE"]),  # number of z layers
 }
