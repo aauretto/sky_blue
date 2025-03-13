@@ -7,7 +7,7 @@ from xarray import DataArray, Dataset
 
 
 def fetch(timestamp: dt.datetime, satellite: GOES) -> Dataset:
-    return satellite.nearesttime(timestamp, download=False)
+    return satellite.nearesttime(timestamp, return_as="xarray", download=False)
 
 
 def fetch_range(start: dt.datetime, end: dt.datetime, satellite: GOES) -> Dataset:
