@@ -57,3 +57,8 @@ srun -t 0-01:00 -p preempt --gres=gpu:h100:1 --pty bash
 
 ### PIREP GRID FORMAT ###
 When the pireps are placed on their grid, the grid is `np.nan` everywhere else and NEG events are set to the background risk and will be later 0ed during spreading
+
+### Satellite Data TimeStamp Notes
+
+The AWS S3 Bucket from which GOES-16 ABI-L2 CMPIC Sattelite Images are pulled is not consistent with the TimeStamps matching when the satellite images were actually taken,
+especially on earlier years such as 2017. The team believes that this is due to satellite images being post-hoc uploaded to the S3 Bucket. Therefore, the timestamps from which we expect to pull satellite data are generated using dt.datetime independently in our model pipeline to avoid any such inconsistency issues.

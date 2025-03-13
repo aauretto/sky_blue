@@ -17,6 +17,66 @@ from generator import Generator
 BACKGROUND_RISKS = [0.01, 0.03, 0.05, 0.07]
 BACKGROUND_RISK = BACKGROUND_RISKS[0]
 
+def generate_combined_train_val_timestamps_set() -> list[dt.datetime]:
+    """
+    Generates a list of 5 minutes seperated datetimes starting on minute 3
+    of each year 2018-2024 and 2017 without Jan and Feb
+
+    Returns
+    -------
+    a list of datetimes in the range
+    """
+    years = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
+    months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    times = []
+    for y in years:
+        if y == 2025: # Heldout 2025 for testing
+            break
+        for m in months:
+            if y == 2017 and (m == 1 or m == 2): # 2017 Jan and Feb don't have data
+                continue
+            current = dt.datetime(y, m, 1, 0, 3, 0)
+
+            next_month = m + 1
+            next_year = y
+            if next_month > 12:
+                next_month = 1
+                next_year += 1
+            next_month_start = dt.datetime(next_year, next_month, 1, 0, 0)
+            while current < next_month_start:
+                times.append(current)
+                current = current + dt.timedelta(minutes=5)
+    return times  
+
+def generate_test_timestamps():
+    """
+    Generates a list of 5 minutes seperated datetimes starting on minute 3
+    of 2025 ending on 2025-12-31
+
+    Returns
+    -------
+    a list of datetimes in the range
+    """
+    years = [2025, 2026]
+    months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
+    times = []
+    for y in years:
+        for m in months:
+            current = dt.datetime(y, m, 1, 0, 3, 0)
+
+            next_month = m + 1
+            next_year = y
+            if next_month > 12:
+                next_month = 1
+                next_year += 1
+            next_month_start = dt.datetime(next_year, next_month, 1, 0, 0)
+            recent_file_time = dt.datetime.now() - dt.timedelta(days=1) # 24 window for NOAA to upload the data to the AWS bucket
+            if next_month_start > recent_file_time:
+                next_month_start = recent_file_time
+            while current < next_month_start:
+                times.append(current)
+                current = current + dt.timedelta(minutes=5)
+    return times
 
 def get_data(
     start: dt.datetime,
@@ -131,7 +191,34 @@ def run_hyperparameter_tuning(
 
 
 if __name__ == "__main__":
-    multiprocessing.set_start_method("forkserver", force=False)
+    multiprocessing.set_start_method("forkserver", force=True)
+    timestamps = generate_combined_train_val_timestamps_set()
+    # print(len(timestamps))
+    # print("The timestamps for our sliced time period are", timestamps[808416:808416+12])
+    # print(len(timestamps[808416:808416+12]))
+    t_train, t_val = train_test_split(timestamps[808416:808416+12], test_size=0.20, random_state=42) # timestamp slice is for the desired subset to train with
+    t_test = generate_test_timestamps()
+    print(f"Length of train dataset: ", len(t_train))
+    print(f"Length of val dataset: ", len(t_val))
+    print(f"Length of test dataset: ", len(t_test))
+    sat = GOES(satellite=16, product="ABI", domain="C")
+    bands = [8, 9, 10, 13, 14, 15]
+
+    train_generator = Generator(t_train, 2, 1, 1, BACKGROUND_RISK, 2, sat, bands) # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
+    val_generator = Generator(t_val, 2, 1, 1, BACKGROUND_RISK, 2, sat, bands)     # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
+
+
+
+
+
+
+
+    #******************************************************************#
+    exit(0)
+    #******************************************************************#
+
+
+
 
     start = dt.datetime(2024, 11, 6, 0, 0)
     end = dt.datetime(2024, 11, 6, 1, 0)
@@ -179,6 +266,7 @@ if __name__ == "__main__":
     # sample_x, sample_y = train_dataset[0]
     # model = model_initializer(kt.HyperParameters())
     # model.fit(sample_x, sample_y, epochs=1)
+    #******************************************************************#
 
     print("About to run the hyperparameter tuning loop")
     best_model = run_hyperparameter_tuning(train_dataset, val_dataset)
