@@ -26,6 +26,7 @@ def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
 
 
 def fetch(url: str) -> list[dict]:
+    print(url)
     df = pd.read_csv(url)
 
     # Fix dataframe columns
@@ -114,7 +115,11 @@ def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
 def compute_grid(report: dict) -> npt.NDArray:
     from consts import GRID_RANGE, MAP_RANGE
 
-    grid = np.full((GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan)
+    grid = np.full(
+        (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]),
+        np.nan,
+        dtype=np.float32,
+    )
 
     from pirep.defs.report import Aircraft, Altitude, Location, Turbulence
 

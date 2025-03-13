@@ -7,7 +7,11 @@ from xarray import DataArray, Dataset
 
 
 def fetch(timestamp: dt.datetime, satellite: GOES) -> Dataset:
-    return satellite.nearesttime(timestamp, return_as="xarray", download=False)
+    return satellite.nearesttime(
+        dt.datetime.fromtimestamp(timestamp.timestamp(), tz=None),
+        return_as="xarray",
+        download=False,
+    )
 
 
 def fetch_range(start: dt.datetime, end: dt.datetime, satellite: GOES) -> Dataset:
@@ -92,7 +96,8 @@ def project(
 
     # Shape data into grid
     data = np.zeros(
-        (temps.shape[0], GRID_RANGE["LAT"], GRID_RANGE["LON"], temps.shape[-1])
+        (temps.shape[0], GRID_RANGE["LAT"], GRID_RANGE["LON"], temps.shape[-1]),
+        dtype=np.float32,
     )
     data[:, rows, cols, :] = temps
 
