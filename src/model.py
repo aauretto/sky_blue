@@ -4,20 +4,20 @@ import multiprocessing
 import keras
 import keras_tuner as kt
 import numpy as np
-import tensorflow as tf
+from numpy import random as rnd
 from goes2go import GOES
 from numpy import typing as npt
-from sklearn.model_selection import RandomizedSearchCV, train_test_split
 
 import consts as consts
 import pirep as pr
 import satellite as st
 from generator import Generator
 
-BACKGROUND_RISKS = [0.01, 0.03, 0.05, 0.07]
-BACKGROUND_RISK = BACKGROUND_RISKS[0]
 
-def generate_combined_train_val_timestamps_set() -> list[dt.datetime]:
+def generate_timestamps(
+    start: dt.datetime = dt.datetime(2017, 3, 1, 0, 3),
+    end: dt.datetime = dt.datetime(2025, 1, 1, 0, 0),
+) -> list[dt.datetime]:
     """
     Generates a list of 5 minutes seperated datetimes starting on minute 3
     of each year 2018-2024 and 2017 without Jan and Feb
@@ -26,27 +26,16 @@ def generate_combined_train_val_timestamps_set() -> list[dt.datetime]:
     -------
     a list of datetimes in the range
     """
-    years = [2017, 2018, 2019, 2020, 2021, 2022, 2023, 2024, 2025]
-    months = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12]
-    times = []
-    for y in years:
-        if y == 2025: # Heldout 2025 for testing
-            break
-        for m in months:
-            if y == 2017 and (m == 1 or m == 2): # 2017 Jan and Feb don't have data
-                continue
-            current = dt.datetime(y, m, 1, 0, 3, 0)
 
-            next_month = m + 1
-            next_year = y
-            if next_month > 12:
-                next_month = 1
-                next_year += 1
-            next_month_start = dt.datetime(next_year, next_month, 1, 0, 0)
-            while current < next_month_start:
-                times.append(current)
-                current = current + dt.timedelta(minutes=5)
-    return times  
+    timestamps = [[] for _ in range(12)]
+    current_time = start
+
+    while current_time < end:
+        timestamps[current_time.minute // 5].append(current_time)
+        current_time = current_time + dt.timedelta(minutes=5)
+
+    return timestamps
+
 
 def generate_test_timestamps():
     """
@@ -70,13 +59,16 @@ def generate_test_timestamps():
                 next_month = 1
                 next_year += 1
             next_month_start = dt.datetime(next_year, next_month, 1, 0, 0)
-            recent_file_time = dt.datetime.now() - dt.timedelta(days=1) # 24 window for NOAA to upload the data to the AWS bucket
+            recent_file_time = dt.datetime.now() - dt.timedelta(
+                days=1
+            )  # 24 window for NOAA to upload the data to the AWS bucket
             if next_month_start > recent_file_time:
                 next_month_start = recent_file_time
             while current < next_month_start:
                 times.append(current)
                 current = current + dt.timedelta(minutes=5)
     return times
+
 
 def get_data(
     start: dt.datetime,
@@ -115,15 +107,14 @@ def get_labels(
     return labels
 
 
-def model_initializer(hp):
+def model_initializer(hp, frame_size: int = 9):
     # Model parameters
     num_classes = 14
-    out_steps = 4  # how many time units outward to predict
     lat_size = consts.GRID_RANGE["LAT"]
     lon_size = consts.GRID_RANGE["LON"]
 
     model = keras.Sequential()
-    model.add(keras.layers.Input((out_steps, lat_size, lon_size, 6)))
+    model.add(keras.layers.Input((frame_size, lat_size, lon_size, 6)))
     model.add(
         keras.layers.ConvLSTM2D(
             filters=hp.Int("filters", min_value=16, max_value=64, step=16),
@@ -192,85 +183,57 @@ def run_hyperparameter_tuning(
 
 if __name__ == "__main__":
     multiprocessing.set_start_method("forkserver", force=True)
-    timestamps = generate_combined_train_val_timestamps_set()
-    # print(len(timestamps))
-    # print("The timestamps for our sliced time period are", timestamps[808416:808416+12])
-    # print(len(timestamps[808416:808416+12]))
-    t_train, t_val = train_test_split(timestamps[808416:808416+12], test_size=0.20, random_state=42) # timestamp slice is for the desired subset to train with
-    t_test = generate_test_timestamps()
-    print(f"Length of train dataset: ", len(t_train))
-    print(f"Length of val dataset: ", len(t_val))
-    print(f"Length of test dataset: ", len(t_test))
+    timestamps = generate_timestamps(
+        start=dt.datetime(2024, 11, 6, 0, 0, tzinfo=dt.UTC),
+        end=dt.datetime(2024, 11, 6, 12, 0, tzinfo=dt.UTC),
+    )
+    # print([len(sequence) for sequence in timestamps])
+    # print([sequence[0] for sequence in timestamps])
+    # print("\n\n\n\n")
+    # print([sequence[90] for sequence in timestamps])
+
+    rng = rnd.default_rng(seed=42)
+    rng.shuffle(timestamps)
+    t_train, t_val = timestamps[:10], timestamps[10:]
+    t_test = generate_timestamps(
+        start=dt.datetime(2025, 1, 1, 0, 0, tzinfo=dt.UTC),
+        end=dt.datetime.now(tz=dt.UTC),
+    )
+
+    print("Length of train dataset: ", len(t_train))
+    print("Length of val dataset: ", len(t_val))
+    print("Length of test dataset: ", len(t_test))
+
     sat = GOES(satellite=16, product="ABI", domain="C")
     bands = [8, 9, 10, 13, 14, 15]
 
-    train_generator = Generator(t_train, 2, 1, 1, BACKGROUND_RISK, 2, sat, bands) # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
-    val_generator = Generator(t_val, 2, 1, 1, BACKGROUND_RISK, 2, sat, bands)     # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
-
-
-
-
-
-
-
-    #******************************************************************#
-    exit(0)
-    #******************************************************************#
-
-
-
-
-    start = dt.datetime(2024, 11, 6, 0, 0)
-    end = dt.datetime(2024, 11, 6, 1, 0)
-
-    data, timestamps = get_data(start, end)
-    print("DATA has been retrieved")
-    labels = get_labels(start, end)
-    print("LABELS have been retrieved")
-
-    t_train, t_test = train_test_split(timestamps, test_size=0.33, random_state=42)
-    print(f"Number of training samples{len(t_train)}")  # 8
-    print(f"Number of testing samples{len(t_test)}")  # 4
-
-    # print("TRAIN-TEST-SPLIT created")
-    t_train, t_val = train_test_split(t_train, test_size=0.2, random_state=42)
-    print(f"Number of training samples{len(t_train)}")  # 6
-    print(f"Number of validation samples{len(t_val)}")  # 2
-    # print("TRAIN-VAL-SPLIT created")
-    print("TRAINING GENERATOR")
-    train_dataset = Generator(
-        data, labels, t_train, 2, 1, 1, BACKGROUND_RISK, 2
+    train_generator = Generator(
+        t_train, batch_size=1, frame_size=9, sat=sat, bands=bands
     )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
-    print(f"Length of train dataset: {len(train_dataset)}")
-    print("TESTING GENERATOR")
-    test_dataset = Generator(data, labels, t_test, 2, 1, 1, BACKGROUND_RISK, 2)
-    print(f"Length of test dataset: {len(test_dataset)}")
-    print("VALIDATION GENERATIOB")
-    val_dataset = Generator(data, labels, t_val, 2, 1, 1, BACKGROUND_RISK, 2)
-    print(f"Length of val dataset: {len(val_dataset)}")
+    val_generator = Generator(
+        t_val, batch_size=1, frame_size=9, sat=sat, bands=bands
+    )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
+    test_generator = Generator(
+        t_test, batch_size=1, frame_size=9, sat=sat, bands=bands
+    )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
 
-    print(
-        f"train: {len(train_dataset)}, test: {len(test_dataset)}, val: {len(val_dataset)}"
-    )
+    print("train batches: ", len(train_generator))
+    print("val batches: ", len(val_generator))
+    print("test batches: ", len(test_generator))
+
     # Code to test the model initializer
     # test_hp = kt.HyperParameters()
-    # test_model = model_initializer(test_hp)
+    # test_model = model_initializer(test_hp, frame_size=9)
     # test_model.summary()
 
-    # Code to test the data
-    # sample_x, sample_y = train_dataset[0]
-    # print("Sample X Shape", sample_x)
-    # print("Sample Y Shape", sample_y)
-
-    # Test a single training step
-    # sample_x, sample_y = train_dataset[0]
-    # model = model_initializer(kt.HyperParameters())
-    # model.fit(sample_x, sample_y, epochs=1)
-    #******************************************************************#
-
     print("About to run the hyperparameter tuning loop")
-    best_model = run_hyperparameter_tuning(train_dataset, val_dataset)
+    best_model = run_hyperparameter_tuning(train_generator, val_generator)
     best_model.summary()
+    # ******************************************************************#
+    exit(0)
+    # ******************************************************************#
+
+    # ******************************************************************#
 
     checkpoint_path = "persistent_files/best_model_checkpoint.h5"
     checkpoint_callback = keras.callbacks.ModelCheckpoint(
