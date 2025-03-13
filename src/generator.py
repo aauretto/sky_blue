@@ -7,6 +7,7 @@ import pirep as pr
 import satellite as st
 import xarray as xr
 import datetime as dt
+from numpy import typing as npt
 
 from pirep.defs.spreading import concatenate_all_pireps
 
@@ -25,11 +26,11 @@ class Generator(keras.utils.Sequence):
     ): #TODO no more background risk
         super().__init__(**kwargs)
         self.times = timestamps
-        self.width = width
-        self.stride = stride
-        self.offset = offset # TODO what are these value
-        self.batch_size = batch_size
-        self.background_risk = background_risk,
+        self.width = width # number of (satellite, pirep) instances in a frame should be 9 because 8hrs + now
+        self.stride = stride # remove was the stride between (satellite, pirep) instances in a frame
+        self.offset = offset # removed (was how far you slide the frame window forward)
+        self.batch_size = batch_size # the size of a batch
+        self.background_risk = background_risk, #remove
         self.sat = sat,
         self.bands = bands
 
@@ -69,40 +70,32 @@ class Generator(keras.utils.Sequence):
 
 
     def __retreive_y_frame(self, timestamps: list[dt.datetime]):
+        return np.array([self.__retrieve_y_datum(t) for t in timestamps])
 
+    def __retrieve_y_datum(self, timestamp: dt.datetime) -> npt.NDArray:
+        start = timestamp - dt.timedelta(minutes = consts.PIREP_RELEVANCE_DURATION)
+        end = timestamp + dt.timedelta(minutes = consts.PIREP_RELEVANCE_DURATION)
+        return concatenate_all_pireps(pr.parse_all(pr.fetch(pr.url(start, end)))) 
+        
+    
+    def __generate_frames(self, timestamp: dt.datetime) -> list[dt.datetime]:
+        return [timestamp + dt.timedelta(hours = 1) * i for i in range(9)] # Magic number 
+            
     
     def __getitem__(self, batch_index): #gets a batch
         batch_x = []
         batch_y = []
 
-        for sample_index in range(self.batch_size):
-            # TODO document these
-            idx = batch_index * self.batch_size + sample_index
+        batch_times = self.times[batch_index * self.batch_size:(batch_index + 1) * self.batch_size]
+        frames_timestamps = [self.__generate_frames(t) for t in batch_times]
+        # Warning: be careful of incomplete batches (len(batch_times) != batch_size )
 
-            ts = self.times[
-                idx * self.offset : idx * self.offset + self.width : self.stride
-            ]
-
-            xs, updated_timestamps = self.__retreive_x_frame(ts)
+        for frame_times in frames_timestamps:
             
-            # xs = np.array([self.X[t] for t in ts])  # Shape (time, lat, lon, channels)
-            print("SHAPE XS:", xs.shape)
-
-            ys = np.array(
-                [
-                    concatenate_all_pireps(
-                        [
-                            frame
-                            for t_frame, frame in self.Y.items()
-                            if abs((t_frame - t) / dt.timedelta(minutes=1))
-                            <= consts.PIREP_RELEVANCE_DURATION
-                        ],
-                        self.background_risk,
-                    )
-                    for t in ts
-                ]
-            )  # Shape (time, lat, lon, num_classes)
-            print("SHAPE YS:", ys.shape)
+            xs, updated_timestamps = self.__retreive_x_frame(frame_times)
+            print("SHAPE XS:", xs.shape) # Shape (9, lat, lon, bands)
+            ys = self.__retreive_y_frame(updated_timestamps)
+            print("SHAPE YS:", ys.shape) # Shape (9, lat, lon, alt)
 
             if xs.shape[0] == 0 or ys.shape[0] == 0:
                 print(f"Skipping empty sequence at batch {batch_index}")
@@ -110,10 +103,6 @@ class Generator(keras.utils.Sequence):
 
             batch_x.append(xs)
             batch_y.append(ys)
-
-        # if len(batch_x) < self.batch_size:
-        #     print(f"Skipping incomplete batch {index} with size {len(batch_x)}")
-        #     return self.__getitem__((index + 1) % self.__len__())
 
         batch_x = np.array(batch_x)  # Shape (batch_size, time, lat, lon, channels)
         batch_y = np.array(batch_y)  # Shape (batch_size, time, lat, lon, num_classes)
