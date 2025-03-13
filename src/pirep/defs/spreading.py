@@ -146,7 +146,7 @@ def radial_spread(grid, intensity, BACKGROUND_RISK):
 
 
 # Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
-def concatenate_all_pireps(reports: list[dict], BACKGROUND_RISK: int):
+def concatenate_all_pireps(reports: list[dict], background_risk: int):
     # make final grid and temp grid
     finalGrid = np.full(
         (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan
@@ -159,7 +159,7 @@ def concatenate_all_pireps(reports: list[dict], BACKGROUND_RISK: int):
         tmpGrid, aircraft, intensity = pr.compute_grid(report)
 
         # spread pirep in temp grid
-        spread_pirep(tmpGrid, aircraft, intensity, BACKGROUND_RISK)
+        spread_pirep(tmpGrid, aircraft, intensity, background_risk)
 
         # merge temp grid with final grid
         finalGrid = merge.merge_max(
@@ -170,10 +170,13 @@ def concatenate_all_pireps(reports: list[dict], BACKGROUND_RISK: int):
     gc.collect()
     # locs = np.where(np.isnan(finalGrid) | np.isneginf(finalGrid))
     # finalGrid[locs] = BACKGROUND_RISK
-    print(f"\n*************************Final Grid About to Create*************************")
+    print(
+        f"\n*************************Final Grid About to Create*************************"
+    )
     mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
-    finalGrid[mask] = np.random.uniform(1e-5, 1e-7, size=mask.sum()) #TODO document magic numbers
+    finalGrid[mask] = np.random.uniform(
+        1e-5, 1e-7, size=mask.sum()
+    )  # TODO document magic numbers
     print(f"\n*************************Final Grid Created*************************")
-
 
     return finalGrid
