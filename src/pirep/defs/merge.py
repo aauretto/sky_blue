@@ -1,7 +1,7 @@
 import numpy as np
 from scipy.ndimage import maximum_filter
 
-
+#TODO make sure float 32s stay the same when we get to this
 def merge_max(pireps):
     """This is a naive merge function. It just takes the max value at each point"""
     return np.nanmax(pireps, axis=0)

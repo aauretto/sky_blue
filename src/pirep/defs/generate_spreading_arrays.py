@@ -48,7 +48,8 @@ RADIAL_RISKS = {
 # spread a pirep in the horzintal direction
 def create_empty_grid(bounding):
     return np.full(((2 * int(np.ceil((100 + bounding) * KM_TO_CELLS_VERTICAL))) | 1,  # | == Make it odd operator
-                     (2 * int(np.ceil((100 + bounding) * KM_TO_CELLS_HORIZONTAL))) | 1), np.nan)
+                     (2 * int(np.ceil((100 + bounding) * KM_TO_CELLS_HORIZONTAL))) | 1),
+                     np.nan, dtype=np.float32)
 
 def calc_risk_from_dist(dist_km, risks):
     idx = np.abs(risks[0] - dist_km).argmin()

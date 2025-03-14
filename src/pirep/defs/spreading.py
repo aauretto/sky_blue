@@ -149,7 +149,8 @@ def radial_spread(grid, intensity, BACKGROUND_RISK):
 def concatenate_all_pireps(reports: list[dict], background_risk: int):
     # make final grid and temp grid
     finalGrid = np.full(
-        (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan
+        (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan,
+        dtype=np.float32
     )
 
     import pirep as pr
