@@ -1,0 +1,394 @@
+ ╭─goes2go──────────────────────────────────────────────╮
+ │ INFO: Created a default config file.                 │
+ │ You may view/edit goes2go's configuration here:      │
+ │           /root/.config/goes2go/config.toml          │
+ ╰──────────────────────────────────────────────────────╯
+
+Length of train dataset:  10
+Length of val dataset:  2
+Length of test dataset:  12
+train batches:  110
+val batches:  22
+test batches:  20935
+About to run the hyperparameter tuning loop
+Reloading Tuner from kt_tuning/hyperparameter_tuning/tuner0.json
+About to do the tuner search
+
+Search: Running Trial #3
+
+Value             |Best Value So Far |Hyperparameter
+32                |32                |filters
+0.4               |0.2               |dropout_rate
+0.00049034        |0.0027374         |learning_rate
+2                 |2                 |tuner/epochs
+0                 |0                 |tuner/initial_epoch
+2                 |2                 |tuner/bracket
+0                 |0                 |tuner/round
+
+
+
+
+
+ ABOUT TO GO INTO __getitem__
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/09/OR_ABI-L2-MCMIPC-M6_G16_s20243110901174_e20243110903547_c20243110904068.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/10/OR_ABI-L2-MCMIPC-M6_G16_s20243111001174_e20243111003547_c20243111004062.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/11/OR_ABI-L2-MCMIPC-M6_G16_s20243111101174_e20243111103547_c20243111104067.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/12/OR_ABI-L2-MCMIPC-M6_G16_s20243111201174_e20243111203547_c20243111204057.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/13/OR_ABI-L2-MCMIPC-M6_G16_s20243111301174_e20243111303553_c20243111304070.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/14/OR_ABI-L2-MCMIPC-M6_G16_s20243111401174_e20243111403559_c20243111404066.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/15/OR_ABI-L2-MCMIPC-M6_G16_s20243111501174_e20243111503547_c20243111504064.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/16/OR_ABI-L2-MCMIPC-M6_G16_s20243111601174_e20243111603547_c20243111604072.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/17/OR_ABI-L2-MCMIPC-M6_G16_s20243111701174_e20243111703553_c20243111704073.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+
+
+
+
+ SATELLITE DATA RETRIEVAL RETURNING __retrieve_x_frame
+
+
+
+
+ ABOUT TO CONCETENATE ALL BATCH PIREPS __retrieve_y_frame
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T08%3A47%3A36Z&ets=2024-11-06T09%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T09%3A47%3A36Z&ets=2024-11-06T10%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T10%3A47%3A36Z&ets=2024-11-06T11%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T11%3A47%3A36Z&ets=2024-11-06T12%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T12%3A47%3A36Z&ets=2024-11-06T13%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T13%3A47%3A36Z&ets=2024-11-06T14%3A17%3A36Z&artcc=_ALL&fmt=csv
+Failed to parse PIREP: ICT UA /OV ICT230090/TM 1415/FL380/TP BE40/TB INTMT LGT CHOP 380  CONS LGT CHOP 400/RM ZKC FDC
+Traceback (most recent call last):
+  File "/skyblue/src/pirep/__init__.py", line 56, in parse
+    report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/report.py", line 73, in parse
+    entries = Turbulence.parse(val, altitude)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/turbulence.py", line 50, in parse
+    altitude = Altitude.parse(m["altitude"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/altitude.py", line 55, in parse
+    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
+                     ^^^^^^^^
+ValueError: invalid literal for int() with base 10: '380  CONS LGT CHOP 400'
+
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T14%3A47%3A36Z&ets=2024-11-06T15%3A17%3A36Z&artcc=_ALL&fmt=csv
+Failed to parse PIREP: GXY UA /OV GLL260015/TM 1459/FL210/TP B739/TB MOD CHOP 200  LGT CHOP ABV 200/IC NEG/RM ZDVWC-21
+Traceback (most recent call last):
+  File "/skyblue/src/pirep/__init__.py", line 56, in parse
+    report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/report.py", line 73, in parse
+    entries = Turbulence.parse(val, altitude)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/turbulence.py", line 50, in parse
+    altitude = Altitude.parse(m["altitude"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/altitude.py", line 55, in parse
+    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
+                     ^^^^^^^^
+ValueError: invalid literal for int() with base 10: '200  LGT CHOP ABV 200'
+
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T15%3A47%3A36Z&ets=2024-11-06T16%3A17%3A36Z&artcc=_ALL&fmt=csv
+Failed to parse PIREP: BUF UA /OV BUF010030/TM 1606/FL200/TP E75L/TB LGT DURC /RM ZOB
+Traceback (most recent call last):
+  File "/skyblue/src/pirep/__init__.py", line 56, in parse
+    report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/report.py", line 73, in parse
+    entries = Turbulence.parse(val, altitude)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/turbulence.py", line 50, in parse
+    altitude = Altitude.parse(m["altitude"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/altitude.py", line 55, in parse
+    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
+                     ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'DURC '
+
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T16%3A47%3A36Z&ets=2024-11-06T17%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+SHAPE XS: (9, 1500, 2500, 6)
+SHAPE YS: (9, 1500, 2500, 14)
+Batch 0: X.shape=(1, 9, 1500, 2500, 6), Y.shape=(1, 9, 1500, 2500, 14)
+
+
+
+
+ ABOUT TO GO INTO __getitem__
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/08/OR_ABI-L2-MCMIPC-M6_G16_s20243110856174_e20243110858547_c20243110859058.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/09/OR_ABI-L2-MCMIPC-M6_G16_s20243110956174_e20243110958553_c20243110959056.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/10/OR_ABI-L2-MCMIPC-M6_G16_s20243111056174_e20243111058547_c20243111059066.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/11/OR_ABI-L2-MCMIPC-M6_G16_s20243111156174_e20243111158547_c20243111159056.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/12/OR_ABI-L2-MCMIPC-M6_G16_s20243111256174_e20243111258559_c20243111259067.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/13/OR_ABI-L2-MCMIPC-M6_G16_s20243111356174_e20243111358559_c20243111359064.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/14/OR_ABI-L2-MCMIPC-M6_G16_s20243111456174_e20243111458547_c20243111459068.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/15/OR_ABI-L2-MCMIPC-M6_G16_s20243111556174_e20243111558547_c20243111559059.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/16/OR_ABI-L2-MCMIPC-M6_G16_s20243111656174_e20243111658547_c20243111659067.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+
+
+
+
+ SATELLITE DATA RETRIEVAL RETURNING __retrieve_x_frame
+
+
+
+
+ ABOUT TO CONCETENATE ALL BATCH PIREPS __retrieve_y_frame
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T08%3A42%3A36Z&ets=2024-11-06T09%3A12%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T09%3A42%3A36Z&ets=2024-11-06T10%3A12%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T10%3A42%3A36Z&ets=2024-11-06T11%3A12%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T11%3A42%3A36Z&ets=2024-11-06T12%3A12%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T12%3A42%3A36Z&ets=2024-11-06T13%3A12%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T13%3A42%3A36Z&ets=2024-11-06T14%3A12%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T14%3A42%3A36Z&ets=2024-11-06T15%3A12%3A36Z&artcc=_ALL&fmt=csv
+Failed to parse PIREP: ONT UA /OV 2NM NORTH OF ONT/TM 1446/FL070/TP C525/TB MOD DURC 120
+Traceback (most recent call last):
+  File "/skyblue/src/pirep/__init__.py", line 56, in parse
+    report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/report.py", line 73, in parse
+    entries = Turbulence.parse(val, altitude)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/turbulence.py", line 50, in parse
+    altitude = Altitude.parse(m["altitude"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/altitude.py", line 55, in parse
+    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
+                     ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'DURC 120'
+
+Failed to parse PIREP: GXY UA /OV GLL260015/TM 1459/FL210/TP B739/TB MOD CHOP 200  LGT CHOP ABV 200/IC NEG/RM ZDVWC-21
+Traceback (most recent call last):
+  File "/skyblue/src/pirep/__init__.py", line 56, in parse
+    report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/report.py", line 73, in parse
+    entries = Turbulence.parse(val, altitude)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/turbulence.py", line 50, in parse
+    altitude = Altitude.parse(m["altitude"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/altitude.py", line 55, in parse
+    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
+                     ^^^^^^^^
+ValueError: invalid literal for int() with base 10: '200  LGT CHOP ABV 200'
+
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T15%3A42%3A36Z&ets=2024-11-06T16%3A12%3A36Z&artcc=_ALL&fmt=csv
+Failed to parse PIREP: BUF UA /OV BUF010030/TM 1606/FL200/TP E75L/TB LGT DURC /RM ZOB
+Traceback (most recent call last):
+  File "/skyblue/src/pirep/__init__.py", line 56, in parse
+    report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/report.py", line 73, in parse
+    entries = Turbulence.parse(val, altitude)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/turbulence.py", line 50, in parse
+    altitude = Altitude.parse(m["altitude"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/altitude.py", line 55, in parse
+    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
+                     ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'DURC '
+
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T16%3A42%3A36Z&ets=2024-11-06T17%3A12%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+SHAPE XS: (9, 1500, 2500, 6)
+SHAPE YS: (9, 1500, 2500, 14)
+Batch 1: X.shape=(1, 9, 1500, 2500, 6), Y.shape=(1, 9, 1500, 2500, 14)
+Epoch 1/2
+
+
+
+
+ ABOUT TO GO INTO __getitem__
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/09/OR_ABI-L2-MCMIPC-M6_G16_s20243110901174_e20243110903547_c20243110904068.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/10/OR_ABI-L2-MCMIPC-M6_G16_s20243111001174_e20243111003547_c20243111004062.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/11/OR_ABI-L2-MCMIPC-M6_G16_s20243111101174_e20243111103547_c20243111104067.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/12/OR_ABI-L2-MCMIPC-M6_G16_s20243111201174_e20243111203547_c20243111204057.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/13/OR_ABI-L2-MCMIPC-M6_G16_s20243111301174_e20243111303553_c20243111304070.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/14/OR_ABI-L2-MCMIPC-M6_G16_s20243111401174_e20243111403559_c20243111404066.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/15/OR_ABI-L2-MCMIPC-M6_G16_s20243111501174_e20243111503547_c20243111504064.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/16/OR_ABI-L2-MCMIPC-M6_G16_s20243111601174_e20243111603547_c20243111604072.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/17/OR_ABI-L2-MCMIPC-M6_G16_s20243111701174_e20243111703553_c20243111704073.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+
+
+
+
+ SATELLITE DATA RETRIEVAL RETURNING __retrieve_x_frame
+
+
+
+
+ ABOUT TO CONCETENATE ALL BATCH PIREPS __retrieve_y_frame
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T08%3A47%3A36Z&ets=2024-11-06T09%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T09%3A47%3A36Z&ets=2024-11-06T10%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T10%3A47%3A36Z&ets=2024-11-06T11%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T11%3A47%3A36Z&ets=2024-11-06T12%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T12%3A47%3A36Z&ets=2024-11-06T13%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T13%3A47%3A36Z&ets=2024-11-06T14%3A17%3A36Z&artcc=_ALL&fmt=csv
+Failed to parse PIREP: ICT UA /OV ICT230090/TM 1415/FL380/TP BE40/TB INTMT LGT CHOP 380  CONS LGT CHOP 400/RM ZKC FDC
+Traceback (most recent call last):
+  File "/skyblue/src/pirep/__init__.py", line 56, in parse
+    report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/report.py", line 73, in parse
+    entries = Turbulence.parse(val, altitude)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/turbulence.py", line 50, in parse
+    altitude = Altitude.parse(m["altitude"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/altitude.py", line 55, in parse
+    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
+                     ^^^^^^^^
+ValueError: invalid literal for int() with base 10: '380  CONS LGT CHOP 400'
+
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T14%3A47%3A36Z&ets=2024-11-06T15%3A17%3A36Z&artcc=_ALL&fmt=csv
+Failed to parse PIREP: GXY UA /OV GLL260015/TM 1459/FL210/TP B739/TB MOD CHOP 200  LGT CHOP ABV 200/IC NEG/RM ZDVWC-21
+Traceback (most recent call last):
+  File "/skyblue/src/pirep/__init__.py", line 56, in parse
+    report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/report.py", line 73, in parse
+    entries = Turbulence.parse(val, altitude)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/turbulence.py", line 50, in parse
+    altitude = Altitude.parse(m["altitude"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/altitude.py", line 55, in parse
+    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
+                     ^^^^^^^^
+ValueError: invalid literal for int() with base 10: '200  LGT CHOP ABV 200'
+
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T15%3A47%3A36Z&ets=2024-11-06T16%3A17%3A36Z&artcc=_ALL&fmt=csv
+Failed to parse PIREP: BUF UA /OV BUF010030/TM 1606/FL200/TP E75L/TB LGT DURC /RM ZOB
+Traceback (most recent call last):
+  File "/skyblue/src/pirep/__init__.py", line 56, in parse
+    report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
+             ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/report.py", line 73, in parse
+    entries = Turbulence.parse(val, altitude)
+              ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/turbulence.py", line 50, in parse
+    altitude = Altitude.parse(m["altitude"])
+               ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+  File "/skyblue/src/pirep/defs/altitude.py", line 55, in parse
+    alt_min = max(0, int(alt) * 100 - 5000) #TODO magic number fixing
+                     ^^^^^^^^
+ValueError: invalid literal for int() with base 10: 'DURC '
+
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T16%3A47%3A36Z&ets=2024-11-06T17%3A17%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+SHAPE XS: (9, 1500, 2500, 6)
+SHAPE YS: (9, 1500, 2500, 14)
+Batch 0: X.shape=(1, 9, 1500, 2500, 6), Y.shape=(1, 9, 1500, 2500, 14)
+
+
+
+
+ ABOUT TO GO INTO __getitem__
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/10/OR_ABI-L2-MCMIPC-M6_G16_s20243111021174_e20243111023547_c20243111024091.nc]. 

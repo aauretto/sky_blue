@@ -1,0 +1,84 @@
+Length of train dataset:  10
+Length of val dataset:  2
+Length of test dataset:  12
+train batches:  110
+val batches:  22
+test batches:  20948
+About to run the hyperparameter tuning loop 
+{'RSS (Resident Set Size)': '646.57 MB', 'VMS (Virtual Memory Size)': '2927.89 MB', 'Shared Memory': '315.61 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '1552.17 MB', 'Dirty Pages': '0.00 MB', 'PID': '70'}
+Reloading Tuner from kt_tuning/hyperparameter_tuning/tuner0.json
+About to do the tuner search{'RSS (Resident Set Size)': '647.13 MB', 'VMS (Virtual Memory Size)': '3343.91 MB', 'Shared Memory': '315.73 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '1584.94 MB', 'Dirty Pages': '0.00 MB', 'PID': '70'}
+
+Search: Running Trial #3
+
+Value             |Best Value So Far |Hyperparameter
+32                |32                |filters
+0.4               |0.2               |dropout_rate
+0.00049034        |0.0027374         |learning_rate
+2                 |2                 |tuner/epochs
+0                 |0                 |tuner/initial_epoch
+2                 |2                 |tuner/bracket
+0                 |0                 |tuner/round
+
+
+
+
+
+ ABOUT TO GO INTO __getitem__
+
+
+
+
+ TIMESTAMPS ABOUT TO RETRIEVE __getitem__{'RSS (Resident Set Size)': '1066.85 MB', 'VMS (Virtual Memory Size)': '40860.31 MB', 'Shared Memory': '499.95 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2418.50 MB', 'Dirty Pages': '0.00 MB', 'PID': '70'} 
+ for a length of batch times of 1
+
+
+
+
+ TIMESTAMPS RETRIEVED __getitem__{'RSS (Resident Set Size)': '1066.85 MB', 'VMS (Virtual Memory Size)': '40860.31 MB', 'Shared Memory': '499.95 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2418.50 MB', 'Dirty Pages': '0.00 MB', 'PID': '70'}
+
+
+
+
+ SATTELITE DATA ABOUT TO RETRIEVE __getitem__{'RSS (Resident Set Size)': '1066.85 MB', 'VMS (Virtual Memory Size)': '40860.31 MB', 'Shared Memory': '499.95 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2418.50 MB', 'Dirty Pages': '0.00 MB', 'PID': '70'}
+
+
+
+
+ SATELLITE DATA RETRIEVAL STARTING __retrieve_x_frame {'RSS (Resident Set Size)': '1066.85 MB', 'VMS (Virtual Memory Size)': '40860.31 MB', 'Shared Memory': '499.95 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2418.50 MB', 'Dirty Pages': '0.00 MB', 'PID': '70'}
+
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/03/OR_ABI-L2-MCMIPC-M6_G16_s20243110301174_e20243110303547_c20243110304077.nc]. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+📚 Finished reading [1] files into xarray.Dataset.
+
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/04/OR_ABI-L2-MCMIPC-M6_G16_s20243110401174_e20243110403547_c20243110404067.nc]. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+📚 Finished reading [1] files into xarray.Dataset.
+
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/05/OR_ABI-L2-MCMIPC-M6_G16_s20243110501174_e20243110503547_c20243110504083.nc]. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+📚 Finished reading [1] files into xarray.Dataset.
+
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/06/OR_ABI-L2-MCMIPC-M6_G16_s20243110611174_e20243110613547_c20243110614064.nc]. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+📚 Finished reading [1] files into xarray.Dataset.
+
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/07/OR_ABI-L2-MCMIPC-M6_G16_s20243110701174_e20243110703559_c20243110704088.nc]. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+📚 Finished reading [1] files into xarray.Dataset.
+
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/08/OR_ABI-L2-MCMIPC-M6_G16_s20243110801174_e20243110803558_c20243110804064.nc]. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+📚 Finished reading [1] files into xarray.Dataset.
+
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/09/OR_ABI-L2-MCMIPC-M6_G16_s20243110901174_e20243110903547_c20243110904068.nc]. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+📚 Finished reading [1] files into xarray.Dataset.
+
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/10/OR_ABI-L2-MCMIPC-M6_G16_s20243111001174_e20243111003547_c20243111004062.nc]. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+📚 Finished reading [1] files into xarray.Dataset.
+
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/11/OR_ABI-L2-MCMIPC-M6_G16_s20243111101174_e20243111103547_c20243111104067.nc]. 
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        
+📚 Finished reading [1] files into xarray.Dataset.

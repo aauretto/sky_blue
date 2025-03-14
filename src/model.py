@@ -16,12 +16,28 @@ from generator import Generator
 import psutil
 import os
 
+<<<<<<< Updated upstream
 def get_memory_usage():
     process = psutil.Process(os.getpid())
     return process.memory_info().rss  # Resident Set Size (RSS) in bytes
 
 BACKGROUND_RISKS = [0.01, 0.03, 0.05, 0.07]
 BACKGROUND_RISK = BACKGROUND_RISKS[0]
+=======
+def get_memory_info():
+    process = psutil.Process(os.getpid())
+    mem_info = process.memory_info()
+    
+    return {
+        "RSS (Resident Set Size)": f"{mem_info.rss / 1024 ** 2:.2f} MB",
+        "VMS (Virtual Memory Size)": f"{mem_info.vms / 1024 ** 2:.2f} MB",
+        "Shared Memory": f"{mem_info.shared / 1024 ** 2:.2f} MB",
+        "Text (code)": f"{mem_info.text / 1024 ** 2:.2f} MB",
+        "Data + Stack": f"{mem_info.data / 1024 ** 2:.2f} MB",
+        "Dirty Pages": f"{mem_info.dirty / 1024 ** 2:.2f} MB",
+        "PID": f"{os.getpid()}"
+    }
+>>>>>>> Stashed changes
 
 
 def get_data(
@@ -127,10 +143,14 @@ def run_hyperparameter_tuning(
     )
     print(f"\n\n\n*************************  run_hyperparameter_tuning KT Tuner initialized Mem = {get_memory_usage()}*************************\n\n")
 
-    print("About to do the tuner search")
+    print(f"About to do the tuner search{get_memory_info()}")
     tuner.search(train_dataset, epochs=10, validation_data=val_dataset, verbose=2)
+<<<<<<< Updated upstream
     print(f"\n\n\n*************************  KT Tuner Search has run Mem = {get_memory_usage()}*************************\n\n")
     print("a best model has been retrieved")
+=======
+    print(f"a best model has been retrieved{get_memory_info()}")
+>>>>>>> Stashed changes
     best_hyperparameters = tuner.get_best_hyperparameters(num_trials=1)[
         0
     ].hyperparameters
@@ -143,6 +163,7 @@ def run_hyperparameter_tuning(
 
 
 if __name__ == "__main__":
+<<<<<<< Updated upstream
     print(f"\n\n\n************************* Start program Mem = {get_memory_usage()}*************************\n\n")
     multiprocessing.set_start_method("forkserver", force=False)
 
@@ -184,11 +205,19 @@ if __name__ == "__main__":
 
     print(
         f"train: {len(train_dataset)}, test: {len(test_dataset)}, val: {len(val_dataset)}"
+=======
+    multiprocessing.set_start_method("forkserver", force=True)
+    np.random.seed(42)
+    timestamps = generate_timestamps(
+        start=dt.datetime(2024, 11, 6, 0, 0, tzinfo=dt.UTC),
+        end=dt.datetime(2024, 11, 6, 12, 0, tzinfo=dt.UTC),
+>>>>>>> Stashed changes
     )
     # Code to test the model initializer
     # test_hp = kt.HyperParameters()
     # test_model = model_initializer(test_hp)
     # test_model.summary()
+<<<<<<< Updated upstream
 
     # Code to test the data
     # sample_x, sample_y = train_dataset[0]
@@ -204,6 +233,10 @@ if __name__ == "__main__":
     print(f"\n\n\n************************* Right before hyperparameter tuning memory check = {get_memory_usage()}*************************\n\n")
     best_model = run_hyperparameter_tuning(train_dataset, val_dataset) # TODO checkpoint the best model returned by KT Tuner
     print(f"\n\n\n************************* Right after hyperparameter tuning memory check = {get_memory_usage()}*************************\n\n")
+=======
+    print(f"About to run the hyperparameter tuning loop \n{get_memory_info()}")
+    best_model = run_hyperparameter_tuning(train_generator, val_generator)
+>>>>>>> Stashed changes
     best_model.summary()
 
     print(f"\n\n\n************************* Checkpoint about to be created memory check = {get_memory_usage()}*************************\n\n")
@@ -216,9 +249,16 @@ if __name__ == "__main__":
         save_weights_only=False,  # Save entire model (structure + weights)
         verbose=1,
     )
+<<<<<<< Updated upstream
     print(f"\n\n\n************************* Checkpoint callback created memory check = {get_memory_usage()}*************************\n\n")
 
     best_model.fit(train_dataset, epochs=10, checkpoint_callback=[checkpoint_callback])
     print(f"\n\n\n************************* Best model has been fit we are done created memory check = {get_memory_usage()}*************************\n\n")
+=======
+    print("About to fit the best model to the fuller dataset and about to enter TODO section")
+    best_model.fit(
+        train_generator, epochs=10, checkpoint_callback=[checkpoint_callback]
+    ) # TODO maybe replace with fit_generator
+>>>>>>> Stashed changes
     # final_loss, final_mae = best_model.evaluate(X_test, y_test)
     # print(f"Test Loss: {final_loss}, Test MAE: {final_mae}")

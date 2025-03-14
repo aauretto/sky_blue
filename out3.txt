@@ -1,0 +1,449 @@
+Length of train dataset:  10
+Length of val dataset:  2
+Length of test dataset:  12
+train batches:  110
+val batches:  22
+test batches:  20947
+About to run the hyperparameter tuning loop 
+{'RSS (Resident Set Size)': '664.33 MB', 'VMS (Virtual Memory Size)': '2928.69 MB', 'Shared Memory': '333.54 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '1552.96 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+Reloading Tuner from kt_tuning/hyperparameter_tuning/tuner0.json
+About to do the tuner search{'RSS (Resident Set Size)': '664.81 MB', 'VMS (Virtual Memory Size)': '3344.70 MB', 'Shared Memory': '333.60 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '1585.73 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+Search: Running Trial #3
+
+Value             |Best Value So Far |Hyperparameter
+32                |32                |filters
+0.4               |0.4               |dropout_rate
+0.00049034        |0.00049034        |learning_rate
+2                 |2                 |tuner/epochs
+0                 |0                 |tuner/initial_epoch
+2                 |2                 |tuner/bracket
+0                 |0                 |tuner/round
+
+
+
+
+
+ ABOUT TO GO INTO __getitem__
+
+
+
+
+ TIMESTAMPS ABOUT TO RETRIEVE __getitem__{'RSS (Resident Set Size)': '1088.78 MB', 'VMS (Virtual Memory Size)': '40860.20 MB', 'Shared Memory': '520.51 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2418.04 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'} 
+ for a length of batch times of 1
+
+
+
+
+ TIMESTAMPS RETRIEVED __getitem__{'RSS (Resident Set Size)': '1088.78 MB', 'VMS (Virtual Memory Size)': '40860.20 MB', 'Shared Memory': '520.51 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2418.04 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATTELITE DATA ABOUT TO RETRIEVE __getitem__{'RSS (Resident Set Size)': '1088.78 MB', 'VMS (Virtual Memory Size)': '40860.20 MB', 'Shared Memory': '520.51 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2418.04 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATELLITE DATA RETRIEVAL STARTING __retrieve_x_frame {'RSS (Resident Set Size)': '1088.78 MB', 'VMS (Virtual Memory Size)': '40860.20 MB', 'Shared Memory': '520.51 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2418.04 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/01/OR_ABI-L2-MCMIPC-M6_G16_s20243110116174_e20243110118547_c20243110119063.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/02/OR_ABI-L2-MCMIPC-M6_G16_s20243110216174_e20243110218547_c20243110219067.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/03/OR_ABI-L2-MCMIPC-M6_G16_s20243110316174_e20243110318547_c20243110319058.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/04/OR_ABI-L2-MCMIPC-M6_G16_s20243110416174_e20243110418547_c20243110419056.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/05/OR_ABI-L2-MCMIPC-M6_G16_s20243110516174_e20243110518553_c20243110519057.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/06/OR_ABI-L2-MCMIPC-M6_G16_s20243110616174_e20243110618558_c20243110619069.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/07/OR_ABI-L2-MCMIPC-M6_G16_s20243110716174_e20243110718547_c20243110719058.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/08/OR_ABI-L2-MCMIPC-M6_G16_s20243110816174_e20243110818547_c20243110819062.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/09/OR_ABI-L2-MCMIPC-M6_G16_s20243110916174_e20243110918547_c20243110919063.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+
+
+
+
+ SATELLITE DATA RETRIEVAL RETURNING __retrieve_x_frame {'RSS (Resident Set Size)': '1841.93 MB', 'VMS (Virtual Memory Size)': '41880.45 MB', 'Shared Memory': '456.81 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '3476.18 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATTELITE DATA RETRIEVED __getitem__{'RSS (Resident Set Size)': '1641.95 MB', 'VMS (Virtual Memory Size)': '41680.17 MB', 'Shared Memory': '456.81 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '3275.91 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ PIREP DATA STARTING __retrieve_y_frame {'RSS (Resident Set Size)': '1641.95 MB', 'VMS (Virtual Memory Size)': '41680.17 MB', 'Shared Memory': '456.81 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '3275.91 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ ABOUT TO CONCETENATE ALL BATCH PIREPS __retrieve_y_frame{'RSS (Resident Set Size)': '1641.95 MB', 'VMS (Virtual Memory Size)': '41680.17 MB', 'Shared Memory': '456.81 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '3275.91 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T01%3A02%3A36Z&ets=2024-11-06T01%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T02%3A02%3A36Z&ets=2024-11-06T02%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T03%3A02%3A36Z&ets=2024-11-06T03%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T04%3A02%3A36Z&ets=2024-11-06T04%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T05%3A02%3A36Z&ets=2024-11-06T05%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T06%3A02%3A36Z&ets=2024-11-06T06%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T07%3A02%3A36Z&ets=2024-11-06T07%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T08%3A02%3A36Z&ets=2024-11-06T08%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T09%3A02%3A36Z&ets=2024-11-06T09%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+
+
+
+
+ PIREP DATA RETRIEVED __getitem__{'RSS (Resident Set Size)': '3672.66 MB', 'VMS (Virtual Memory Size)': '43554.93 MB', 'Shared Memory': '461.35 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5146.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+SHAPE XS: (9, 1500, 2500, 6)
+SHAPE YS: (9, 1500, 2500, 14)
+
+
+
+
+ BATCH X APPENDED __getitem__{'RSS (Resident Set Size)': '3672.66 MB', 'VMS (Virtual Memory Size)': '43554.93 MB', 'Shared Memory': '461.35 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5146.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ BATCH Y APPPENDED __getitem__{'RSS (Resident Set Size)': '3672.66 MB', 'VMS (Virtual Memory Size)': '43554.93 MB', 'Shared Memory': '461.35 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5146.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ GET ITEM FOR LOOP ENDED __getitem__{'RSS (Resident Set Size)': '3672.66 MB', 'VMS (Virtual Memory Size)': '43554.93 MB', 'Shared Memory': '461.35 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5146.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ NUMPYED BATCH X __getitem__{'RSS (Resident Set Size)': '4445.02 MB', 'VMS (Virtual Memory Size)': '44327.40 MB', 'Shared Memory': '461.35 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5918.74 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ NUMPYED BATCH y __getitem__{'RSS (Resident Set Size)': '6247.36 MB', 'VMS (Virtual Memory Size)': '46129.85 MB', 'Shared Memory': '461.35 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '7721.18 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+Batch 0: X.shape=(1, 9, 1500, 2500, 6), Y.shape=(1, 9, 1500, 2500, 14)
+
+
+
+
+ ABOUT TO GO INTO __getitem__
+
+
+
+
+ TIMESTAMPS ABOUT TO RETRIEVE __getitem__{'RSS (Resident Set Size)': '3672.66 MB', 'VMS (Virtual Memory Size)': '43554.93 MB', 'Shared Memory': '461.35 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5146.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'} 
+ for a length of batch times of 1
+
+
+
+
+ TIMESTAMPS RETRIEVED __getitem__{'RSS (Resident Set Size)': '3672.66 MB', 'VMS (Virtual Memory Size)': '43554.93 MB', 'Shared Memory': '461.35 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5146.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATTELITE DATA ABOUT TO RETRIEVE __getitem__{'RSS (Resident Set Size)': '3672.66 MB', 'VMS (Virtual Memory Size)': '43554.93 MB', 'Shared Memory': '461.35 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5146.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATELLITE DATA RETRIEVAL STARTING __retrieve_x_frame {'RSS (Resident Set Size)': '3672.66 MB', 'VMS (Virtual Memory Size)': '43554.93 MB', 'Shared Memory': '461.35 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5146.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/00/OR_ABI-L2-MCMIPC-M6_G16_s20243110016174_e20243110018558_c20243110019071.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/01/OR_ABI-L2-MCMIPC-M6_G16_s20243110116174_e20243110118547_c20243110119063.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/02/OR_ABI-L2-MCMIPC-M6_G16_s20243110216174_e20243110218547_c20243110219067.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/03/OR_ABI-L2-MCMIPC-M6_G16_s20243110316174_e20243110318547_c20243110319058.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/04/OR_ABI-L2-MCMIPC-M6_G16_s20243110416174_e20243110418547_c20243110419056.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/05/OR_ABI-L2-MCMIPC-M6_G16_s20243110516174_e20243110518553_c20243110519057.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/06/OR_ABI-L2-MCMIPC-M6_G16_s20243110616174_e20243110618558_c20243110619069.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/07/OR_ABI-L2-MCMIPC-M6_G16_s20243110716174_e20243110718547_c20243110719058.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/08/OR_ABI-L2-MCMIPC-M6_G16_s20243110816174_e20243110818547_c20243110819062.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+
+
+
+
+ SATELLITE DATA RETRIEVAL RETURNING __retrieve_x_frame {'RSS (Resident Set Size)': '3556.09 MB', 'VMS (Virtual Memory Size)': '44618.50 MB', 'Shared Memory': '354.19 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '6212.21 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATTELITE DATA RETRIEVED __getitem__{'RSS (Resident Set Size)': '3270.27 MB', 'VMS (Virtual Memory Size)': '44332.40 MB', 'Shared Memory': '354.19 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5926.11 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ PIREP DATA STARTING __retrieve_y_frame {'RSS (Resident Set Size)': '3270.27 MB', 'VMS (Virtual Memory Size)': '44332.40 MB', 'Shared Memory': '354.19 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5926.11 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ ABOUT TO CONCETENATE ALL BATCH PIREPS __retrieve_y_frame{'RSS (Resident Set Size)': '3270.27 MB', 'VMS (Virtual Memory Size)': '44332.40 MB', 'Shared Memory': '354.19 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '5926.11 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T00%3A02%3A36Z&ets=2024-11-06T00%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T01%3A02%3A36Z&ets=2024-11-06T01%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T02%3A02%3A36Z&ets=2024-11-06T02%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T03%3A02%3A36Z&ets=2024-11-06T03%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T04%3A02%3A36Z&ets=2024-11-06T04%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T05%3A02%3A36Z&ets=2024-11-06T05%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T06%3A02%3A36Z&ets=2024-11-06T06%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T07%3A02%3A36Z&ets=2024-11-06T07%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T08%3A02%3A36Z&ets=2024-11-06T08%3A32%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+
+
+
+
+ PIREP DATA RETRIEVED __getitem__{'RSS (Resident Set Size)': '5209.73 MB', 'VMS (Virtual Memory Size)': '46134.85 MB', 'Shared Memory': '356.06 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '7728.56 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+SHAPE XS: (9, 1500, 2500, 6)
+SHAPE YS: (9, 1500, 2500, 14)
+
+
+
+
+ BATCH X APPENDED __getitem__{'RSS (Resident Set Size)': '5209.73 MB', 'VMS (Virtual Memory Size)': '46134.85 MB', 'Shared Memory': '356.06 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '7728.56 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ BATCH Y APPPENDED __getitem__{'RSS (Resident Set Size)': '5209.73 MB', 'VMS (Virtual Memory Size)': '46134.85 MB', 'Shared Memory': '356.06 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '7728.56 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ GET ITEM FOR LOOP ENDED __getitem__{'RSS (Resident Set Size)': '5209.73 MB', 'VMS (Virtual Memory Size)': '46134.85 MB', 'Shared Memory': '356.06 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '7728.56 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ NUMPYED BATCH X __getitem__{'RSS (Resident Set Size)': '5982.09 MB', 'VMS (Virtual Memory Size)': '46907.32 MB', 'Shared Memory': '356.06 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '8501.04 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ NUMPYED BATCH y __getitem__{'RSS (Resident Set Size)': '7784.43 MB', 'VMS (Virtual Memory Size)': '48709.77 MB', 'Shared Memory': '355.99 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '10303.48 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+Batch 1: X.shape=(1, 9, 1500, 2500, 6), Y.shape=(1, 9, 1500, 2500, 14)
+Epoch 1/2
+
+
+
+
+ ABOUT TO GO INTO __getitem__
+
+
+
+
+ TIMESTAMPS ABOUT TO RETRIEVE __getitem__{'RSS (Resident Set Size)': '695.43 MB', 'VMS (Virtual Memory Size)': '41632.96 MB', 'Shared Memory': '366.05 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2718.50 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'} 
+ for a length of batch times of 1
+
+
+
+
+ TIMESTAMPS RETRIEVED __getitem__{'RSS (Resident Set Size)': '695.43 MB', 'VMS (Virtual Memory Size)': '41632.96 MB', 'Shared Memory': '366.05 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2718.50 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATTELITE DATA ABOUT TO RETRIEVE __getitem__{'RSS (Resident Set Size)': '695.43 MB', 'VMS (Virtual Memory Size)': '41632.96 MB', 'Shared Memory': '366.05 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2718.50 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATELLITE DATA RETRIEVAL STARTING __retrieve_x_frame {'RSS (Resident Set Size)': '695.43 MB', 'VMS (Virtual Memory Size)': '41632.96 MB', 'Shared Memory': '366.05 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '2718.50 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/05/OR_ABI-L2-MCMIPC-M6_G16_s20243110521174_e20243110523559_c20243110524081.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/06/OR_ABI-L2-MCMIPC-M6_G16_s20243110621174_e20243110623547_c20243110624060.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/07/OR_ABI-L2-MCMIPC-M6_G16_s20243110721174_e20243110723547_c20243110724070.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/08/OR_ABI-L2-MCMIPC-M6_G16_s20243110821174_e20243110823547_c20243110824057.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/09/OR_ABI-L2-MCMIPC-M6_G16_s20243110921174_e20243110923547_c20243110924062.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/10/OR_ABI-L2-MCMIPC-M6_G16_s20243111021174_e20243111023547_c20243111024091.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/11/OR_ABI-L2-MCMIPC-M6_G16_s20243111121174_e20243111123559_c20243111124058.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/12/OR_ABI-L2-MCMIPC-M6_G16_s20243111221174_e20243111223547_c20243111224074.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/13/OR_ABI-L2-MCMIPC-M6_G16_s20243111321174_e20243111323559_c20243111324069.nc].                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                         📚 Finished reading [1] files into xarray.Dataset.
+
+
+
+
+ SATELLITE DATA RETRIEVAL RETURNING __retrieve_x_frame {'RSS (Resident Set Size)': '5177.48 MB', 'VMS (Virtual Memory Size)': '46442.44 MB', 'Shared Memory': '365.43 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '7163.82 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATTELITE DATA RETRIEVED __getitem__{'RSS (Resident Set Size)': '5177.48 MB', 'VMS (Virtual Memory Size)': '46442.44 MB', 'Shared Memory': '365.43 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '7163.82 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ PIREP DATA STARTING __retrieve_y_frame {'RSS (Resident Set Size)': '5177.48 MB', 'VMS (Virtual Memory Size)': '46442.44 MB', 'Shared Memory': '365.43 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '7163.82 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ ABOUT TO CONCETENATE ALL BATCH PIREPS __retrieve_y_frame{'RSS (Resident Set Size)': '5177.48 MB', 'VMS (Virtual Memory Size)': '46442.44 MB', 'Shared Memory': '365.43 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '7163.82 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T05%3A07%3A36Z&ets=2024-11-06T05%3A37%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T06%3A07%3A36Z&ets=2024-11-06T06%3A37%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T07%3A07%3A36Z&ets=2024-11-06T07%3A37%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T08%3A07%3A36Z&ets=2024-11-06T08%3A37%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T09%3A07%3A36Z&ets=2024-11-06T09%3A37%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T10%3A07%3A36Z&ets=2024-11-06T10%3A37%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T11%3A07%3A36Z&ets=2024-11-06T11%3A37%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T12%3A07%3A36Z&ets=2024-11-06T12%3A37%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+https://mesonet.agron.iastate.edu/cgi-bin/request/gis/pireps.py?sts=2024-11-06T13%3A07%3A36Z&ets=2024-11-06T13%3A37%3A36Z&artcc=_ALL&fmt=csv
+
+*************************Final Grid About to Create*************************
+
+*************************Final Grid Created*************************
+
+
+
+
+ PIREP DATA RETRIEVED __getitem__{'RSS (Resident Set Size)': '6980.70 MB', 'VMS (Virtual Memory Size)': '48244.88 MB', 'Shared Memory': '365.44 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '8966.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+SHAPE XS: (9, 1500, 2500, 6)
+SHAPE YS: (9, 1500, 2500, 14)
+
+
+
+
+ BATCH X APPENDED __getitem__{'RSS (Resident Set Size)': '6980.70 MB', 'VMS (Virtual Memory Size)': '48244.88 MB', 'Shared Memory': '365.44 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '8966.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ BATCH Y APPPENDED __getitem__{'RSS (Resident Set Size)': '6980.70 MB', 'VMS (Virtual Memory Size)': '48244.88 MB', 'Shared Memory': '365.44 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '8966.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ GET ITEM FOR LOOP ENDED __getitem__{'RSS (Resident Set Size)': '6980.70 MB', 'VMS (Virtual Memory Size)': '48244.88 MB', 'Shared Memory': '365.44 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '8966.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ NUMPYED BATCH X __getitem__{'RSS (Resident Set Size)': '7753.06 MB', 'VMS (Virtual Memory Size)': '49017.36 MB', 'Shared Memory': '365.44 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '9738.74 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ NUMPYED BATCH y __getitem__{'RSS (Resident Set Size)': '9555.41 MB', 'VMS (Virtual Memory Size)': '50819.80 MB', 'Shared Memory': '365.44 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '11541.18 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+Batch 25: X.shape=(1, 9, 1500, 2500, 6), Y.shape=(1, 9, 1500, 2500, 14)
+
+
+
+
+ ABOUT TO GO INTO __getitem__
+
+
+
+
+ TIMESTAMPS ABOUT TO RETRIEVE __getitem__{'RSS (Resident Set Size)': '6980.75 MB', 'VMS (Virtual Memory Size)': '48244.88 MB', 'Shared Memory': '365.48 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '8966.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'} 
+ for a length of batch times of 1
+
+
+
+
+ TIMESTAMPS RETRIEVED __getitem__{'RSS (Resident Set Size)': '6980.75 MB', 'VMS (Virtual Memory Size)': '48244.88 MB', 'Shared Memory': '365.48 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '8966.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATTELITE DATA ABOUT TO RETRIEVE __getitem__{'RSS (Resident Set Size)': '6980.75 MB', 'VMS (Virtual Memory Size)': '48244.88 MB', 'Shared Memory': '365.48 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '8966.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+
+
+
+
+ SATELLITE DATA RETRIEVAL STARTING __retrieve_x_frame {'RSS (Resident Set Size)': '6980.75 MB', 'VMS (Virtual Memory Size)': '48244.88 MB', 'Shared Memory': '365.48 MB', 'Text (code)': '2.80 MB', 'Data + Stack': '8966.26 MB', 'Dirty Pages': '0.00 MB', 'PID': '208'}
+📖☁ Reading (1/1) file from AWS to MEMORY [noaa-goes16/ABI-L2-MCMIPC/2024/311/01/OR_ABI-L2-MCMIPC-M6_G16_s20243110111174_e20243110113553_c20243110114057.nc]. 
