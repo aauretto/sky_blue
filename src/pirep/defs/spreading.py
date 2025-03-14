@@ -166,8 +166,8 @@ def concatenate_all_pireps(reports: list[dict], background_risk: int):
             [finalGrid, tmpGrid]
         )  # TODO change which spread we want
 
-    del tmpGrid
-    gc.collect()
+        del tmpGrid
+        gc.collect()
     # locs = np.where(np.isnan(finalGrid) | np.isneginf(finalGrid))
     # finalGrid[locs] = BACKGROUND_RISK
     print(
