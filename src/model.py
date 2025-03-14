@@ -47,13 +47,20 @@ def get_data(
     bands: list[int] = [8, 9, 10, 13, 14, 15],
 ) -> tuple[npt.NDArray, npt.ArrayLike]:
     # Fetch satellite data
+    print(f"\n\n\n************************* get_data start Mem = {get_memory_usage()}*************************\n\n")
     data = st.fetch_range(start, end, satellite=sat)
+    print(f"\n\n\n************************* get_data fetched range Mem = {get_memory_usage()}*************************\n\n")
 
     # Project data onto grid
     lats, lons = st.calculate_coordinates(data)
+    print(f"\n\n\n************************* get_data calculate_coordinates range Mem = {get_memory_usage()}*************************\n\n")
+    
     band_data = st.fetch_bands(data, bands)
+    print(f"\n\n\n************************* get_data fetch bands range Mem = {get_memory_usage()}*************************\n\n")
     timestamps = np.array(band_data.coords["t"], dtype=np.datetime64)
+    print(f"\n\n\n************************* get_data timestamps np array allocated range Mem = {get_memory_usage()}*************************\n\n")
     data = st.smooth(st.project(lats, lons, band_data.data))
+    print(f"\n\n\n************************* get_data data has been smoothened and projected Mem = {get_memory_usage()}*************************\n\n")
 
     assert data.shape[1:] == (
         consts.GRID_RANGE["LAT"],
@@ -69,16 +76,18 @@ def get_labels(
     end: dt.datetime,
 ) -> dict:
     # Retrieve PIREPs
-    print(f"\n\n\n************************* get_labels Mem = {get_memory_usage()}*************************\n\n")
+    print(f"\n\n\n************************* get_labels start Mem = {get_memory_usage()}*************************\n\n")
     reports: list[dict] = pr.parse_all(pr.fetch(pr.url(start, end)))
     print("Parsed reports")
     # Convert reports to grids
     labels = dict(map(lambda row: (row["Timestamp"], row), reports))
+    print(f"\n\n\n************************* get_labels end Mem = {get_memory_usage()}*************************\n\n")
 
     return labels
 
 
 def model_initializer(hp):
+    print(f"\n\n\n************************* model_initializer start Mem = {get_memory_usage()}*************************\n\n")
     # Model parameters
     num_classes = 14
     out_steps = 4  # how many time units outward to predict
@@ -125,6 +134,7 @@ def model_initializer(hp):
     )
 
     # model.summary()
+    print(f"\n\n\n************************* model_initializer end Mem = {get_memory_usage()}*************************\n\n")
     return model
 
 
@@ -168,7 +178,7 @@ if __name__ == "__main__":
     multiprocessing.set_start_method("forkserver", force=False)
 
     start = dt.datetime(2024, 11, 6, 0, 0)
-    end = dt.datetime(2024, 11, 6, 0, 30)
+    end = dt.datetime(2024, 11, 6, 1, 0)
     print(f"\n\n\n************************* Datetime made Mem = {get_memory_usage()}*************************\n\n")
     data, timestamps = get_data(start, end)
     print(f"\n\n\n************************* Data retrieved Mem = {get_memory_usage()}*************************\n\n")
@@ -183,7 +193,7 @@ if __name__ == "__main__":
     print(f"Number of testing samples{len(t_test)}")  # 4
 
     # print("TRAIN-TEST-SPLIT created")
-    t_train, t_val = train_test_split(t_train, test_size=0.2, random_state=42)
+    t_train, t_val = train_test_split(t_train, test_size=0.2, random_state=42) # t_train: timestamps
     print(f"\n\n\n************************* Train test split for train and val Mem = {get_memory_usage()}*************************\n\n")
     print(f"Number of training samples{len(t_train)}")  # 6
     print(f"Number of validation samples{len(t_val)}")  # 2
