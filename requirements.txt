@@ -42,7 +42,7 @@ MetPy==1.6.3
 ml-dtypes==0.4.1
 multidict==6.1.0
 namex==0.0.8
-numpy==2.0.2
+numpy==1.26.*
 opt_einsum==3.4.0
 optree==0.14.0
 packaging==24.2
@@ -53,6 +53,7 @@ platformdirs==4.3.6
 pooch==1.8.2
 propcache==0.2.1
 protobuf==5.29.3
+psutil
 pydantic==2.10.6
 pydantic_core==2.27.2
 Pygments==2.19.1
@@ -69,9 +70,9 @@ scipy==1.15.2
 setuptools==75.8.0
 shapely==2.0.7
 six==1.17.0
-tensorboard==2.18.0
-tensorboard-data-server==0.7.2
-tensorflow[and-cuda]==2.18.0
+# tensorboard==2.18.0
+# tensorboard-data-server==0.7.2
+# tensorflow[and-cuda]==2.15.0
 termcolor==2.5.0
 threadpoolctl==3.5.0
 toml==0.10.2
