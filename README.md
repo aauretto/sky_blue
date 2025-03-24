@@ -23,7 +23,7 @@ To run, do python <fileName> to use the version of Python supported by the conta
 If there are build problems try running `docker system prune` -- Should never be the problem but its basically free to try.
 
 When we run our code on the HPC, we need to push to Docker Hub so that we can then pull the latest version
-on the HPC. The Tufts HPC uses singularity instead of docker, so we need to run singularity pull docker://papillonlibre/tufts_capstone_skyblue:latest.
+on the HPC. The Tufts HPC uses singularity instead of docker, so we need to run singularity pull docker://aauretto122/skyblue_images:hpc-gpu
 
 The HPC container should be pushed to a remote repo so it can be pulled on the HPC and run there.
 
@@ -35,10 +35,11 @@ The HPC container should be pushed to a remote repo so it can be pulled on the H
 
 # Generally, how to pull Docker image on HPC:
 1) Log into a HPC node
-2) `module load singularity`
-3) Use Singularity to pull, convert, and the docker image
+2) Log onto a compute node using: `srun -N1 -n8 -t0-8 -p preempt --gres=gpu:h100:1 --pty bash`
+3) `module load singularity`
+4) Use Singularity to pull, convert, and the docker image
    `singularity pull docker://<username>/<container_name>`
-4) This creates a .sif file that acts as a runnable image using the below steps:
+5) This creates a .sif file that acts as a runnable image using the below steps:
 
 # Workflow for pulling and running model training container on HPC
 1) Log into HPC and get a terminal

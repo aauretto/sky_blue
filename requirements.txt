@@ -70,9 +70,6 @@ scipy==1.15.2
 setuptools==75.8.0
 shapely==2.0.7
 six==1.17.0
-# tensorboard==2.18.0
-# tensorboard-data-server==0.7.2
-# tensorflow[and-cuda]==2.15.0
 termcolor==2.5.0
 threadpoolctl==3.5.0
 toml==0.10.2
