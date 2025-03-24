@@ -3,45 +3,41 @@
 In order to launch the container for our code, you first download [Docker Desktop] (https://www.docker.com/products/docker-desktop/)
 for your OS. Docker will prompt you to create an account. Unless you intend to push or make new images, for the purposes of our application, you do not need an account as we are already hosting our container on Docker Hub.
 
-There are two Dockerfiles in this repository corresponing to two containers that we use:
-1) Dockerfile.dev -- The dev container that we use to develop code for the project
-2) Dockerfile.hpc -- The container that will be put on the HPC and train our model
+We run our code using a Docker container that has all of our dependencies in it. `Dockerfile` is the file we use
+to build that container. An image located at `docker://aauretto122/skyblue_images:hpc-gpu` will have all of our dependencies in it.
 
-In the below notes <Dockerfile> should be replaced with Dockerfile.dev/hpc depending on what image/container you want to use
+To build the image from the top level of the GitHub Repository (aka skyblue) do this command (should work for Powershell or WSL. Mac
+users may need to do platform-specific things).
+`docker build -t <image_name>:latest .`
 
-To build the image from the top level of the GitHub Repository (aka skyblue) do this command Powershell if you are not a Mac user.
-`docker build -t <image_name>:latest -f ./<Dockerfile> .`
-
-To run the dev container:
+Our container can be used to develop in when the image is built using:
 Do this command: `docker run --gpus all -it --rm -v ${PWD}:/skyblue/ <image_name>:latest`
-The above command needs to be run from the skyblue directory on your computer and will sync the container files with local ones
+The above command needs to be run from the skyblue directory on your computer and will sync the container files with local ones. Changes
+made to files under the /skyblue directory in the container will be reflected outside of the container too.
 
-To run the CUDA dev container with the GPUS: `docker run -it --gpus all --rm -v ${PWD}:/skyblue/ skyblue_cuda_dev:latest`
-
-To run, do python <fileName> to use the version of Python supported by the container.
+Our code uses the default python in the container (python 3.11), which can be run using the command `python` from inside the container.
 
 If there are build problems try running `docker system prune` -- Should never be the problem but its basically free to try.
 
-When we run our code on the HPC, we need to push to Docker Hub so that we can then pull the latest version
-on the HPC. The Tufts HPC uses singularity instead of docker, so we need to run singularity pull docker://aauretto122/skyblue_images:hpc-gpu
-
-The HPC container should be pushed to a remote repo so it can be pulled on the HPC and run there.
+When we run our code on the HPC, we need to use Singularity (Docker for Computing Clusters) to run our container.
+We accomplish this by doing the following:
 
 # Pushing Docker image to remote repo:
-* Repeat this each time we wanna push to HPC
 1) Login to a docker hub account: `docker login`
 2) Rename docker image to whatever you want it to be named in the repo: `docker tag <local_image>:<tag> <desired_name>:<desired_tag>`
 3) Push to repo: `docker push <desired_name>:<desired_tag>`
 
-# Generally, how to pull Docker image on HPC:
+# Pulling Docker image on HPC:
 1) Log into a HPC node
 2) Log onto a compute node using: `srun -N1 -n8 -t0-8 -p preempt --gres=gpu:h100:1 --pty bash`
 3) `module load singularity`
 4) Use Singularity to pull, convert, and the docker image
    `singularity pull docker://<username>/<container_name>`
+   If you just want a container that works with our code and don't need to make any other
+   modifications, pull from `docker://aauretto122/skyblue_images:hpc-gpu`
 5) This creates a .sif file that acts as a runnable image using the below steps:
 
-# Workflow for pulling and running model training container on HPC
+There are two scripts on the HPC to make pulling and running code easier. They can be used like so: 
 1) Log into HPC and get a terminal
 2) Run `sh pull_image.sh <docker hub username>/<Container that trains model> --rm` 
    to get the latest version of the container that will train a model

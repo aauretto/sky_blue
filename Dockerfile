@@ -18,7 +18,7 @@ ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
 
 WORKDIR /skyblue
-COPY . /skyblue
+COPY ./requirements.txt .
 
 # Install pip requirements
 RUN pip install -r requirements.txt
