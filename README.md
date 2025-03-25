@@ -46,6 +46,14 @@ There are two scripts on the HPC to make pulling and running code easier. They c
         can use to save files that need to exist beyond the lifetime of the container. In (3), 
         the second argument will be mounted in as `/skyblue/persistent_files`
 
+To run code on the HPC, we are currently using a script that launches the container and mounts in a 
+git repository containing our source code. This script is called `run_code` and is used like so:
+`run_code sif_file repo_root [-it]`
+Where sif_file is the location of the sif file you pulled, repo root is the root of a git repo with
+our code in it, and the optional -it flag will make the container interactive (give you a shell to
+execute commands in once it spools up). If -it is omitted the srcipt will automatically run
+`python /skyblue/src/model.py` in the container.
+
 ### Provision GPU on HPC
 srun -N1 -n8 -t0-8 -p preempt --gres=gpu:h100:1 --pty bash
 
