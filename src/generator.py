@@ -29,7 +29,7 @@ class Generator(keras.utils.Sequence):
         self.batch_timestamps = [
             timestamp
             for sequence in self.timestamps
-            for timestamp in sequence[:-batch_size]
+            for timestamp in sequence[:len(sequence) - frame_size + 1]
         ]
         self.rng.shuffle(self.batch_timestamps)
         self.batch_size = batch_size  # the size of a batch
