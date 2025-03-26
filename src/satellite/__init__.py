@@ -11,6 +11,7 @@ def fetch(timestamp: dt.datetime, satellite: GOES) -> Dataset:
         dt.datetime.fromtimestamp(timestamp.timestamp(), tz=None),
         return_as="xarray",
         download=False,
+        verbose=False
     )
 
 
