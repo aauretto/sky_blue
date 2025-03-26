@@ -6,7 +6,6 @@ from goes2go import GOES
 import pirep as pr
 import satellite as st
 import xarray as xr
-import datetime as dt
 from numpy import random as rnd
 
 from pirep.defs.spreading import concatenate_all_pireps

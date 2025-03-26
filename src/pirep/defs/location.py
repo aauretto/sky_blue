@@ -108,14 +108,16 @@ class Location(BaseModel):
         match len(code):
             case 3:
                 results = AIRPORT_CODES[
-                    (AIRPORT_CODES["iata_code"] == code)
-                    | (AIRPORT_CODES["local_code"] == code)
+                    ((AIRPORT_CODES["iata_code"] == code)
+                    | (AIRPORT_CODES["local_code"] == code))
+                    & (AIRPORT_CODES["continent"] == "NA")
                 ]
 
             case 4:
                 results = AIRPORT_CODES[
-                    (AIRPORT_CODES["icao_code"] == code)
-                    | (AIRPORT_CODES["gps_code"] == code)
+                    ((AIRPORT_CODES["icao_code"] == code)
+                    | (AIRPORT_CODES["gps_code"] == code))
+                    & (AIRPORT_CODES["continent"] == "NA")
                 ]
 
             case _:

@@ -16,8 +16,8 @@ import random
 
 
 def generate_timestamps(
-    start: dt.datetime = dt.datetime(2017, 3, 1, 0, 3),
-    end: dt.datetime = dt.datetime(2025, 1, 1, 0, 0),
+    start: dt.datetime = dt.datetime(2017, 3, 1, 0, 3, tzinfo=dt.UTC),
+    end: dt.datetime = dt.datetime(2025, 1, 1, 0, 0, tzinfo=dt.UTC),
 ) -> list[dt.datetime]:
     """
     Generates a list of 5 minutes seperated datetimes starting on minute 3
@@ -185,7 +185,7 @@ if __name__ == "__main__":
     model.fit(
                 train_generator,
                 validation_data=val_generator,
-                epochs=1,
+                epochs=2,
                 batch_size=1,
                 shuffle=False,
                 verbose=2

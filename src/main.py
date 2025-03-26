@@ -13,7 +13,7 @@ from consts import MAP_RANGE, BACKGROUND_RISK
 from pirep.defs.spreading import concatenate_all_pireps, spread_pirep
 
 if __name__ == "__main__":
-    reports = pr.parse_all(pr.fetch(pr.url(dt.datetime(2024, 11, 6, 23, 30, 0), dt.datetime(2024, 11, 8, 0, 0, 0))))
+    reports = pr.parse_all(pr.fetch(pr.url(dt.datetime(2024, 11, 6, 23, 30, 0, tzinfo=dt.UTC), dt.datetime(2024, 11, 8, 0, 0, 0, tzinfo=dt.UTC))))
     print(f"Number of reports in specified range is {len(reports)}")
 
     grid = concatenate_all_pireps(reports, BACKGROUND_RISK)

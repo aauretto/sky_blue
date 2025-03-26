@@ -15,8 +15,8 @@ from generator import Generator
 
 
 def generate_timestamps(
-    start: dt.datetime = dt.datetime(2017, 3, 1, 0, 3),
-    end: dt.datetime = dt.datetime(2025, 1, 1, 0, 0),
+    start: dt.datetime = dt.datetime(2017, 3, 1, 0, 3, tzinfo=dt.UTC),
+    end: dt.datetime = dt.datetime(2025, 1, 1, 0, 0, tzinfo=dt.UTC),
 ) -> list[dt.datetime]:
     """
     Generates a list of 5 minutes seperated datetimes starting on minute 3
@@ -44,7 +44,7 @@ def model_initializer(hp, frame_size: int = 9):
     lon_size = consts.GRID_RANGE["LON"]
 
     model = keras.Sequential()
-    model.add(keras.layers.Input((frame_size, lat_size, lon_size, 6)))
+    model.add(keras.layers.Input((frame_size, lat_size, lon_size, 6))) # 6 is number of bands 
     model.add(
         keras.layers.ConvLSTM2D(
             filters=hp.Int("filters", min_value=16, max_value=64, step=16),
@@ -130,9 +130,9 @@ if __name__ == "__main__":
         end=dt.datetime.now(tz=dt.UTC),
     )
 
-    print("Length of train dataset: ", len(t_train))
-    print("Length of val dataset: ", len(t_val))
-    print("Length of test dataset: ", len(t_test))
+    print(f"Length of train dataset: {len(t_train)} with {sum(map(lambda x: len(x), t_train))} total elements")
+    print(f"Length of val dataset: {len(t_val)} with {sum(map(lambda x: len(x), t_val))} total elements")
+    print(f"Length of test dataset: {len(t_test)} with {sum(map(lambda x: len(x), t_test))} total elements")
 
     sat = GOES(satellite=16, product="ABI", domain="C")
     bands = [8, 9, 10, 13, 14, 15]
