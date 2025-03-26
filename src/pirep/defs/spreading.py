@@ -171,13 +171,9 @@ def concatenate_all_pireps(reports: list[dict], background_risk: int):
         gc.collect()
     # locs = np.where(np.isnan(finalGrid) | np.isneginf(finalGrid))
     # finalGrid[locs] = BACKGROUND_RISK
-    print(
-        f"\n*************************Final Grid About to Create*************************"
-    )
     mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
     finalGrid[mask] = np.random.uniform(
         1e-5, 1e-7, size=mask.sum()
     )  # TODO document magic numbers
-    print(f"\n*************************Final Grid Created*************************")
 
     return finalGrid
