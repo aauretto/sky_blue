@@ -26,7 +26,6 @@ def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
 
 
 def fetch(url: str) -> list[dict]:
-    print(url)
     df = pd.read_csv(url)
 
     # Fix dataframe columns
@@ -49,9 +48,7 @@ def parse(row: dict) -> dict:
     from pirep.defs.altitude import Altitude, AltitudeError
     from pirep.defs.location import CodeError
     from pirep.defs.report import PilotReport, ReportError
-
-    # print(f"\x1b[1K\r{row['Report']}", end="")
-
+    
     try:
         report = PilotReport.parse(row["Report"], timestamp=row["Timestamp"])
         row["Priority"] = report.priority
@@ -66,7 +63,7 @@ def parse(row: dict) -> dict:
         row["Turbulence"] = report.turbulence
 
         return row
-    except (ReportError, CodeError, AltitudeError):
+    except (ReportError, CodeError, AltitudeError) as e:
         return row
 
     except Exception:
@@ -76,6 +73,7 @@ def parse(row: dict) -> dict:
 
 
 def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
+
     reports: list[dict] = [parse(row) for row in table]
     reports = [
         {k: row[k] for k in row.keys() if k not in ["Lat", "Lon"]} for row in table
