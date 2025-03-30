@@ -183,17 +183,8 @@ def add_pirep(grid, prData, intensity, BACKGROUND_RISK):
     k_lon_min = k_lon_center - (lon - g_lon_min)
     k_lon_max = k_lon_center + (g_lon_max - lon)
 
-    print(f"{g_lat_min} {g_lat_max} {g_lon_min} {g_lon_max}")
-    print(f"{k_lat_min} {k_lat_max} {k_lon_min} {k_lon_max}")
-
-
     target_area = grid[g_lat_min : g_lat_max, g_lon_min : g_lon_max , :]
     kernel_area = subGrid[k_lat_min : k_lat_max, k_lon_min : k_lon_max , :]
-
-    print(f"{np.nanmax(target_area)}")
-    print(f"{np.nanmax(kernel_area)}")
-    print(np.max(grid))
-    print("="*80)
     grid[g_lat_min : g_lat_max, g_lon_min : g_lon_max , :] = np.fmax(target_area, kernel_area)
 
 # Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
@@ -226,9 +217,9 @@ def concatenate_all_pireps(reports: list[dict], background_risk: int):
     # finalGrid[locs] = BACKGROUND_RISK
 
     # TODO ADD THIS BACK AIDEN
-    # mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
-    # finalGrid[mask] = np.random.uniform(
-    #     1e-5, 1e-7, size=mask.sum()
-    # )  # TODO document magic numbers
+    mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
+    finalGrid[mask] = np.random.uniform(
+        1e-5, 1e-7, size=mask.sum()
+    )  # TODO document magic numbers
 
     return finalGrid
