@@ -145,6 +145,57 @@ def radial_spread(grid, intensity, BACKGROUND_RISK):
         )
 
 
+# Grid should be a slice of the larger grid equal to kernel size
+def add_pirep(grid, prData, intensity, BACKGROUND_RISK): 
+    lat      = prData.lat_idx
+    lon      = prData.lon_idx
+    alt_min  = prData.alt_min_idx
+    alt_max  = prData.alt_max_idx
+    turb_idx = prData.turbulence_index
+
+    # Compute kernel, put it on orig grid using vector crap
+    kernel = RADIAL_KERNELS[intensity]
+
+    # max sizes of axes for grid we are modifying and kernel we are applying to it
+    g_lat_shp, g_lon_shp, g_alt_shp = grid.shape
+    k_lat_shp, k_lon_shp = kernel.shape
+
+    # Subgrid = area we project pirep into
+    subGrid = np.full(shape=(k_lat_shp, k_lon_shp, GRID_RANGE["ALT"]), fill_value = np.nan)
+
+    # Put turb index in middle of kernel we want to spread
+    subGrid[subGrid.shape[0] // 2, subGrid.shape[0] // 2, alt_min : alt_max] = turb_idx
+
+    vertical_spread(subGrid, intensity, BACKGROUND_RISK)
+    radial_spread(subGrid, intensity, BACKGROUND_RISK)
+
+    k_lat_center, k_lon_center = k_lat_shp // 2, k_lon_shp // 2
+
+    # Slicing bounds on the grid
+    g_lat_min = max(0, lat - k_lat_shp // 2)
+    g_lat_max = min(g_lat_shp, lat + k_lat_shp // 2 + 1)
+    g_lon_min = max(0, lon - k_lon_shp // 2)
+    g_lon_max = min(g_lon_shp, lon + k_lon_shp // 2 + 1)
+
+    # Slicing bounds for kernel
+    k_lat_min = k_lat_center - (lat - g_lat_min)
+    k_lat_max = k_lat_center + (g_lat_max - lat)
+    k_lon_min = k_lon_center - (lon - g_lon_min)
+    k_lon_max = k_lon_center + (g_lon_max - lon)
+
+    print(f"{g_lat_min} {g_lat_max} {g_lon_min} {g_lon_max}")
+    print(f"{k_lat_min} {k_lat_max} {k_lon_min} {k_lon_max}")
+
+
+    target_area = grid[g_lat_min : g_lat_max, g_lon_min : g_lon_max , :]
+    kernel_area = subGrid[k_lat_min : k_lat_max, k_lon_min : k_lon_max , :]
+
+    print(f"{np.nanmax(target_area)}")
+    print(f"{np.nanmax(kernel_area)}")
+    print(np.max(grid))
+    print("="*80)
+    grid[g_lat_min : g_lat_max, g_lon_min : g_lon_max , :] = np.fmax(target_area, kernel_area)
+
 # Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
 def concatenate_all_pireps(reports: list[dict], background_risk: int):
     # make final grid and temp grid
@@ -157,23 +208,27 @@ def concatenate_all_pireps(reports: list[dict], background_risk: int):
 
     for report in reports:
         # print(f"{type(report)=}\n{report}", "\n============================================================")
-        tmpGrid, aircraft, intensity = pr.compute_grid(report)
+        prGridData, aircraft, intensity = pr.compute_grid(report)
 
-        # spread pirep in temp grid
-        spread_pirep(tmpGrid, aircraft, intensity, background_risk)
+        # Add targeted pirep to grid
+        add_pirep(finalGrid, prGridData, intensity, background_risk)
 
-        # merge temp grid with final grid
-        finalGrid = merge.merge_max(
-            [finalGrid, tmpGrid]
-        )  # TODO change which spread we want
+        # spread_pirep(tmpGrid, aircraft, intensity, background_risk)
 
-        del tmpGrid
-        gc.collect()
+        # # merge temp grid with final grid
+        # finalGrid = merge.merge_max(
+        #     [finalGrid, tmpGrid]
+        # )  # TODO change which spread we want
+
+        # del tmpGrid
+        # gc.collect()
     # locs = np.where(np.isnan(finalGrid) | np.isneginf(finalGrid))
     # finalGrid[locs] = BACKGROUND_RISK
-    mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
-    finalGrid[mask] = np.random.uniform(
-        1e-5, 1e-7, size=mask.sum()
-    )  # TODO document magic numbers
+
+    # TODO ADD THIS BACK AIDEN
+    # mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
+    # finalGrid[mask] = np.random.uniform(
+    #     1e-5, 1e-7, size=mask.sum()
+    # )  # TODO document magic numbers
 
     return finalGrid

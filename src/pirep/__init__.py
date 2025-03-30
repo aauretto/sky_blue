@@ -110,14 +110,23 @@ def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
 # ]
 
 
+# Temporary struct that holds some turb data
+class PirepGrid():
+    def __init__(self, lat_idx, lon_idx, alt_min_idx, alt_max_idx, turbulence_index):
+        self.lat_idx = lat_idx
+        self.lon_idx = lon_idx
+        self.alt_min_idx = alt_min_idx
+        self.alt_max_idx = alt_max_idx
+        self.turbulence_index = turbulence_index
+
 def compute_grid(report: dict) -> npt.NDArray:
     from consts import GRID_RANGE, MAP_RANGE
 
-    grid = np.full(
-        (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]),
-        np.nan,
-        dtype=np.float32,
-    )
+    # grid = np.full(
+    #     (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]),
+    #     np.nan,
+    #     dtype=np.float32,
+    # )
 
     from pirep.defs.report import Aircraft, Altitude, Location, Turbulence
 
@@ -149,11 +158,20 @@ def compute_grid(report: dict) -> npt.NDArray:
         if MAP_RANGE["ALT"]["RANGE"][alt_max_idx] < alt.max:
             alt_max_idx = min(alt_max_idx + 1, len(MAP_RANGE["ALT"]["RANGE"]))
 
-        grid[
-            convert(loc.lat, "LAT") : convert(loc.lat, "LAT") + 1,
-            convert(loc.lon, "LON") : convert(loc.lon, "LON") + 1,
-            alt_min_idx : alt_max_idx + 1,
-        ] = turbulence_index
+        # grid[
+        #     convert(loc.lat, "LAT") : convert(loc.lat, "LAT") + 1,
+        #     convert(loc.lon, "LON") : convert(loc.lon, "LON") + 1,
+        #     alt_min_idx : alt_max_idx + 1,
+        # ] = turbulence_index
+
+        # Return a 4-tuple with the center point and turb index in it
+        grid = PirepGrid(
+            lat_idx = convert(loc.lat, "LAT"),
+            lon_idx = convert(loc.lon, "LON"),
+            alt_min_idx = alt_min_idx,
+            alt_max_idx = alt_max_idx,
+            turbulence_index = turbulence_index,
+            )
 
         return (grid, aircraft, intensity)
     else:

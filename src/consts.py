@@ -40,3 +40,5 @@ GRID_RANGE = {
     "LON": 2500,  # number of cols
     "ALT": len(MAP_RANGE["ALT"]["RANGE"]),  # number of z layers
 }
+
+BACKGROUND_RISK = 4e-5
