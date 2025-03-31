@@ -1,6 +1,6 @@
 #!/bin/bash
 #SBATCH -J Make_Syyblue_Cache  # job name
-#SBATCH --time=02-00:00:00     # requested time (DD-HH:MM:SS)
+#SBATCH --time=03-00:00:00     # requested time (DD-HH:MM:SS)
 #SBATCH -p batch               # running in batch jobs
 #SBATCH -N 1                   # 1 node
 #SBATCH -n 4                   # 8 tasks total (default 1 CPU core per task) = # of cores
@@ -27,11 +27,10 @@
 #SBATCH --output=cacheJob.%j.%N.out #saving standard output to file, %j=JOBID, %N=NodeName
 #SBATCH --error=cacheJob.%j.%N.err #saving standard error to file, %j=JOBID, %N=NodeName
 #SBATCH --mail-type=ALL        # email about everything
-#SBATCH --mail-user=aiden.auretto@tufts.edu
+#SBATCH --mail-user=simon.webber@tufts.edu
 
 #[commands_you_would_like_to_exe_on_the_compute_nodes]
 module load singularity
 singularity exec --no-mount "hostfs" --bind /cluster/tufts/capstone25skyblue/swebbe01/sky_blue:/skyblue /cluster/tufts/capstone25skyblue/skyblue_images_hpc-gpu.sif sh -c "cd /skyblue && python /skyblue/src/createCache.py"
 
-# Current running job 3/26/25 - 11:36
-# 12806095
+#Current job id 12855436
