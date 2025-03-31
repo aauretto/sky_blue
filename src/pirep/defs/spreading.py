@@ -6,6 +6,7 @@ from consts import MAP_RANGE, GRID_RANGE
 
 import gc
 import pirep.defs.merge as merge
+from Logger import LOGGER
 
 # Data Source: https://journals.ametsoc.org/view/journals/bams/aop/BAMS-D-23-0142.1/BAMS-D-23-0142.1.pdf
 ### Altitudinal Computations ### Taken from the page 14 graphs of the source above
@@ -198,25 +199,13 @@ def concatenate_all_pireps(reports: list[dict], background_risk: int):
     import pirep as pr
 
     for report in reports:
-        # print(f"{type(report)=}\n{report}", "\n============================================================")
         prGridData, aircraft, intensity = pr.compute_grid(report)
-
         # Add targeted pirep to grid
-        add_pirep(finalGrid, prGridData, aircraft, intensity, background_risk)
+        try:
+            add_pirep(finalGrid, prGridData, aircraft, intensity, background_risk)
+        except Exception as e:
+            LOGGER.error(f"Failed to add pirep {report}\n", exc_info=True)
 
-        # spread_pirep(tmpGrid, aircraft, intensity, background_risk)
-
-        # # merge temp grid with final grid
-        # finalGrid = merge.merge_max(
-        #     [finalGrid, tmpGrid]
-        # )  # TODO change which spread we want
-
-        # del tmpGrid
-        # gc.collect()
-    # locs = np.where(np.isnan(finalGrid) | np.isneginf(finalGrid))
-    # finalGrid[locs] = BACKGROUND_RISK
-
-    # TODO ADD THIS BACK AIDEN
     mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
     finalGrid[mask] = np.random.uniform(
         1e-5, 1e-7, size=mask.sum()

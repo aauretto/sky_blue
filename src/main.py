@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-
+from Logger import LOGGER
 import datetime as dt
 
 import numpy as np
@@ -17,6 +17,7 @@ if __name__ == "__main__":
     print(f"Number of reports in specified range is {len(reports)}")
 
     grid = concatenate_all_pireps(reports, BACKGROUND_RISK)
+    print(f'Concatenated reports')
 
 
     ### Old Single Pirep Stuff
@@ -42,25 +43,25 @@ if __name__ == "__main__":
     # print(f"PIREP of {aircraft} aircraft and {intensity} intensity")
     # print(f"has values in {np.argwhere(~np.isnan(grid))}")
 
-    x, y, z = np.indices(grid.shape)
-    x, y, z, values = x.flatten(), y.flatten(), z.flatten(), grid.flatten()
+    # x, y, z = np.indices(grid.shape)
+    # x, y, z, values = x.flatten(), y.flatten(), z.flatten(), grid.flatten()
 
 
-    fig = plt.figure(figsize=(8, 8))
-    ax = fig.add_subplot(111, projection='3d')
-    sc = ax.scatter(x, y, z, c=values, cmap='viridis', s=1, alpha=.5)  # Adjust alpha for transparency
-    ax.set_facecolor('black')
-    ax.tick_params(axis='x', colors='white')
-    ax.tick_params(axis='y', colors='white')
-    ax.tick_params(axis='z', colors='white')
-    ax.set_xlim(0, 1500)
-    ax.set_ylim(0, 2500)
+    # fig = plt.figure(figsize=(8, 8))
+    # ax = fig.add_subplot(111, projection='3d')
+    # sc = ax.scatter(x, y, z, c=values, cmap='viridis', s=1, alpha=.5)  # Adjust alpha for transparency
+    # ax.set_facecolor('black')
+    # ax.tick_params(axis='x', colors='white')
+    # ax.tick_params(axis='y', colors='white')
+    # ax.tick_params(axis='z', colors='white')
+    # ax.set_xlim(0, 1500)
+    # ax.set_ylim(0, 2500)
 
 
-    # Add color bar
-    plt.colorbar(sc)
+    # # Add color bar
+    # plt.colorbar(sc)
 
-    plt.savefig("/skyblue/spread.png")
+    # plt.savefig("/skyblue/spread.png")
     # fig = plt.figure()
     # vals = np.argwhere(~np.isnan(grid))
 

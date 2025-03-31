@@ -1,3 +1,4 @@
+from Logger import LOGGER
 import datetime as dt
 import multiprocessing
 

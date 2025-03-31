@@ -4,6 +4,7 @@ import numpy as np
 import numpy.typing as npt
 import pandas as pd
 from consts import MAP_RANGE
+from Logger import LOGGER
 
 
 def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
@@ -67,8 +68,9 @@ def parse(row: dict) -> dict:
         return row
 
     except Exception:
-        print(f"Failed to parse PIREP: {row['Report']}")
-        print(traceback.format_exc())
+        LOGGER.debug(f"Failed to parse PIREP: {row['Report']}", exc_info=True)
+        # print()
+        # print(traceback.format_exc())
         return row
 
 
