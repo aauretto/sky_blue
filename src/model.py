@@ -38,7 +38,7 @@ def build_model(
     hp: kt.HyperParameters,
     dim_frames=9,
     dim_lat=consts.GRID_RANGE["LAT"],
-    dim_lon=consts.GRID_RANGE["LAT"],
+    dim_lon=consts.GRID_RANGE["LON"],
     dim_alt=consts.GRID_RANGE["ALT"],
     dim_bands=6,
 ):
