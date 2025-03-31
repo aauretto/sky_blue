@@ -28,8 +28,6 @@ MAP_RANGE = {
             42000,
             48000,
         ]  # TODO maybe a 0
-        # "MIN": 0,  # ft
-        # "MAX": 45_000,  # ft
     },
 }
 
