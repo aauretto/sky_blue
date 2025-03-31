@@ -15,7 +15,7 @@ from pirep.defs.spreading import concatenate_all_pireps, spread_pirep
 
 def main():
     ts_begin = time.time()
-    reports = pr.parse_all(pr.fetch(pr.url(dt.datetime(2024, 11, 6, 0, 0, 0, tzinfo=dt.UTC), dt.datetime(2024, 11, 7, 0, 0, 0, tzinfo=dt.UTC))))
+    reports = pr.parse_all(pr.fetch(pr.url(dt.datetime(2024, 12, 6, 0, 0, 0, tzinfo=dt.UTC), dt.datetime(2024, 12, 13, 0, 0, 0, tzinfo=dt.UTC))))
     print(f"Number of reports in specified range is {len(reports)}")
     ts_fetch = time.time()
     print(f"Time taken to fetch = {ts_fetch - ts_begin}")
@@ -27,10 +27,10 @@ def main():
     print(f"total time = {ts_concat - ts_begin}")
     
     # Plot a single slice (e.g., the middle slice along the depth axis)
-    plt.imshow(grid[:,:, 10], cmap='viridis', interpolation='nearest')
+    plt.imshow(grid[:,:, 10], cmap='viridis', interpolation='nearest', origin='lower')
     plt.colorbar()
     plt.title("Slice of Alt Level 10")
-    plt.savefig("/skyblue/new_spread.png")
+    plt.savefig("/skyblue/new_spread_new_rng_lower.png")
 
 if __name__ == "__main__":
     main()

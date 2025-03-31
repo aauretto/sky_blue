@@ -112,12 +112,12 @@ def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
 
 # Temporary struct that holds some turb data
 class PirepGrid():
-    def __init__(self, lat_idx, lon_idx, alt_min_idx, alt_max_idx, turbulence_index):
+    def __init__(self, lat_idx, lon_idx, alt_min_idx, alt_max_idx, turbulence_idx):
         self.lat_idx = lat_idx
         self.lon_idx = lon_idx
         self.alt_min_idx = alt_min_idx
         self.alt_max_idx = alt_max_idx
-        self.turbulence_index = turbulence_index
+        self.turbulence_idx = turbulence_idx
 
 def compute_grid(report: dict) -> npt.NDArray:
     from consts import GRID_RANGE, MAP_RANGE
@@ -169,8 +169,8 @@ def compute_grid(report: dict) -> npt.NDArray:
             lat_idx = convert(loc.lat, "LAT"),
             lon_idx = convert(loc.lon, "LON"),
             alt_min_idx = alt_min_idx,
-            alt_max_idx = alt_max_idx,
-            turbulence_index = turbulence_index,
+            alt_max_idx = alt_max_idx + 1,
+            turbulence_idx = turbulence_index,
             )
 
         return (grid, aircraft, intensity)

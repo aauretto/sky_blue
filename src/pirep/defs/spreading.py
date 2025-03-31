@@ -146,15 +146,16 @@ def radial_spread(grid, intensity, BACKGROUND_RISK):
 
 
 # Grid should be a slice of the larger grid equal to kernel size
-def add_pirep(grid, prData, intensity, BACKGROUND_RISK): 
+def add_pirep(grid, prData, aircraft, intensity, BACKGROUND_RISK): 
     lat      = prData.lat_idx
     lon      = prData.lon_idx
     alt_min  = prData.alt_min_idx
     alt_max  = prData.alt_max_idx
-    turb_idx = prData.turbulence_index
+    turb_idx = prData.turbulence_idx
+
 
     # Compute kernel, put it on orig grid using vector crap
-    kernel = RADIAL_KERNELS[intensity]
+    kernel = RADIAL_KERNELS[PIREP_INT_CRAFT_TO_SPREAD_INT[aircraft][intensity]]
 
     # max sizes of axes for grid we are modifying and kernel we are applying to it
     g_lat_shp, g_lon_shp, g_alt_shp = grid.shape
@@ -166,8 +167,13 @@ def add_pirep(grid, prData, intensity, BACKGROUND_RISK):
     # Put turb index in middle of kernel we want to spread
     subGrid[subGrid.shape[0] // 2, subGrid.shape[0] // 2, alt_min : alt_max] = turb_idx
 
-    vertical_spread(subGrid, intensity, BACKGROUND_RISK)
-    radial_spread(subGrid, intensity, BACKGROUND_RISK)
+    try:
+        spread_pirep(subGrid, aircraft, intensity, BACKGROUND_RISK)
+    except Exception as e:
+        print(f"Exception {e}\n with data:\n  lat {prData.lat_idx}\n lon {prData.lon_idx}\n alt_min {prData.alt_min_idx}\n alt_max {prData.alt_max_idx}\n turb idx {prData.turbulence_idx}")
+        exit(1)
+    # vertical_spread(subGrid, intensity, BACKGROUND_RISK)
+    # radial_spread(subGrid, intensity, BACKGROUND_RISK)
 
     k_lat_center, k_lon_center = k_lat_shp // 2, k_lon_shp // 2
 
@@ -202,7 +208,7 @@ def concatenate_all_pireps(reports: list[dict], background_risk: int):
         prGridData, aircraft, intensity = pr.compute_grid(report)
 
         # Add targeted pirep to grid
-        add_pirep(finalGrid, prGridData, intensity, background_risk)
+        add_pirep(finalGrid, prGridData, aircraft, intensity, background_risk)
 
         # spread_pirep(tmpGrid, aircraft, intensity, background_risk)
 
