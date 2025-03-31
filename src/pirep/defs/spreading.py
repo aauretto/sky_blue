@@ -167,13 +167,7 @@ def add_pirep(grid, prData, aircraft, intensity, BACKGROUND_RISK):
     # Put turb index in middle of kernel we want to spread
     subGrid[subGrid.shape[0] // 2, subGrid.shape[0] // 2, alt_min : alt_max] = turb_idx
 
-    try:
-        spread_pirep(subGrid, aircraft, intensity, BACKGROUND_RISK)
-    except Exception as e:
-        print(f"Exception {e}\n with data:\n  lat {prData.lat_idx}\n lon {prData.lon_idx}\n alt_min {prData.alt_min_idx}\n alt_max {prData.alt_max_idx}\n turb idx {prData.turbulence_idx}")
-        exit(1)
-    # vertical_spread(subGrid, intensity, BACKGROUND_RISK)
-    # radial_spread(subGrid, intensity, BACKGROUND_RISK)
+    spread_pirep(subGrid, aircraft, intensity, BACKGROUND_RISK)
 
     k_lat_center, k_lon_center = k_lat_shp // 2, k_lon_shp // 2
 
