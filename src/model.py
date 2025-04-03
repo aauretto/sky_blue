@@ -46,11 +46,11 @@ def build_model(
     model.add(keras.layers.Input((dim_frames, dim_lat, dim_lon, dim_bands)))
 
     # 2D Convolutional LSTM layer
-    hp_filters = hp.Choice("filters", values=[16, 32, 64])
+    hp_filters = hp.Choice("filters", values=[8, 16, 32])
     model.add(
         keras.layers.ConvLSTM2D(
             filters=hp_filters,
-            kernel_size=(3, 3),
+            kernel_size=(3, 3), # Todo may need to become 5x5
             padding="same",
             return_sequences=True,
         )
@@ -119,8 +119,8 @@ if __name__ == "__main__":
     tuner = kt.Hyperband(
         build_model,
         objective="val_loss",
-        max_epochs=10,
-        factor=3,
+        max_epochs=7, # was 10
+        factor=10, # Was 3
         directory="tuning",
         project_name="turbulent",
     )
