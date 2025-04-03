@@ -6,3 +6,5 @@
 **/.ruff_cache
 **/kt_tuning
 logging/
+**MyJob**
+**/tuning
