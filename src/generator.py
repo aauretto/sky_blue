@@ -8,8 +8,10 @@ import satellite as st
 import xarray as xr
 from numpy import random as rnd
 
-from pirep.defs.spreading import concatenate_all_pireps
 
+from pirep.defs.spreading import concatenate_all_pireps
+from concurrent.futures import ThreadPoolExecutor
+import threading
 
 class Generator(keras.utils.Sequence):
     def __init__(
@@ -58,7 +60,16 @@ class Generator(keras.utils.Sequence):
         the satellite images and their corresponding, updated timestamps
 
         """
-        xs = [st.fetch(t, self.sat) for t in timestamps]
+        
+        def worker(ts):
+            return st.fetch(ts, self.sat)
+        
+        numProcs = len(timestamps)
+        with ThreadPoolExecutor(max_workers=numProcs) as exec:
+            xs = exec.map(worker, timestamps)
+
+        # xs = [st.fetch(t, self.sat) for t in timestamps]
+
         xs = xr.concat(xs, dim="t")
         lats, lons = st.calculate_coordinates(xs)
         xs = st.fetch_bands(xs, self.bands)
@@ -98,21 +109,27 @@ class Generator(keras.utils.Sequence):
         batch_times = self.batch_timestamps[
             batch_index * self.batch_size : (batch_index + 1) * self.batch_size
         ]
-        frames_timestamps = [self.__generate_frames(t) for t in batch_times]
+        frames_timestamps = [self.__generate_frames(t) for t in batch_times]            
 
-        # Warning: be careful of incomplete batches (len(batch_times) != batch_size )
-        for frame_times in frames_timestamps:
+        
+        def get_frames_worker(frame_times):
+            print(f"{frame_times=}")
             xs, updated_timestamps = self.__retrieve_x_frame(frame_times)
+            print(f"{updated_timestamps=}")
+            updated_timestamps = [uts + dt.timedelta(hours=self.frame_size) for uts in updated_timestamps]
+            print(f"{updated_timestamps=}")
+
             ys = self.__retrieve_y_frame(updated_timestamps)
+            return (xs, ys)
 
-            print("SHAPE XS:", xs.shape)  # Shape (frame_size, lat, lon, bands)
-            print("SHAPE YS:", ys.shape)  # Shape (frame_size, lat, lon, alt)
+        with ThreadPoolExecutor(max_workers=len(frames_timestamps)) as exec:
+            frame_pairs = exec.map(get_frames_worker, frames_timestamps)
 
+        for (xs, ys) in frame_pairs:
             batch_x.append(xs)
             batch_y.append(ys)
 
         batch_x = np.array(batch_x)  # Shape (batch_size, time, lat, lon, bands)
         batch_y = np.array(batch_y)  # Shape (batch_size, time, lat, lon, alt)
 
-        print(f"Batch {batch_index}: X.shape={batch_x.shape}, Y.shape={batch_y.shape}")
         return batch_x, batch_y

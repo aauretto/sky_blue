@@ -9,6 +9,8 @@ from goes2go import GOES
 
 import consts as consts
 from generator import Generator
+import pickle
+import os
 
 
 def generate_timestamps(
@@ -46,10 +48,10 @@ def build_model(
     model.add(keras.layers.Input((dim_frames, dim_lat, dim_lon, dim_bands)))
 
     # 2D Convolutional LSTM layer
-    hp_filters = hp.Choice("filters", values=[8, 16, 32])
+    # hp_filters = hp.Choice("filters", values=[8, 16, 32])
     model.add(
         keras.layers.ConvLSTM2D(
-            filters=hp_filters,
+            filters=hp_filters, #Playing god and choosing #TODO
             kernel_size=(3, 3), # Todo may need to become 5x5
             padding="same",
             return_sequences=True,
@@ -57,8 +59,8 @@ def build_model(
     )
 
     # Dropout layer for regularization
-    hp_dropout = hp.Float("dropout", 0.2, 0.5)
-    model.add(keras.layers.Dropout(rate=hp_dropout))
+    # hp_dropout = hp.Float("dropout", 0.2, 0.5)
+    model.add(keras.layers.Dropout(rate=hp_dropout)) # Playing god and choosing #TODO
 
     # 1x1 2D Convolutional layer to reduce feature map
     model.add(
@@ -71,9 +73,9 @@ def build_model(
     )
 
     # Compile the model
-    hp_learning_rate = hp.Choice("learning_rate", values=[1e-4, 1e-3, 1e-2])
+    # hp_learning_rate = hp.Choice("learning_rate", values=[1e-4, 1e-3, 1e-2])
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=hp_learning_rate),
+        optimizer=keras.optimizers.Adam(learning_rate=hp_learning_rate), # Playing god a choosing #TODO
         loss=keras.losses.MeanSquaredError(),
         metrics=[keras.metrics.MeanAbsoluteError()],
     )
@@ -87,14 +89,14 @@ if __name__ == "__main__":
 
     # Generate dataset timestamps
     timestamps = generate_timestamps(
-        start=dt.datetime(2024, 11, 6, 0, 0, tzinfo=dt.UTC),
-        end=dt.datetime(2024, 11, 6, 12, 0, tzinfo=dt.UTC),
+        start=dt.datetime(2024, 1, 1, 0, 0, tzinfo=dt.UTC),
+        end=dt.datetime(2024, 2, 1, 0, 0, tzinfo=dt.UTC)
     )
     rng.shuffle(timestamps)
     t_train, t_val = timestamps[:10], timestamps[10:]
     t_test = generate_timestamps(
         start=dt.datetime(2025, 1, 1, 0, 0, tzinfo=dt.UTC),
-        end=dt.datetime.now(tz=dt.UTC),
+        end=dt.datetime(2025, 2, 1, 0, 0)
     )
 
     print(f"Timestamps: {len(t_train)}/{len(t_val)}:{len(t_test)}")
@@ -115,26 +117,19 @@ if __name__ == "__main__":
 
     print(f"Generators: {len(gen_train)}/{len(gen_val)}:{len(gen_test)}")
 
-    # Tune the model
-    tuner = kt.Hyperband(
-        build_model,
-        objective="val_loss",
-        max_epochs=7, # was 10
-        factor=10, # Was 3
-        directory="tuning",
-        project_name="turbulent",
-    )
 
-    # Run the hyperparameter search
-    tuner.search(gen_train, validation_data=gen_val, epochs=10)
-
-    # Get the optimal hyperparameters
-    best_hps = tuner.get_best_hyperparameters()[0]
-    print(best_hps)
-
-    model = tuner.hypermodel.build(best_hps)
+    model = build_model(None)
     history = model.fit(gen_train, validation_data=gen_val, epochs=50)
 
-    val_loss_per_epoch = history.history["val_loss"]
-    best_epoch = val_loss_per_epoch.index(max(val_loss_per_epoch)) + 1
-    print("Best epoch: %d" % (best_epoch,))
+    SAVE_PATH = '/cluster/tufts/capstone25skyblue/model_saves'
+    fullTimestamp = dt.datetime.now().strftime("%Y_%m_%d/%H_%M_%S")
+    [yymmdd, hhmmss] = fullTimestamp.split("/")
+
+    SAVE_DIR = SAVE_PATH + '/' + yymmdd
+    os.makedirs(SAVE_DIR, exist_ok = True)
+    MODEL_SAVE_PATH = SAVE_DIR + f"/{hhmmss}_model.keras"
+    HISTORY_SAVE_PATH = SAVE_DIR + f"{hhmmss}_history.pkl"
+
+    model.save(MODEL_SAVE_PATH)
+    with open(HISTORY_SAVE_PATH, 'wb') as f:
+        pickle.dump(history.history, f)

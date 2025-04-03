@@ -5,4 +5,6 @@
 **/.venv
 **/.ruff_cache
 **/kt_tuning
+**/tuning
 logging/
+**MyJob**
