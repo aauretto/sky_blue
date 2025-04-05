@@ -6,6 +6,7 @@ import numpy as np
 import pandas as pd
 import time
 from concurrent.futures import ThreadPoolExecutor
+from model import generate_timestamps #TODO this func should be in satellite
 
 import os
 import xarray as xr
@@ -149,10 +150,10 @@ if __name__ =='__main__':
     startTime = dt.datetime(2024, 1, 1, 0, 0, tzinfo=dt.UTC)
     endTime = dt.datetime(2024, 1, 11, 0, 0, tzinfo=dt.UTC)
 
-    tsList = st.generate_timestamps(startTime, endTime) 
+    tsList = generate_timestamps(startTime, endTime) #TODO make in st
     
     start_t = time.time()
     with ThreadPoolExecutor(max_workers=WINDOW_PER_HOUR) as exec:
         exec.map(cache_images_from_aws, tsList)
     end_t = time.time()
-    print(f"Completed from {startTime} to {endTime} in {end_t - st}")
+    print(f"Completed from {startTime} to {endTime} in {end_t - start_t} seconds")
