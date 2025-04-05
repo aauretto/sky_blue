@@ -12,7 +12,7 @@ import os
 import xarray as xr
 
 ### MEGA CONSTANTS:
-MAX_THREADS = 48
+MAX_PROCESSES = 128
 WINDOW_PER_HOUR = 12
 BANDS = [8,9,10,13,14,15]
 CACHE_DIR = "/cluster/tufts/capstone25skyblue/Caches/sat_cache"
@@ -126,7 +126,7 @@ def cache_images_from_aws(timestamps):
     None
     """
     # Launch job to download all timestamps over multiple threads
-    with multiprocessing.Pool(processes=MAX_THREADS // WINDOW_PER_HOUR) as exec:
+    with multiprocessing.Pool(processes=MAX_PROCESSES // WINDOW_PER_HOUR) as exec:
         xs = exec.map(cache_worker, timestamps)
     
 
@@ -158,7 +158,7 @@ def retreive_satellite_data(tsList):
         
         # Try and get image from cache. If we can't, download it from aws first
         try:
-            data = np.load(infile, allow_pickle = True)
+            data = np.load(infile, allow_picksle = True)
         except Exception:
             cache_worker(ts)
             data = np.load(infile, allow_pickle = True)
@@ -166,7 +166,7 @@ def retreive_satellite_data(tsList):
         # timestamp gets wrapped in a numpy object on save so we call .item to unbox it
         return data["timestamp"].item(), data["image"]
 
-    with ThreadPoolExecutor(max_workers=MAX_THREADS // WINDOW_PER_HOUR) as exec:
+    with ThreadPoolExecutor(max_workers=MAX_PROCESSES // WINDOW_PER_HOUR) as exec:
         stampsAndImages = exec.map(retrieve_worker, tsList)
 
     # Get images and stamps in their own arrays, merge the images
