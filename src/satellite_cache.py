@@ -7,6 +7,7 @@ import pandas as pd
 import time
 from concurrent.futures import ThreadPoolExecutor
 
+
 import os
 import xarray as xr
 
@@ -125,7 +126,7 @@ def cache_images_from_aws(timestamps):
     None
     """
     # Launch job to download all timestamps over multiple threads
-    with ThreadPoolExecutor(max_workers=MAX_THREADS // WINDOW_PER_HOUR) as exec:
+    with multiprocessing.Pool(processes=MAX_THREADS // WINDOW_PER_HOUR) as exec:
         xs = exec.map(cache_worker, timestamps)
     
 
