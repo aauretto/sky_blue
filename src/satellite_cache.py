@@ -75,6 +75,7 @@ def cache_worker(ts):
     ------
     None
     """
+    print(f"Starting worker for {ts}")
     startTime = time.time()
     # Figure out where we are going to store the cached file
     yyyymmdd, hhmmss = parse_timestamp(ts)
@@ -104,7 +105,7 @@ def cache_worker(ts):
     os.makedirs(thisDir, exist_ok=True)
     np.savez(outfile, image=smoothed, timestamp=updated_timestamp)
     endTime = time.time()
-    print(f"File {outfile} written to in {startTime - endTime}s")
+    print(f"Finished worker for {ts}. File {outfile} written to in {endTime - startTime}s")
 
  
 
