@@ -151,6 +151,8 @@ if __name__ =='__main__':
 
     tsList = st.generate_timestamps(startTime, endTime) 
     
-
+    start_t = time.time()
     with ThreadPoolExecutor(max_workers=WINDOW_PER_HOUR) as exec:
         exec.map(cache_images_from_aws, tsList)
+    end_t = time.time()
+    print(f"Completed from {startTime} to {endTime} in {end_t - st}")
