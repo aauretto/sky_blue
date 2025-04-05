@@ -11,7 +11,7 @@ import os
 import xarray as xr
 
 ### MEGA CONSTANTS:
-MAX_THREADS = 128
+MAX_THREADS = 24
 WINDOW_PER_HOUR = 12
 BANDS = [8,9,10,13,14,15]
 CACHE_DIR = "/cluster/tufts/capstone25skyblue/Caches/sat_cache"
