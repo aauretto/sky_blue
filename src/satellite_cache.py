@@ -6,17 +6,40 @@ import numpy as np
 import pandas as pd
 import time
 from concurrent.futures import ThreadPoolExecutor
-from model import generate_timestamps #TODO this func should be in satellite
 
 import os
 import xarray as xr
 
 ### MEGA CONSTANTS:
-MAX_THREADS = 1280
+MAX_THREADS = 128
 WINDOW_PER_HOUR = 12
 BANDS = [8,9,10,13,14,15]
 CACHE_DIR = "/cluster/tufts/capstone25skyblue/Caches/sat_cache"
 
+
+############TODO REMOVE THIS 
+def generate_timestamps(
+    start: dt.datetime = dt.datetime(2017, 3, 1, 0, 3, tzinfo=dt.UTC),
+    end: dt.datetime = dt.datetime(2025, 1, 1, 0, 0, tzinfo=dt.UTC),
+) -> list[dt.datetime]:
+    """
+    Generates a list of 5 minutes seperated datetimes starting on minute 3
+    of each year 2018-2024 and 2017 without Jan and Feb
+
+    Returns
+    -------
+    a list of datetimes in the range
+    """
+
+    timestamps = [[] for _ in range(12)]
+    current_time = start
+
+    while current_time < end:
+        timestamps[current_time.minute // 5].append(current_time)
+        current_time = current_time + dt.timedelta(minutes=5)
+
+    return timestamps
+########################TODO REMOVE ABOVE
 
 def parse_timestamp(ts):
     """
@@ -155,7 +178,8 @@ if __name__ =='__main__':
     startTime = dt.datetime(2024, 1, 1, 0, 0, tzinfo=dt.UTC)
     endTime = dt.datetime(2024, 1, 11, 0, 0, tzinfo=dt.UTC)
 
-    tsList = generate_timestamps(startTime, endTime) #TODO make in st
+    tsList = generate_timestamps(startTime, endTime)
+    print(f"Generated timestamps {len(tsList)=}")
     
     start_t = time.time()
     with ThreadPoolExecutor(max_workers=WINDOW_PER_HOUR) as exec:
