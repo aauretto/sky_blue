@@ -11,7 +11,7 @@ import os
 import xarray as xr
 
 ### MEGA CONSTANTS:
-MAX_THREADS = 24
+MAX_THREADS = 48
 WINDOW_PER_HOUR = 12
 BANDS = [8,9,10,13,14,15]
 CACHE_DIR = "/cluster/tufts/capstone25skyblue/Caches/sat_cache"
@@ -158,7 +158,7 @@ def retreive_satellite_data(tsList):
         # Try and get image from cache. If we can't, download it from aws first
         try:
             data = np.load(infile, allow_pickle = True)
-        except FileNotFoundError:
+        except Exception:
             cache_worker(ts)
             data = np.load(infile, allow_pickle = True)
 
