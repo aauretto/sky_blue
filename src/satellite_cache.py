@@ -9,7 +9,6 @@ from concurrent.futures import ThreadPoolExecutor
 
 import os
 import xarray as xr
-import pickle
 
 BANDS = [8,9,10,13,14,15]
 CACHE_DIR = "/skyblue/caching"
@@ -17,8 +16,8 @@ CACHE_DIR = "/skyblue/caching"
 def parse_timestamp(ts):
     return ts.strftime("%Y_%m_%d|%H_%M_%S").split("|")
 
+SAT = GOES(satellite=16, product="ABI", domain="C")
 def download_images(timestamps):
-    SAT = GOES(satellite=16, product="ABI", domain="C")
     def worker(ts):
         startTime = time.time()
         yyyymmdd, hhmmss = parse_timestamp(ts)
@@ -58,15 +57,39 @@ def load_images(tsList):
         endTime = time.time()
 
         print(f"Loaded from {infile} [{endTime-startTime:.4f}s]")
-
-        return data["timestamp"], data["image"]
+        # timestamp gets wrapped in a numpy object on save so we call .item to unbox it
+        return data["timestamp"].item(), data["image"]
 
     numProcs = len(tsList)
     with ThreadPoolExecutor(max_workers=numProcs) as exec:
         stampsAndImages = exec.map(worker, tsList)
 
-    # NOTE vstack the arrays
-    return(list(stampsAndImages))
+    # Get images and stamps in their own arrays, merge the images
+    [allStamps, allImages] = list(zip(*list(stampsAndImages)))
+    return (np.vstack(allImages), list(allStamps))
+
+# Code from generator to test against
+def sanity_check(timestamps: list[dt.datetime]):
+        def worker(ts):
+            return st.fetch(ts, SAT)
+        
+        numProcs = len(timestamps)
+        with ThreadPoolExecutor(max_workers=numProcs) as exec:
+            xs = exec.map(worker, timestamps)
+
+        # xs = [st.fetch(t, self.sat) for t in timestamps]
+
+        xs = xr.concat(xs, dim="t")
+        lats, lons = st.calculate_coordinates(xs)
+        xs = st.fetch_bands(xs, BANDS)
+        updated_timestamps = [
+            dt.datetime.fromtimestamp(
+                timestamp.astype("datetime64[s]").astype(int), dt.UTC
+            )
+            for timestamp in np.array(xs.coords["t"], dtype=np.datetime64)
+        ]
+        xs = st.smooth(st.project(lats, lons, xs.data))
+        return xs, updated_timestamps
 
 if __name__ =='__main__':
 
@@ -85,11 +108,19 @@ if __name__ =='__main__':
     print(f"Full caching for 9 procs took {end - start}s")
 
     start = time.time()
-    ims = load_images(tsList)
+    ims, times = load_images(tsList)
     end = time.time()
 
     print(f"Full retreival for images took {end - start}s")
 
-    print(ims[0][0])
-    print(ims[0][1])
+    print("="*100)
+    print("Checking against known info:")
+
+    trueData, trueStamps = sanity_check(tsList)
+    print(type(trueStamps[0]))
+    print(type(times[0]))
+    # Check that the array we get from the old method and the array we get from the new method are the same
+    # print(trueData == ims)
+
+
 
