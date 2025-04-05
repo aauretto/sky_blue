@@ -15,7 +15,7 @@ import xarray as xr
 MAX_THREADS = 1280
 WINDOW_PER_HOUR = 12
 BANDS = [8,9,10,13,14,15]
-CACHE_DIR = "/skyblue/caching"
+CACHE_DIR = "/cluster/tufts/capstone25skyblue/Caches/sat_cache"
 
 
 def parse_timestamp(ts):
@@ -52,12 +52,14 @@ def cache_worker(ts):
     ------
     None
     """
+    startTime = time.time()
     # Figure out where we are going to store the cached file
     yyyymmdd, hhmmss = parse_timestamp(ts)
     thisDir = f"{CACHE_DIR}/{yyyymmdd}"
     outfile = f"{thisDir}/{hhmmss}.npz"
 
     if os.path.isfile(outfile):
+        print(f"File {outfile} already exists. Skipping...")
         return
 
     # Get data from AWS, compute updated timestamp for data, pull out bands we want
@@ -78,6 +80,9 @@ def cache_worker(ts):
     # Write file to disk
     os.makedirs(thisDir, exist_ok=True)
     np.savez(outfile, image=smoothed, timestamp=updated_timestamp)
+    endTime = time.time()
+    print(f"File {outfile} written to in {startTime - endTime}s")
+
  
 
 def cache_images_from_aws(timestamps):
