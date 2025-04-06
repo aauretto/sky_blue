@@ -51,7 +51,7 @@ def build_model(
     # hp_filters = hp.Choice("filters", values=[8, 16, 32])
     model.add(
         keras.layers.ConvLSTM2D(
-            filters=hp_filters, #Playing god and choosing #TODO
+            filters=16, #Playing god and choosing #TODO
             kernel_size=(3, 3), # Todo may need to become 5x5
             padding="same",
             return_sequences=True,
@@ -60,7 +60,7 @@ def build_model(
 
     # Dropout layer for regularization
     # hp_dropout = hp.Float("dropout", 0.2, 0.5)
-    model.add(keras.layers.Dropout(rate=hp_dropout)) # Playing god and choosing #TODO
+    model.add(keras.layers.Dropout(rate=.25)) # Playing god and choosing #TODO
 
     # 1x1 2D Convolutional layer to reduce feature map
     model.add(
@@ -75,7 +75,7 @@ def build_model(
     # Compile the model
     # hp_learning_rate = hp.Choice("learning_rate", values=[1e-4, 1e-3, 1e-2])
     model.compile(
-        optimizer=keras.optimizers.Adam(learning_rate=hp_learning_rate), # Playing god a choosing #TODO
+        optimizer=keras.optimizers.Adam(learning_rate=1e-3), # Playing god a choosing #TODO
         loss=keras.losses.MeanSquaredError(),
         metrics=[keras.metrics.MeanAbsoluteError()],
     )
@@ -90,16 +90,16 @@ if __name__ == "__main__":
     # Generate dataset timestamps
     timestamps = generate_timestamps(
         start=dt.datetime(2024, 1, 1, 0, 0, tzinfo=dt.UTC),
-        end=dt.datetime(2024, 2, 1, 0, 0, tzinfo=dt.UTC)
+        end=dt.datetime(2024, 1, 1, 10, 0, tzinfo=dt.UTC)
     )
     rng.shuffle(timestamps)
     t_train, t_val = timestamps[:10], timestamps[10:]
-    t_test = generate_timestamps(
-        start=dt.datetime(2025, 1, 1, 0, 0, tzinfo=dt.UTC),
-        end=dt.datetime(2025, 2, 1, 0, 0)
-    )
+    # t_test = generate_timestamps(
+    #     start=dt.datetime(2025, 1, 1, 0, 0, tzinfo=dt.UTC),
+    #     end=dt.datetime(2025, 2, 1, 0, 0)
+    # )
 
-    print(f"Timestamps: {len(t_train)}/{len(t_val)}:{len(t_test)}")
+    # print(f"Timestamps: {len(t_train)}/{len(t_val)}:{len(t_test)}")
 
     sat = GOES(satellite=16, product="ABI", domain="C")
     bands = [8, 9, 10, 13, 14, 15]
@@ -111,15 +111,15 @@ if __name__ == "__main__":
     gen_val = Generator(
         t_val, batch_size=1, frame_size=9, sat=sat, bands=bands
     )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
-    gen_test = Generator(
-        t_test, batch_size=1, frame_size=9, sat=sat, bands=bands
-    )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
+    # gen_test = Generator(
+    #     t_test, batch_size=1, frame_size=9, sat=sat, bands=bands
+    # )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
 
-    print(f"Generators: {len(gen_train)}/{len(gen_val)}:{len(gen_test)}")
+    # print(f"Generators: {len(gen_train)}/{len(gen_val)}:{len(gen_test)}")
 
 
     model = build_model(None)
-    history = model.fit(gen_train, validation_data=gen_val, epochs=50)
+    history = model.fit(gen_train, validation_data=gen_val, epochs=2) # epochs: 50
 
     SAVE_PATH = '/cluster/tufts/capstone25skyblue/model_saves'
     fullTimestamp = dt.datetime.now().strftime("%Y_%m_%d/%H_%M_%S")

@@ -8,7 +8,8 @@ from xarray import DataArray, Dataset
 
 def fetch(timestamp: dt.datetime, satellite: GOES) -> Dataset:
     return satellite.nearesttime(
-        dt.datetime.fromtimestamp(timestamp.timestamp(), tz=None), # Omitting timezone intentionally so we get a niave object
+        timestamp.replace(tzinfo=None),
+        # dt.datetime.fromtimestamp(timestamp.timestamp(), tz=None), # Omitting timezone intentionally so we get a niave object
         return_as="xarray",
         download=False,
         verbose=False

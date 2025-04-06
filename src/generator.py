@@ -68,11 +68,10 @@ class Generator(keras.utils.Sequence):
         with ThreadPoolExecutor(max_workers=numProcs) as exec:
             xs = exec.map(worker, timestamps)
 
-        # xs = [st.fetch(t, self.sat) for t in timestamps]
-
         xs = xr.concat(xs, dim="t")
         lats, lons = st.calculate_coordinates(xs)
         xs = st.fetch_bands(xs, self.bands)
+
         updated_timestamps = [
             dt.datetime.fromtimestamp(
                 timestamp.astype("datetime64[s]").astype(int), dt.UTC
@@ -113,11 +112,12 @@ class Generator(keras.utils.Sequence):
 
         
         def get_frames_worker(frame_times):
-            print(f"{frame_times=}")
+            print(f"\n\n\n{frame_times=}\n")
             xs, updated_timestamps = self.__retrieve_x_frame(frame_times)
-            print(f"{updated_timestamps=}")
-            updated_timestamps = [uts + dt.timedelta(hours=self.frame_size) for uts in updated_timestamps]
-            print(f"{updated_timestamps=}")
+            print(f"\n{updated_timestamps=}\n")
+            updated_timestamps.reverse()
+            updated_timestamps = [uts + i * dt.timedelta(hours=self.frame_size) for i, uts in enumerate(updated_timestamps)]
+            print(f"\n{updated_timestamps=}\n\n\n")
 
             ys = self.__retrieve_y_frame(updated_timestamps)
             return (xs, ys)

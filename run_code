@@ -16,5 +16,5 @@ SINGULARITY_ARGS="--nv --no-mount \"hostfs\" --bind $REPO_ROOT:/skyblue $SIF_FIL
 if [[ $3 == "-it" ]]; then
     $SINGULARITY_CMD shell $SINGULARITY_ARGS
 else
-    $SINGULARITY_CMD exec ${SINGULARITY_ARGS} sh -c 'cd /skyblue && python /skyblue/src/model.py'
+    $SINGULARITY_CMD exec ${SINGULARITY_ARGS} sh -c 'cd /skyblue && python /skyblue/src/model_ex_machina.py'
 fi
