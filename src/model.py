@@ -82,8 +82,8 @@ def build_model(
 
     return model
 
-def make_train_val_gens(start=dt.datetime(2024, 11, 6, 0, 0, tzinfo=dt.UTC),
-                        end=dt.datetime(2024, 11, 6, 12, 0, tzinfo=dt.UTC),
+def make_train_val_gens(start: dt.datetime,
+                        end: dt.datetime,
                         seed=42):
     """
     Generates timestamps for the given range
@@ -160,7 +160,7 @@ def train_model(train_gen, val_gen, model, total_epochs=5):
         monitor='val_loss',
         verbose=1
     )
-    history = model.fit(gen_train, validation_data=gen_val, epochs=total_epochs, callbacks=[checkpoint_callback])
+    history = model.fit(train_gen, validation_data=val_gen, epochs=total_epochs, callbacks=[checkpoint_callback])
     return history
 
 
@@ -178,6 +178,20 @@ def parse_args():
         help="The path to save the tuned model that has to be fit. Save path must not have a file extension"
     )
 
+    parser.add_argument(
+        '--start_date',
+        type=str,
+        default="2017_03_01_00_00",
+        help="The datetime which is the beginning of the training data in UTC: YYYY_MM_DD[_hh_mm]"
+    )
+
+    parser.add_argument(
+        '--end_date',
+        type=str,
+        default="2024_12_31_23_59",
+        help="The datetime which is the beginning of the training data in UTC: YYYY_MM_DD[_hh_mm]"
+    )
+
     # Define subparsers for different modes
     subparsers = parser.add_subparsers(dest="mode", required=True, help="Mode of operation")
 
@@ -186,24 +200,65 @@ def parse_args():
 
     # Subparser for 'ex_machina'
     ex_machina_parser = subparsers.add_parser('ex_machina', help="Run ex machina mode")
-    ex_machina_parser.add_argument('filters', type=int, help="The number of filters used by the CONV LSTM layer")
-    ex_machina_parser.add_argument('dropout', type=float, help="The dropout rate of the dropout layer.")
-    ex_machina_parser.add_argument('learning_rate', type=float, help="The learning rate of the model.")
+    ex_machina_parser.add_argument('--filters', type=int, default=16, help="The number of filters used by the CONV LSTM layer")
+    ex_machina_parser.add_argument('--dropout', type=float, default=.2, help="The dropout rate of the dropout layer.")
+    ex_machina_parser.add_argument('--learning_rate', type=float, default=1e-3, help="The learning rate of the model.")
 
     # Subparser for 'checkpoint'
     checkpoint_parser = subparsers.add_parser('checkpoint', help="Checkpoint mode")
-    checkpoint_parser.add_argument('checkpoint_path', type=str, help="The path to the .keras model checkpoint file")
+    checkpoint_parser.add_argument('--checkpoint_path', type=str, help="The path to the .keras model checkpoint file")
 
+    args = parser.parse_args()
+    start_date = parse_dates(args.start_date)
+    if not start_date:
+        parser.error("start_date must be must be in the form YYYY_MM_DD[_hh_mm]")
+    args.start_date = start_date
+    end_date = parse_dates(args.end_date)
+    if not end_date:
+        parser.error("end_date must be must be in the form YYYY_MM_DD[_hh_mm]")
+    args.end_date = end_date
+        
     # Parse the arguments
-    return parser.parse_args()
+    return args
+
+def parse_dates(dateStr: str):
+    """
+    Parses a string into the YEAR MONTH DATE [MINUTES HOURS] format 
+    required for dt.datetime
+    Input:
+        dateStr: str the string received as input to the script
+    Returns:
+        dateDict: a dictionary of field (str), value (int) pairs to be turned into 
+        a datetime object. 
+    """
+    dateParts = dateStr.split(sep="_")
+    if len(dateParts) not in (3, 5):
+        return None
+    else:
+        datePartsints = [int(dp.lstrip('0')) for dp in dateParts]
+
+        dateDict= {
+            'YYYY' : datePartsints[0],
+            'MM'   : datePartsints[1],
+            'DD'   : datePartsints[2],
+            'hh'   : 0,
+            'mm'   : 0,
+        }
+
+        if len(dateParts) == 5:
+            dateDict["hh"] = datePartsints[3]
+            dateDict["mm"] = datePartsints[4]
+    return dateDict
 
 if __name__ == "__main__":
     multiprocessing.set_start_method("forkserver", force=True)
     os.makedirs(CHECKPOINT_DIR, exist_ok=True)
     
     args = parse_args()
-    print(args.save_path)
-    gen_train, gen_val = make_train_val_gens() # Using default params
+    start_date = dt.datetime(args.start_date['YYYY'], args.start_date['MM'], args.start_date['DD'], args.start_date['hh'], args.start_date['mm'], tzinfo=dt.UTC)
+    end_date = dt.datetime(args.end_date['YYYY'], args.end_date['MM'], args.end_date['DD'], args.end_date['hh'], args.end_date['mm'], tzinfo=dt.UTC)
+    
+    gen_train, gen_val = make_train_val_gens(start_date, end_date) # Using default params
 
     if args.mode == "ex_machina":
         print(f"Running ex machina with arguments: {args.filters}, {args.dropout}, {args.learning_rate}")
