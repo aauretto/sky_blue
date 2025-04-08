@@ -137,7 +137,6 @@ def hyperparam_tune(gen_train, gen_val, tuner_epochs, max_epochs = 7, factor = 1
 
     # Get the optimal hyperparameters
     best_hps = tuner.get_best_hyperparameters()[0]
-    print(f"Best hyperparameters are{best_hps}")
 
     model = tuner.hypermodel.build(best_hps)
     return model, best_hps
@@ -264,15 +263,18 @@ if __name__ == "__main__":
         print(f"Running ex machina with arguments: {args.filters}, {args.dropout}, {args.learning_rate}")
         model = build_model(args.filters, args.dropout, args.learning_rate)
     elif args.mode == "tune":
-        print("Running hyperparameter tuning...")
+        print("Running hyperparameter tuning")
         model, best_hps = hyperparam_tune(gen_train, gen_val)
         with open(args.save_path + 'best_hps.pkl') as f:
             pickle.dump(best_hps, f)
     elif args.mode == "checkpoint":
         print(f"Resuming from checkpoint: {args.checkpoint_path}")
         model = keras.models.load_model(args.checkpoint_path)
+    print("Entering final model training")
     history = train_model(gen_train, gen_val, model)
+    print("Finished model training")
     model.save(args.save_path + '.keras', overwrite=True, include_optimizer=True)
+    print("Model saved")
     with open(args.save_path + '.pkl', 'wb') as f:
         pickle.dump(history.history, f)
 

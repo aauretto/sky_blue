@@ -69,8 +69,6 @@ def parse(row: dict) -> dict:
 
     except Exception:
         LOGGER.debug(f"Failed to parse PIREP: {row['Report']}", exc_info=True)
-        # print()
-        # print(traceback.format_exc())
         return row
 
 
