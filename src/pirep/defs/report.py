@@ -76,9 +76,9 @@ class PilotReport(BaseModel):
                     else:
                         data["turbulence"] = entries
 
-                # Unknown flag
+                # Unknown flag i.e. not a turbulence flag
                 case _:
-                    # print("Unknown flag:", flag)
+                    # Unimplemented
                     pass
 
         return PilotReport(
