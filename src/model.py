@@ -13,30 +13,9 @@ import argparse
 
 import consts as consts
 from generator import Generator
+import satellite as st
 
 CHECKPOINT_DIR = './checkpoints'
-
-def generate_timestamps(
-    start: dt.datetime = dt.datetime(2017, 3, 1, 0, 3, tzinfo=dt.UTC),
-    end: dt.datetime = dt.datetime(2025, 1, 1, 0, 0, tzinfo=dt.UTC),
-) -> list[dt.datetime]:
-    """
-    Generates a list of 5 minutes seperated datetimes starting on minute 3
-    of each year 2018-2024 and 2017 without Jan and Feb
-
-    Returns
-    -------
-    a list of datetimes in the range
-    """
-
-    timestamps = [[] for _ in range(12)]
-    current_time = start
-
-    while current_time < end:
-        timestamps[current_time.minute // 5].append(current_time)
-        current_time = current_time + dt.timedelta(minutes=5)
-
-    return timestamps
 
 def build_tuning_model(
     hp: kt.HyperParameters,
@@ -115,7 +94,7 @@ def make_train_val_gens(start=dt.datetime(2024, 11, 6, 0, 0, tzinfo=dt.UTC),
     """
     rng = rnd.default_rng(seed=seed)
     # Generate dataset timestamps
-    timestamps = generate_timestamps(
+    timestamps = st.generate_timestamps(
         start=start,
         end=end,
     )
