@@ -113,13 +113,10 @@ class Generator(keras.utils.Sequence):
 
         
         def get_frames_worker(frame_times):
-            print(f"{frame_times=}")
             xs, updated_timestamps = self.__retrieve_x_frame(frame_times)
-            print(f"{updated_timestamps=}")
 
             # We want the timestamps for the last xs (now) and the next 8 hours
-            updated_timestamps = [updated_timestamps[-1] + i * dt.timedelta(hours=self.frame_size) for i in range(len(updated_timestamps))]
-            print(f"{updated_timestamps=}")
+            updated_timestamps = [updated_timestamps[-1] + i * dt.timedelta(hours=1) for i in range(self.frame_size)]
 
             ys = self.__retrieve_y_frame(updated_timestamps)
             return (xs, ys)
