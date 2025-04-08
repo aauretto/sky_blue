@@ -5,7 +5,9 @@
 **/.venv
 **/.ruff_cache
 **/kt_tuning
-logging/
+**/logging
 **MyJob**
 **/tuning
+**/tools
+**/checkpoints
 **dummy**
