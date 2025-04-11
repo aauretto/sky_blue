@@ -1,0 +1,9 @@
+SLURM_ARRAY_TASK_ID=0
+TOTAL_JOBS=1
+
+module load singularity
+
+SIF_FILE="/cluster/tufts/capstone25skyblue/skyblue_images_hpc-gpu-no-repo.sif"
+SINGULARITY_ARGS="--nv --no-mount \"hostfs\" --bind /cluster/tufts/capstone25skyblue/aauret01/sky_blue:/skyblue $SIF_FILE"
+
+singularity exec ${SINGULARITY_ARGS} sh -c "python /skyblue/src/satellite_cache_array_job.py $SLURM_ARRAY_TASK_ID $TOTAL_JOBS"
