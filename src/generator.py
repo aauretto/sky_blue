@@ -1,3 +1,4 @@
+from Logger import LOGGER
 import datetime as dt
 import numpy as np
 import keras
@@ -133,7 +134,8 @@ class Generator(keras.utils.Sequence):
                 updated_timestamps = [updated_timestamps[-1] + i * dt.timedelta(hours=1) for i in range(self.frame_size)]
                 ys = self.__cache_y_frame(updated_timestamps)
                 return (xs, ys)
-            except:
+            except Exception as e:
+                LOGGER.debug(f"Got error {e} in get_frames_worker with timestamps {frame_times}", exc_info=True)
 
 
                 xs, updated_timestamps = self.__retrieve_x_frame(frame_times)
