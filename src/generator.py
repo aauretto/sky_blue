@@ -130,7 +130,7 @@ class Generator(keras.utils.Sequence):
         def get_frames_worker(frame_times):
             try:
                 # get from cache
-                updated_timestamps, xs = retreive_satellite_data(frame_times)
+                xs, updated_timestamps = retreive_satellite_data(frame_times)
                 updated_timestamps = [updated_timestamps[-1] + i * dt.timedelta(hours=1) for i in range(self.frame_size)]
                 ys = self.__cache_y_frame(updated_timestamps)
                 return (xs, ys)

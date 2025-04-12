@@ -164,7 +164,7 @@ def retreive_satellite_data(tsList):
         
         # Try and get image from cache. If we can't, download it from aws first
         try:
-            data = np.load(infile, allow_picksle = True)
+            data = np.load(infile, allow_pickle = True)
         except Exception:
             cache_worker(ts)
             data = np.load(infile, allow_pickle = True)
