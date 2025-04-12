@@ -86,6 +86,7 @@ def build_model(
 
 def make_train_val_gens(start: dt.datetime,
                         end: dt.datetime,
+                        batch_size: int = 1,
                         seed=42):
     """
     Generates timestamps for the given range
@@ -105,6 +106,8 @@ def make_train_val_gens(start: dt.datetime,
     
     all_train = [item for sublist in t_train for item in sublist]
     all_val = [item for sublist in t_val for item in sublist]
+    print(f"The total number of training timestamps is: {len(all_train)}")
+    print(f"The total number of validation timestamps is: {len(all_val)}")
     times, reports = read_pirep_cache()
 
     delta = dt.timedelta(minutes = PIREP_RELEVANCE_DURATION)
@@ -122,11 +125,14 @@ def make_train_val_gens(start: dt.datetime,
 
     # Create the generators
     gen_train = Generator(
-        t_train, train_y_times, train_y_reports, batch_size=1, frame_size=9, sat=sat, bands=bands
-    )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
+        t_train, train_y_times, train_y_reports, batch_size=batch_size, frame_size=9, sat=sat, bands=bands
+    ) 
     gen_val = Generator(
-        t_val, val_y_times, val_y_reports, batch_size=1, frame_size=9, sat=sat, bands=bands
-    )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
+        t_val, val_y_times, val_y_reports, batch_size=batch_size, frame_size=9, sat=sat, bands=bands
+    )
+
+    print(f"The number of train batches is {len(gen_train)}")
+    print(f"The number of validation batches is {len(gen_val)}")
 
     return gen_train, gen_val
 
@@ -207,6 +213,13 @@ def parse_args():
         help="The datetime which is the beginning of the training data in UTC: YYYY_MM_DD[_hh_mm]"
     )
 
+    parser.add_argument(
+        '--batch_size',
+        type=int,
+        default=1,
+        help="The batch size for the data generators"
+    )
+
     # Define subparsers for different modes
     subparsers = parser.add_subparsers(dest="mode", required=True, help="Mode of operation")
 
@@ -277,7 +290,8 @@ if __name__ == "__main__":
     start_date = dt.datetime(args.start_date['YYYY'], args.start_date['MM'], args.start_date['DD'], args.start_date['hh'], args.start_date['mm'], tzinfo=dt.UTC)
     end_date = dt.datetime(args.end_date['YYYY'], args.end_date['MM'], args.end_date['DD'], args.end_date['hh'], args.end_date['mm'], tzinfo=dt.UTC)
     
-    gen_train, gen_val = make_train_val_gens(start_date, end_date) # Using default params
+    print(f"Creating generators with batch_size={args.batch_size}")
+    gen_train, gen_val = make_train_val_gens(start_date, end_date, args.batch_size) # Using default params
 
     if args.mode == "ex_machina":
         print(f"Running ex machina with arguments: {args.filters}, {args.dropout}, {args.learning_rate}")
