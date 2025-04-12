@@ -19,10 +19,10 @@ def read_pirep_cache() -> tuple[list[pd._libs.tslibs.timestamps.Timestamp], list
     return times, reports
 
 def retrieve_from_pirep_cache(start: dt.datetime, end: dt.datetime, 
-                              times: list[pd._libs.tslibs.timestamps.Timestamp], reports: list[dict]) -> list[dict]:
+                              times: list[pd._libs.tslibs.timestamps.Timestamp], reports: list[dict] = None) -> list[dict]:
     start_idx = np.searchsorted(times, start, side='left')
     end_idx = np.searchsorted(times, end, side='right')
-    return reports[start_idx:end_idx]
+    return start_idx, end_idx
 
 
 

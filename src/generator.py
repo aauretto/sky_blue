@@ -7,6 +7,8 @@ import pirep as pr
 import satellite as st
 import xarray as xr
 from numpy import random as rnd
+from satellite_cache import retreive_satellite_data
+from cacheReading import retrieve_from_pirep_cache
 
 
 from pirep.defs.spreading import concatenate_all_pireps
@@ -17,6 +19,8 @@ class Generator(keras.utils.Sequence):
     def __init__(
         self,
         timestamps: list[list[dt.datetime]],
+        y_times,
+        y_reports,
         batch_size: int,
         frame_size: int = 9,
         sat: GOES = GOES(satellite=16, product="ABI", domain="C"),
@@ -37,6 +41,8 @@ class Generator(keras.utils.Sequence):
         self.frame_size = frame_size  # number of (satellite, pirep) instances in a frame should be 9 because 8hrs + now
         self.sat = sat
         self.bands = bands
+        self.y_times = y_times
+        self.y_reports = y_reports
 
     def __len__(self):  # this returns the length of the window
         """
@@ -99,6 +105,14 @@ class Generator(keras.utils.Sequence):
             ]
         )
 
+    def __cache_y_frame(self, timestamps: list[dt.datetime]):
+        delta_t = dt.timedelta(minutes=consts.PIREP_RELEVANCE_DURATION)
+        frame = []
+        for ts in timestamps:
+            start_idx, end_idx = retrieve_from_pirep_cache(ts - delta_t, ts + delta_t, self.y_times)
+            frame.append(concatenate_all_pireps(self.reports[start_idx, end_idx]))
+        return np.array(frame)
+
     def __generate_frames(self, timestamp: dt.datetime) -> list[dt.datetime]:
         return [timestamp + dt.timedelta(hours=i) for i in range(self.frame_size)]
 
@@ -113,13 +127,22 @@ class Generator(keras.utils.Sequence):
 
         
         def get_frames_worker(frame_times):
-            xs, updated_timestamps = self.__retrieve_x_frame(frame_times)
+            try:
+                # get from cache
+                updated_timestamps, xs = retreive_satellite_data(frame_times)
+                updated_timestamps = [updated_timestamps[-1] + i * dt.timedelta(hours=1) for i in range(self.frame_size)]
+                ys = self.__cache_y_frame(updated_timestamps)
+                return (xs, ys)
+            except:
 
-            # We want the timestamps for the last xs (now) and the next 8 hours
-            updated_timestamps = [updated_timestamps[-1] + i * dt.timedelta(hours=1) for i in range(self.frame_size)]
 
-            ys = self.__retrieve_y_frame(updated_timestamps)
-            return (xs, ys)
+                xs, updated_timestamps = self.__retrieve_x_frame(frame_times)
+
+                # We want the timestamps for the last xs (now) and the next 8 hours
+                updated_timestamps = [updated_timestamps[-1] + i * dt.timedelta(hours=1) for i in range(self.frame_size)]
+
+                ys = self.__retrieve_y_frame(updated_timestamps)
+                return (xs, ys)
 
         with ThreadPoolExecutor(max_workers=len(frames_timestamps)) as exec:
             frame_pairs = exec.map(get_frames_worker, frames_timestamps)

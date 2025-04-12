@@ -1,0 +1,20 @@
+#! /usr/bin/bash
+
+SIF_FILE=$1
+REPO_ROOT=$2
+DO_INTERACTIVE=$3
+
+if [ $# -ne 2 -a $# -ne 3 ]; then
+  echo "Usage: run_code sif_file repo_root [-it]"
+  exit 1
+fi
+
+module load singularity
+SINGULARITY_CMD="singularity"
+SINGULARITY_ARGS="--nv --no-mount \"hostfs\" --bind $REPO_ROOT:/skyblue $SIF_FILE"
+
+if [[ $3 == "-it" ]]; then
+    $SINGULARITY_CMD shell $SINGULARITY_ARGS
+else
+    $SINGULARITY_CMD exec ${SINGULARITY_ARGS} sh -c 'cd /skyblue && ./execute_model.sh'
+fi

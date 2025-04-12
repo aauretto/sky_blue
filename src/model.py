@@ -14,6 +14,8 @@ import argparse
 import consts as consts
 from generator import Generator
 import satellite as st
+from cacheReading import read_pirep_cache, retrieve_from_pirep_cache
+from consts import PIREP_RELEVANCE_DURATION
 
 CHECKPOINT_DIR = './checkpoints'
 
@@ -100,16 +102,30 @@ def make_train_val_gens(start: dt.datetime,
     )
     rng.shuffle(timestamps)
     t_train, t_val = timestamps[:10], timestamps[10:]
+    
+    all_train = [item for sublist in t_train for item in sublist]
+    all_val = [item for sublist in t_val for item in sublist]
+    times, reports = read_pirep_cache()
+
+    delta = dt.timedelta(minutes = PIREP_RELEVANCE_DURATION)
+    
+    start_train, end_train = retrieve_from_pirep_cache(min(all_train) - delta, max(all_train) + delta, times)
+    start_val, end_val = retrieve_from_pirep_cache(min(all_val) - delta, max(all_val) + delta, times)
+    train_y_times = times[start_train:end_train]
+    train_y_reports = reports[start_train:end_train]
+    val_y_times = times[start_val:end_val]
+    val_y_reports = reports[start_val:end_val]
+
 
     sat = GOES(satellite=16, product="ABI", domain="C")
     bands = [8, 9, 10, 13, 14, 15]
 
     # Create the generators
     gen_train = Generator(
-        t_train, batch_size=1, frame_size=9, sat=sat, bands=bands
+        t_train, train_y_times, train_y_reports, batch_size=1, frame_size=9, sat=sat, bands=bands
     )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
     gen_val = Generator(
-        t_val, batch_size=1, frame_size=9, sat=sat, bands=bands
+        t_val, val_y_times, val_y_reports, batch_size=1, frame_size=9, sat=sat, bands=bands
     )  # xs shape: (4,1500,2500, 6) ys shape: (4,1500,2500, 14)
 
     return gen_train, gen_val
@@ -208,6 +224,10 @@ def parse_args():
     checkpoint_parser.add_argument('--checkpoint_path', type=str, help="The path to the .keras model checkpoint file")
 
     args = parser.parse_args()
+
+    t = dt.datetime.now().strftime("%Y_%m_%d_%H_%M")
+
+    args.save_path += t
     start_date = parse_dates(args.start_date)
     if not start_date:
         parser.error("start_date must be must be in the form YYYY_MM_DD[_hh_mm]")
@@ -273,9 +293,9 @@ if __name__ == "__main__":
     print("Entering final model training")
     history = train_model(gen_train, gen_val, model)
     print("Finished model training")
-    model.save(args.save_path + '.keras', overwrite=True, include_optimizer=True)
+    model.save(args.save_path + 'model.keras', overwrite=True, include_optimizer=True)
     print("Model saved")
-    with open(args.save_path + '.pkl', 'wb') as f:
+    with open(args.save_path + 'history.pkl', 'wb') as f:
         pickle.dump(history.history, f)
 
 
