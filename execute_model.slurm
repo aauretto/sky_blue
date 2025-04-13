@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH -J Execute_Model       # job name
+#SBATCH -J Model3              # job name
 #SBATCH --time=07-00:00:00     # requested time (DD-HH:MM:SS)
 #SBATCH -p preempt             # running on "mpi" partition/queue
 #SBATCH -N 1                   # 1 node
@@ -37,4 +37,5 @@ module load singularity
 /cluster/tufts/capstone25skyblue/model_executor /cluster/tufts/capstone25skyblue/skyblue_images_hpc-gpu-no-repo.sif /cluster/tufts/capstone25skyblue/aauret01/sky_blue
 
 
-# Submitted batch job 13088145
+
+# Submitted batch job 13097526
