@@ -111,7 +111,7 @@ class Generator(keras.utils.Sequence):
         frame = []
         for ts in timestamps:
             start_idx, end_idx = retrieve_from_pirep_cache(ts - delta_t, ts + delta_t, self.y_times)
-            frame.append(concatenate_all_pireps(self.y_reports[start_idx, end_idx]))
+            frame.append(concatenate_all_pireps(self.y_reports[start_idx:end_idx], background_risk=4e-5))
         return np.array(frame)
 
     def __generate_frames(self, timestamp: dt.datetime) -> list[dt.datetime]:
