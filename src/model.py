@@ -1,3 +1,19 @@
+"""
+File model.py trains a Convolutional LSTM model to predict turbulence for a time horizon
+up to 8 hours in the future given a timeseries of GOES satellite data as input data
+and PIREPs as ground truth data. 
+
+Usage: model.py --save_path="/path_to_directory_for_saved_models" --start_date="YYYY_MM_DD"
+                                                                --end_date="YYYY_MM_DD"
+                                                                --batch_size=int, 
+                                                                "{tune, ex_machina, checkpoint}"
+
+Effects:
+    Running this model will generate a checkpoints directory for the model checkpoints
+    during training to be stored. Running this model will also save a model.keras
+    on training completion.
+"""
+
 from Logger import LOGGER
 import datetime as dt
 import multiprocessing
@@ -29,6 +45,21 @@ def build_tuning_model(
 ):
     """
     Wrapper for build_model that can be used in keras hyperparameter tuning
+    Inputs:
+        hp: kt.HyperParameters
+            contains a hyperparameter space and current values. An instance can be passed to HyperModel.build(hp)
+        dim_frames: int, defaults to 9
+            the number of frames in one GOES satellite time series
+        dim_lat: int
+            the dimension of the latitude space
+        dim_lon: int
+            the dimension of the longitude space
+        dim_alt: int
+            the dimension of the altitude space
+        dim_bands: int
+            the number of bands of GOES satellite data used for our input data
+
+    Returns: the model returned by build_model given the inputs to this wrapper
     """
     hp_filters = hp.Choice("filters", values=[8, 16, 32])
     hp_dropout = hp.Float("dropout", 0.2, 0.5)
@@ -47,7 +78,28 @@ def build_model(
     dim_bands=6,
 ):
     """
-    Builds the model architecture
+    Builds the model architecture based on the provided inputs
+
+    Inputs:
+        hp_filters: int
+            hyperparameter defining the number of filters for the Convolutional LSTM
+        hp_dropout: float
+            hyperparameter defining the dropout rate for neurons in the the Convolutional LSTM
+        hp_learning_rate: float
+            hyperparameter defining the learning rate in the the Convolutional LSTM
+        dim_frames: int
+            the number of frames in one GOES satellite time series
+        dim_lat: int
+            the dimension of the latitude space
+        dim_lon: int
+            the dimension of the longitude space
+        dim_alt: int
+            the dimension of the altitude space
+        dim_bands: int
+            the number of bands of GOES satellite data used for our input data
+
+    Returns: tf.keras.Model
+        the compiled model given the defined architecture and provided hyperparameters
     """
     model = keras.Sequential()
     model.add(keras.layers.Input((dim_frames, dim_lat, dim_lon, dim_bands)))
@@ -91,9 +143,21 @@ def make_train_val_gens(start: dt.datetime,
     """
     Generates timestamps for the given range
 
+    Inputs:
+        start: dt.datetime
+            for the start of the range
+        end: dt.datetime
+            the end of the range
+        batch_size: int 
+            size of the batches in which timestamps should be passed to Generator
+        seed: int
+            the random_seed used for replicability and reproducability of results  
+
     Return:
-        gen_train: the Generator of the train set data
-        gen_val: the Generator of the val set data
+        gen_train:tf.keras.utils.Sequence or generator
+            the Generator of the train set data
+        gen_val: tf.keras.utils.Sequence or generator
+            the Generator of the val set data
     """
     rng = rnd.default_rng(seed=seed)
     # Generate dataset timestamps
@@ -139,11 +203,23 @@ def make_train_val_gens(start: dt.datetime,
 def hyperparam_tune(gen_train, gen_val, tuner_epochs, max_epochs = 7, factor = 10):
     """
     Builds a Keras Tuner, conducts a hyperparameter search, and returns the best model
-    to be trained
+    to be trained along with its corresponding hyperparameters
+
+    Inputs:
+        gen_train: tf.keras.utils.Sequence or generator
+            the Generator of the train set data
+        gen_val: tf.keras.utils.Sequence or generator
+            the Generator of the val set data
+        tuner_epochs: int
+            The number of epochs to run for each trial during the tuning process.
+        max_epochs: int, defaults to 7
+            The maximum number of epochs for the Hyperband tuner to consider.
 
     Returns:
-        model: the best model to be trained
-        hp: the best hyperparameters with which a model should be trained
+        model: tf.keras.Model
+            the best model to be trained
+        hp: kt.HyperParameters
+            the best hyperparameters with which a model should be trained
     """
     tuner = kt.Hyperband(
             build_tuning_model,
@@ -166,10 +242,23 @@ def hyperparam_tune(gen_train, gen_val, tuner_epochs, max_epochs = 7, factor = 1
 
 def train_model(train_gen, val_gen, model, total_epochs=5):
     """
-    Fits the model to the provided dataset Generators, returns the history of the fit model
+    Trains the provided Keras model using the given training and validation data generators.
+    Saves the best-performing model (based on validation loss) during training.
+
+    Inputs:
+        train_gen: tf.keras.utils.Sequence or generator
+            data generator for the training set.
+        val_gen: tf.keras.utils.Sequence or generator
+            data generator for the val set.
+        model: tf.keras.Model
+            compiled Keras model to be trained
+        total_epochs: int, default to 5
+            total number of epochs to train the model
 
     Returns:
-        history: History object #TODO ?
+        history: tf.keras.callbacks.History:
+            A History object containing the training and validation loss/metrics
+            for each epoch.
     """
     checkpoint_path = os.path.join(CHECKPOINT_DIR, 'model.{epoch:02d}-{val_loss:.2f}.keras')
     
