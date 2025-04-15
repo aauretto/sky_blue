@@ -147,7 +147,7 @@ def radial_spread(grid, intensity, BACKGROUND_RISK):
 
 
 # Grid should be a slice of the larger grid equal to kernel size
-def add_pirep(grid, prData, aircraft, intensity, BACKGROUND_RISK): 
+def add_pirep(grid, prData, aircraft, intensity, BACKGROUND_RISK):
     lat      = prData.lat_idx
     lon      = prData.lon_idx
     alt_min  = prData.alt_min_idx
@@ -189,7 +189,7 @@ def add_pirep(grid, prData, aircraft, intensity, BACKGROUND_RISK):
     grid[g_lat_min : g_lat_max, g_lon_min : g_lon_max , :] = np.fmax(target_area, kernel_area)
 
 # Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
-def concatenate_all_pireps(reports: list[dict], background_risk: int):
+def concatenate_all_pireps(reports: list[dict], background_risk: float):
     # make final grid and temp grid
     finalGrid = np.full(
         (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan,
@@ -203,7 +203,7 @@ def concatenate_all_pireps(reports: list[dict], background_risk: int):
         # Add targeted pirep to grid
         try:
             add_pirep(finalGrid, prGridData, aircraft, intensity, background_risk)
-        except Exception as e:
+        except Exception:
             LOGGER.error(f"Failed to add pirep {report}\n", exc_info=True)
 
     mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
