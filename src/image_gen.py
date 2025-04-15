@@ -3,13 +3,10 @@
 import datetime as dt
 
 import numpy as np
-import pandas as pd
-from goes2go import GOES
-from matplotlib import pyplot as plt
 from PIL import Image
 
 import pirep as pr
-from pirep.defs.spreading import concatenate_all_pireps, spread_pirep
+from pirep.defs.spreading import concatenate_all_pireps
 
 if __name__ == "__main__":
 	reports = pr.parse_all(pr.fetch(pr.url(dt.datetime(2024, 11, 6, 23, 30, 0, tzinfo=dt.UTC), dt.datetime(2024, 11, 8, 0, 0, 0, tzinfo=dt.UTC))))
