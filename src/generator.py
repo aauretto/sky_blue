@@ -1,3 +1,21 @@
+"""
+File: generator.py
+Description: A custom data generator for Keras that loads 
+             and batches time-sequenced satellite imagery 
+             and corresponding PIREP (pilot report) data for 
+             training machine learning models.
+
+Class:
+    - Generator: A Keras-compatible data generator for time-sequenced satellite and PIREP data.
+             
+Usage: To use this generator, instantiate it with the required parameters and pass it to 
+    the model's `.fit()` method in Keras.
+    Example:
+        generator = Generator(timestamps, y_times, y_reports, batch_size=32)
+        model.fit(generator, epochs=5)
+    Note: Generator needs to be instantiated for both x and y data
+"""
+
 from Logger import LOGGER
 import datetime as dt
 import numpy as np
@@ -17,6 +35,38 @@ from concurrent.futures import ThreadPoolExecutor
 import threading
 
 class Generator(keras.utils.Sequence):
+    """
+    A custom data generator for Keras that loads and batches time-sequenced satellite imagery
+    and corresponding PIREP (pilot report) data for training.
+
+    This generator:
+        - Prepares batches of multi-frame satellite data across specified bands.
+        - Uses caching and parallel fetching (via ThreadPoolExecutor) to optimize data retrieval.
+        - Generates matching labels using pre-cached or live PIREP data.
+        - Supports shuffled batches for training and is compatible with Keras's fit methods.
+
+    Input:
+        timestamps (list[list[datetime.datetime]]): 
+            nested list of datetime sequences representing time intervals available for sampling
+
+        y_times (list[datetime.datetime]): 
+            Timestamps corresponding to cached PIREP reports
+
+        y_reports (list): 
+            Cached parsed PIREP reports to be used when cache is enabled.
+
+        batch_size (int): 
+            Number of frames to return per batch.
+
+        frame_size (int, optional): 
+            Number of time steps per frame (default is 9, representing 8 hours + "now").
+
+        sat (GOES, optional): 
+            GOES satellite configuration for data retrieval. Defaults to GOES 16 CMPICABI product
+
+        bands (list[int], optional): 
+            List of satellite spectral bands to include in the dataset.
+    """
     def __init__(
         self,
         timestamps: list[list[dt.datetime]],
@@ -55,7 +105,7 @@ class Generator(keras.utils.Sequence):
 
     def __retrieve_x_frame(self, timestamps: list[dt.datetime]):
         """
-        Retrieves the x (satellite) data for a single frame given the relevant timestamps for
+        Retrieves the x (satellite) data for a single frame (sequence of timestamps)
 
         Parameters
         ----------
@@ -95,6 +145,13 @@ class Generator(keras.utils.Sequence):
         return xs, updated_timestamps
 
     def __retrieve_y_frame(self, timestamps: list[dt.datetime]):
+        """
+        Fetches and combines live PIREP data for the specified time window.
+
+        Input:
+            timestamps: list[dt.datetime]
+                the list of timestamps the satellite images will be fetched
+        """
         delta_t = dt.timedelta(minutes=consts.PIREP_RELEVANCE_DURATION)
         return np.array(
             [
@@ -107,6 +164,13 @@ class Generator(keras.utils.Sequence):
         )
 
     def __cache_y_frame(self, timestamps: list[dt.datetime]):
+        """
+        Retrieves PIREP data from the in-memory cache if available.
+
+        Input:
+            timestamps: list[dt.datetime]
+                the list of timestamps the satellite images will be fetched
+        """
         delta_t = dt.timedelta(minutes=consts.PIREP_RELEVANCE_DURATION)
         frame = []
         for ts in timestamps:
@@ -115,9 +179,15 @@ class Generator(keras.utils.Sequence):
         return np.array(frame)
 
     def __generate_frames(self, timestamp: dt.datetime) -> list[dt.datetime]:
+        """
+        Generates a list of timestamps covering one full frame window.
+        Input:
+            timestamps: list[dt.datetime]
+                the list of timestamps the satellite images will be fetched
+        """
         return [timestamp + dt.timedelta(hours=i) for i in range(self.frame_size)]
 
-    def __getitem__(self, batch_index):  # gets a batch
+    def __getitem__(self, batch_index):  # Returns one batch of (X, Y) data at the specified batch index.
         batch_x = []
         batch_y = []
 
@@ -136,7 +206,6 @@ class Generator(keras.utils.Sequence):
                 return (xs, ys)
             except Exception as e:
                 LOGGER.debug(f"Got error {e} in get_frames_worker with timestamps {frame_times}", exc_info=True)
-
 
                 xs, updated_timestamps = self.__retrieve_x_frame(frame_times)
 
