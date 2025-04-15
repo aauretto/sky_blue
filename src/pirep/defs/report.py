@@ -9,20 +9,22 @@ from pirep.defs.altitude import Altitude
 from pirep.defs.location import Location
 from pirep.defs.turbulence import Turbulence
 
+# Full PIREP format
 FULL = re.compile(
-    r"^(?P<station>[A-Z]{3,4})?"
-    r"\s*(?P<priority>UA|UUA)"
-    r"\s*/OV\s?(?P<location>[A-Z0-9\s]*)"
-    r"\s*/TM\s?(?P<time>[0-9]{4})"
-    r"\s*/FL\s?(?P<altitude>[0-9]{3}|DURC|DURD|UNKN)"
-    r"\s*/TP\s?(?P<aircraft>[A-Z0-9]{3,4})"
-    r"(?P<rest>.*)$"
+    r"^(?P<station>[A-Z]{3,4})?"  # Base station code
+    r"\s*(?P<priority>UA|UUA)"  # PIREP priority code
+    r"\s*/OV\s?(?P<location>[A-Z0-9\s]*)" # Location flag
+    r"\s*/TM\s?(?P<time>[0-9]{4})" # Time flag
+    r"\s*/FL\s?(?P<altitude>[0-9]{3}|DURC|DURD|UNKN)" # Flight level flag
+    r"\s*/TP\s?(?P<aircraft>[A-Z0-9]{3,4})"  # Aircraft type flag
+    r"(?P<rest>.*)$"  # Other flags
 )
 
+# Format for other flags
 REST = re.compile(
-    r"/((?P<flag>SK|WX|TA|WV|TB|IC|RM)"
-    r"\s?(?P<value>[A-Z0-9\s-]*"
-    r"(?:/?(?!SK|WX|TA|WV|TB|IC|RM)[A-Z0-9\s\+-]*)*))*"
+    r"/((?P<flag>SK|WX|TA|WV|TB|IC|RM)" # Flag code
+    r"\s?(?P<value>[A-Z0-9\s-]*" # Flag values
+    r"(?:/?(?!SK|WX|TA|WV|TB|IC|RM)[A-Z0-9\s\+-]*)*))*" # Terminal code
 )
 
 

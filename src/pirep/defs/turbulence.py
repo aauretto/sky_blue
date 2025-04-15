@@ -6,13 +6,14 @@ from pydantic import BaseModel
 
 from pirep.defs.altitude import Altitude
 
+# Turbulence flag format
 TURBULENCE = re.compile(
     r"("
-    r"\s*(?P<duration>INTMT|OCNL|CONS)?"
-    r"\s*(?:NEG|LGT|MOD|SEV|EXTRM)?\s*-?"
-    r"\s*(?P<intensity>SMOOTH|NEG|LGT|MOD|SEV|EXTRM)"
-    r"\s*(?P<type>CAT|CHOP)?"
-    r"\s*(?P<altitude>[A-Z0-9\s-]*)?"
+    r"\s*(?P<duration>INTMT|OCNL|CONS)?"    # Duration
+    r"\s*(?:NEG|LGT|MOD|SEV|EXTRM)?\s*-?"   # Intensity (low end)
+    r"\s*(?P<intensity>SMOOTH|NEG|LGT|MOD|SEV|EXTRM)" # Intensity (high end)
+    r"\s*(?P<type>CAT|CHOP)?"   # Turbulence type
+    r"\s*(?P<altitude>[A-Z0-9\s-]*)?" # Altitude
     r"/?)+"
 )
 

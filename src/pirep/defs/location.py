@@ -7,25 +7,33 @@ from scipy import constants as u
 
 from ..sources import SRC_AIRPORTS, SRC_NAVAIDS
 
+# Format [1234N56789E] (12.34N, 56.789E) or similar
 LOC_LATLON = re.compile(
     r"\s*(?P<lat>[0-9]{2,4})(?P<latsign>[NS])"
     r"\s*(?P<lon>[0-9]{2,5})(?P<lonsign>[EW])"
 )
+
+# Format [ABC-DEF]
 LOC_TWOLOC = re.compile(
     r"(?P<loc1>[A-Z0-9]{3,4})\s?-\s?"
     r"(?P<loc2>[A-Z0-9]{3,4})"
 )
+
+# Format [ABC123456] (456nm in heading 123 from ABC)
 LOC_LOCDIR = re.compile(
     r".*?(?P<loc>[A-Z0-9]{3,4})\s?"
     r"(?P<dir>[0-9]{3})"
     r"(?P<dist>[0-9]{3})"
 )
+
+# Format [123NNE OF ABC] (123nm in heading NNE from ABC)
 LOC_OFFSET = re.compile(
     r"(?P<dist>[0-9]{1,3})\s?"
     r"(?P<dir>NORTH|EAST|SOUTH|WEST|N|NNE|NE|ENE|E|ESE|SE|SSE|S|SSW|SW|WSW|W|WNW|NW|NNW)\s+(OF )?"
     r"(?P<loc>[A-Z0-9]{3,4})"
 )
 
+# Direction to heading conversion
 DIRECTIONS = {
     "NORTH": 0,
     "EAST": 90,

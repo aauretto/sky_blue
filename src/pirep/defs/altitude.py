@@ -4,9 +4,16 @@ from typing import Optional
 
 from pydantic import BaseModel, NonNegativeInt
 
+# Format [ABV123]
 ALT_MINABV = re.compile(r"ABV\s*(?P<alt1>[0-9]{3})")  # Go up 2500ft
+
+# Format [BLO123]
 ALT_MAXBLO = re.compile(r"BLO\s*(?P<alt2>[0-9]{3})")  # Go down 2500ft
+
+# Format [123] or Altitude Error
 ALT_SINGLE = re.compile(r"(?P<alt>[0-9]{3}|DURC|DURD|UNKN)")
+
+# Format [123-456]
 ALT_RANGED = re.compile(r"(?P<alt1>[0-9]{3})\s?-\s?(?P<alt2>[0-9]{3})")
 
 
