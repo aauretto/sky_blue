@@ -59,11 +59,24 @@ class CodeError(Exception):
 
 
 class Location(BaseModel):
+    """A class that encodes locations provided in Pilot Reports."""
+
     lat: float
     lon: float
 
     @staticmethod
     def parse(src: str, base: str):
+        """Return the location of a Pilot Report.
+
+        ### Parameters
+        src (str) : Location string from a Pilot Report
+        base (str) : Reporting station code provided at beginning of a Pilot Report
+
+        ### Returns
+        Location object consisting of latitude and longitude coordinates.
+        """
+
+        # Check for Lat/Lon location format
         if re.match(LOC_LATLON, src):
             m = re.match(LOC_LATLON, src).groupdict()
 
@@ -88,6 +101,7 @@ class Location(BaseModel):
 
             return Location(lat=lat, lon=lon)
 
+        # Check for offset reference format
         elif re.match(LOC_LOCDIR, src) or re.match(LOC_OFFSET, src):
             m = re.match(LOC_LOCDIR, src)
             m = re.match(LOC_OFFSET, src) if m is None else m
@@ -98,6 +112,7 @@ class Location(BaseModel):
 
             return loc.offset(dir, dist)
 
+        # Check for waypoint refefrence format
         elif len(src) == 3:
             return Location.convert_code(src)
 
@@ -105,7 +120,18 @@ class Location(BaseModel):
 
     @staticmethod
     def convert_code(code: str):
+        """Return the coordinates of a waypoint code.
+
+        ### Parameters
+        code (str) : Waypoint code (KBOS/BOS)
+
+        ### Returns
+        Location with latitude and longitude corresponding to the waypoint code
+        """
+
         match len(code):
+
+            # Check if IATA code
             case 3:
                 results = AIRPORT_CODES[
                     ((AIRPORT_CODES["iata_code"] == code)
@@ -113,6 +139,7 @@ class Location(BaseModel):
                     & (AIRPORT_CODES["continent"] == "NA")
                 ]
 
+            # Check if ICAO code
             case 4:
                 results = AIRPORT_CODES[
                     ((AIRPORT_CODES["icao_code"] == code)
@@ -123,6 +150,7 @@ class Location(BaseModel):
             case _:
                 raise CodeError(code)
 
+        # Fallback to Navaid codes if no airports found
         if len(results) == 0:
             results = NAVAID_CODES[NAVAID_CODES["ident"] == code]
 
@@ -134,6 +162,16 @@ class Location(BaseModel):
         return Location(lat=waypoint["latitude_deg"], lon=waypoint["longitude_deg"])
 
     def offset(self, dir: int, dist: int):
+        """Calculate a coordinate offset from a reference
+
+        ### Parameters
+        dir (int): A heading between 0 and 360
+        dist (int): Offset distance in nautical miles
+
+        ### Returns
+        Location with latitude and longitude corresponding to the new location
+        """
+
         r_earth = 6_371_000  # meters
 
         # Convert units

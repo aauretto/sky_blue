@@ -13,6 +13,8 @@ CODES = (
 
 
 class Aircraft(StrEnum):
+    """A class that enumerates aircraft size classes."""
+
     UNKN = "UNKN"
     LGT = "L"
     MED = "M"
@@ -20,6 +22,18 @@ class Aircraft(StrEnum):
 
     @staticmethod
     def parse(src: str):
+        """Return the aircraft size class.
+
+        ### Parameters
+        src (str) : Aircraft model code
+
+        ### Returns
+        UNKN | LGT | MED | HVY : Aircraft size class enumeration.
+
+        ### Notes
+        Jumbo jets are downgraded to HVY, and Light-Medium are upgraded to MED
+        """
+
         if src not in CODES:
             return Aircraft.UNKN
 

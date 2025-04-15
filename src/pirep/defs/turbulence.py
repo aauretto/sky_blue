@@ -18,12 +18,16 @@ TURBULENCE = re.compile(
 
 
 class Turbulence(BaseModel):
+    """A class that encodes details of turbulence reported in Pilot Reports."""
+
     class Duration(StrEnum):
+        """A class that enumerates turbulence duration classes."""
         INT = "INTMT"
         OCL = "OCNL"
         CON = "CONS"
 
     class Intensity(StrEnum):
+        """A class that enumerated turbulence intensity classes."""
         NEG = "NEG"
         LGT = "LGT"
         MOD = "MOD"
@@ -31,6 +35,7 @@ class Turbulence(BaseModel):
         EXT = "EXTRM"
 
     class Type(StrEnum):
+        """A class that enumerated turbulence types."""
         CHOP = "CHOP"
         CLEAR = "CAT"
         CLOUD = ""
@@ -42,8 +47,22 @@ class Turbulence(BaseModel):
 
     @staticmethod
     def parse(src: str, fallback: Altitude):
+        """Parse the turbulence string provided in a Pilot Report.
+
+        ### Parameters
+        src (str) : Turbulence details provided with the /TB flag
+        fallback (Altitude) : The default altitude provided in the Pilot Report
+
+        ### Returns
+        Turbulence object(s) with the relevant fields populated
+
+        ### Notes
+        Returns a list if multiple turbulence flags are passed. The results may need to be split using an explode() method.
+        """
+
         results = []
 
+        # Loop over every turbulence flag encountered
         for m in re.finditer(TURBULENCE, src):
             m = m.groupdict()
 

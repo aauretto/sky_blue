@@ -33,7 +33,10 @@ class ReportError(Exception):
 
 
 class PilotReport(BaseModel):
+    """A class that encodes Pilot Reports (PIREPs)."""
+
     class Priority(StrEnum):
+        """A class that enumerated PIREP priority classes."""
         RTN = "UA"
         URG = "UUA"
 
@@ -49,6 +52,19 @@ class PilotReport(BaseModel):
 
     @staticmethod
     def parse(report: str, timestamp: datetime = datetime.now(UTC)):
+        """Parse a Pilot Report.
+
+        ### Parameters
+        report (str) : Full string corresponding to a single Pilot Report
+        timestamp (datetime) : Timestamp associated with the report.
+
+        ### Returns
+        PilotReport object with the relevant fields populated
+
+        ### Notes
+        See subclasses for specific implementation of each field
+        """
+
         # Verify report is valid
         if not re.match(FULL, report):
             raise ReportError(report)
@@ -62,6 +78,7 @@ class PilotReport(BaseModel):
         altitude = Altitude.parse(m["altitude"])
         aircraft = Aircraft.parse(m["aircraft"])
 
+        # Parse optional fields
         data = {}
         for field in re.finditer(REST, m["rest"]):
             field = field.groupdict()

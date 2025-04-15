@@ -16,6 +16,8 @@ class AltitudeError(Exception):
 
 
 class Altitude(BaseModel):
+    """A class that encodes altitudes provided in Pilot Reports."""
+
     class Error(StrEnum):
         UNKN = "UNKN"
         DURC = "DURC"
@@ -27,10 +29,20 @@ class Altitude(BaseModel):
 
     @staticmethod
     def parse(src: str):
+        """Return the altitude object.
+
+        ### Parameters
+        src (str) : Altitude source string from a Pilot Report
+
+        ### Returns
+        Altitude object.
+        """
+
         err = Altitude.Error.UNKN
         alt_min = None
         alt_max = None
 
+        # Check for ranged altitude strings
         for pat in [ALT_MINABV, ALT_MAXBLO, ALT_RANGED]:
             if pat.match(src) is None:
                 continue
@@ -44,8 +56,10 @@ class Altitude(BaseModel):
             if "alt2" in m.keys():
                 alt_max = int(m["alt2"]) * 100
 
+        # Check for single-altitude strings
         if alt_min is None and alt_max is None and re.match(ALT_SINGLE, src):
             match src:
+                # Handle altitude errors/imprecise altitudes
                 case "UNKN" | "DURC" | "DURD":
                     err = Altitude.Error(src)
                     raise AltitudeError()
