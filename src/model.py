@@ -183,7 +183,7 @@ def make_train_val_gens(start: dt.datetime,
     val_y_times = times[start_val:end_val]
     val_y_reports = reports[start_val:end_val]
 
-
+    # TODO put in satellite consts
     sat = GOES(satellite=16, product="ABI", domain="C")
     bands = [8, 9, 10, 13, 14, 15]
 
