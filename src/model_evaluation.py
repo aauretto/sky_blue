@@ -8,6 +8,7 @@ from cacheReading import read_pirep_cache, retrieve_from_pirep_cache
 from consts import PIREP_RELEVANCE_DURATION
 from goes2go import GOES
 from generator import Generator
+from keras.utils import plot_model
 
 SAVE_DIR = '/cluster/tufts/capstone25skyblue/models/2024_02_02-05_ex_machina_defaults/'
 HISTORY_SAVE_PATH = SAVE_DIR + 'simon_2024_02_02-052025_04_14_20_03history.pkl'
@@ -110,6 +111,27 @@ def make_test_gen(start: dt.datetime,
 
     return gen_test
 
+def plot_model_architecture(model, image_path='model_architecture.png'):
+    """
+    Plots the computation graph of a Keras model and saves the image.
+
+    Parameters
+    ----------
+    model: keras.Model
+        The loaded Keras model whose architecture you want to plot.
+    image_path: str
+        File path to save the image of the model architecture.
+
+    Returns
+    -------
+    None
+    """
+    try:
+        plot_model(model, to_file=image_path, show_shapes=True, show_layer_names=True)
+        print(f"Model architecture saved to {image_path}")
+    except Exception as e:
+        print(f"Failed to plot model architecture: {e}")
+
 
 
 if __name__ == '__main__':
@@ -131,4 +153,5 @@ if __name__ == '__main__':
     
     # Results print to terminal
     results = inference_model.evaluate(test_gen, return_dict=True)
+    plot_model_architecture(inference_model, '/skyblue/model_architecture.png')
 
