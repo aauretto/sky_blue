@@ -122,12 +122,6 @@ class PirepGrid():
 def compute_grid(report: dict) -> npt.NDArray:
     from consts import GRID_RANGE, MAP_RANGE
 
-    # grid = np.full(
-    #     (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]),
-    #     np.nan,
-    #     dtype=np.float32,
-    # )
-
     from pirep.defs.report import Aircraft, Altitude, Location, Turbulence
 
     loc: Location = report["Location"]
@@ -157,12 +151,6 @@ def compute_grid(report: dict) -> npt.NDArray:
         alt_max_idx = np.abs(np.array(MAP_RANGE["ALT"]["RANGE"]) - alt.max).argmin()
         if MAP_RANGE["ALT"]["RANGE"][alt_max_idx] < alt.max:
             alt_max_idx = min(alt_max_idx + 1, len(MAP_RANGE["ALT"]["RANGE"]))
-
-        # grid[
-        #     convert(loc.lat, "LAT") : convert(loc.lat, "LAT") + 1,
-        #     convert(loc.lon, "LON") : convert(loc.lon, "LON") + 1,
-        #     alt_min_idx : alt_max_idx + 1,
-        # ] = turbulence_index
 
         # Return a 4-tuple with the center point and turb index in it
         grid = PirepGrid(

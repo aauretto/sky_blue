@@ -1,15 +1,26 @@
+"""
+File: spreading.py
+
+Description: A file containing utilities to spread PIREPs into risk areas that
+             represent turbulence occurances.
+             
+Usage: 
+    Call concatenate_all_pireps with a list of pireps report objects to generate
+    a map of CONUS with turbulence risk values representing the risk of encountering
+    turbulence determined from the provided PIREPs.
+"""
+
 import numpy as np
+import numpy.typing as npt
 from scipy import constants as u
 from pirep.defs.aircraft import Aircraft
+from pirep import PirepGrid
 
 from consts import MAP_RANGE, GRID_RANGE
 
-import gc
 import pirep.defs.merge as merge
 from Logger import LOGGER
 
-# Data Source: https://journals.ametsoc.org/view/journals/bams/aop/BAMS-D-23-0142.1/BAMS-D-23-0142.1.pdf
-### Altitudinal Computations ### Taken from the page 14 graphs of the source above
 from pirep.defs.generate_spreading_arrays import create_radial_grid
 
 # Disks that represent risk of turbulence relative to the point the pirep was reported at.
@@ -20,6 +31,10 @@ RADIAL_KERNELS = {
     "SEV": create_radial_grid("SEV"),
 }
 
+# Arrays that indicate risk of turbulence at a given altitude level as a 
+# factor of the risk value for that turbulence event.
+# The first array represents distance from center altitude level in km and the
+# second represents the factor mentioned. 
 ALT_RISKS = {
     "NEG": np.array(
         [
@@ -60,15 +75,40 @@ ALT_RISKS = {
     ),
 }
 
+# Conversion from aircraft size + intensity to a unified intensity value
 PIREP_INT_CRAFT_TO_SPREAD_INT = {
     Aircraft.LGT: {"NEG": "NEG", "LGT": "LGT", "MOD": "MOD", "SEV": "MOD"},
     Aircraft.MED: {"NEG": "LGT", "LGT": "MOD", "MOD": "MOD", "SEV": "SEV"},
     Aircraft.HVY: {"NEG": "MOD", "LGT": "SEV", "MOD": "SEV", "SEV": "SEV"},
 }
 
+def spread_pirep(
+    grid            : npt.NDArray, 
+    aircraft        : Aircraft,
+    intensity       : str, 
+    BACKGROUND_RISK : float):
+    """
+    Wrapper so we can call spread_pirep instead of both vert then horiz.
 
-# Wrapper so we can call spread_pirep instead of both vert then horiz
-def spread_pirep(grid, aircraft, intensity, BACKGROUND_RISK):
+    Parameters
+    ----------
+    grid: npt.NDArray
+        3D Array representing a single turbulence event
+    aircraft: aircraft
+        Aircraft size provided by Pirep.defs.aircraft
+    intensity: str
+        Intensity of the reported event
+    BACKGROUND_RISK: float
+        Base risk of turbulence 
+
+    Returns
+    -------
+    None
+
+    Notes 
+    -----
+    Modifies grid in place
+    """
     intensity = PIREP_INT_CRAFT_TO_SPREAD_INT[aircraft][intensity]
     vertical_spread(grid, intensity, BACKGROUND_RISK)
     radial_spread(grid, intensity, BACKGROUND_RISK)
@@ -76,7 +116,30 @@ def spread_pirep(grid, aircraft, intensity, BACKGROUND_RISK):
 
 # Expects a grid of shape (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"])
 # where every cell is np.nan except a single vertical column
-def vertical_spread(grid, intensity, BACKGROUND_RISK):
+def vertical_spread(
+    grid            : npt.NDArray,
+    intensity       : str,
+    BACKGROUND_RISK : float):
+    """
+    Spreads a single turbulence event in the vertical direction
+
+    Parameters
+    ----------
+    grid: npt.NDArray
+        3D Array representing a single turbulence event
+    intensity: str
+        Intensity of the reported event
+    BACKGROUND_RISK: float
+        Base risk of turbulence 
+
+    Returns
+    -------
+    None
+
+    Notes 
+    -----
+    Modifies grid in place
+    """
     # Get indicies where grid is not NaN
     vals = np.argwhere(~np.isnan(grid))
 
@@ -111,7 +174,31 @@ def vertical_spread(grid, intensity, BACKGROUND_RISK):
         grid[lat][lon][i] = ALT_RISKS[intensity][1][idx] * base_risk
 
 
-def radial_spread(grid, intensity, BACKGROUND_RISK):
+def radial_spread(
+    grid            : npt.NDArray, 
+    intensity       : str, 
+    BACKGROUND_RISK : float):
+    """
+    Spreads a single turbulence event in the horizontal direction
+
+    Parameters
+    ----------
+    grid: npt.NDArray
+        3D Array representing a single turbulence event
+    intensity: str
+        Intensity of the reported event
+    BACKGROUND_RISK: float
+        Base risk of turbulence 
+
+    Returns
+    -------
+    None
+
+    Notes 
+    -----
+    Modifies grid in place
+    """
+
     kernel = RADIAL_KERNELS[intensity]
     vals = np.argwhere(~np.isnan(grid))
     # All vals are in a vertical column so pos of pirep in lat,lon is same across all vals
@@ -147,13 +234,43 @@ def radial_spread(grid, intensity, BACKGROUND_RISK):
 
 
 # Grid should be a slice of the larger grid equal to kernel size
-def add_pirep(grid, prData, aircraft, intensity, BACKGROUND_RISK):
+def add_pirep(
+    grid            : npt.NDArray, 
+    prData          : PirepGrid, 
+    aircraft        : Aircraft, 
+    intensity       : str, 
+    BACKGROUND_RISK : float):
+    """
+    Adds a pirep represented by prData to grid
+
+    Parameters
+    ----------
+    grid: npt.NDArray
+        3D Array representing turbulence events in CONUS
+    prData: PirepGrid
+        PirepGrid struct representing a single PIREP
+    aircraft: Aircraft
+        Size class of the aircraft that reported the given PIREP
+    intensity: str
+        Intensity of the reported event
+    BACKGROUND_RISK: float
+        Base risk of turbulence 
+
+    Returns
+    -------
+    None
+
+    Notes 
+    -----
+    Modifies grid in place
+    """
+
+    # Localize data from prData
     lat      = prData.lat_idx
     lon      = prData.lon_idx
     alt_min  = prData.alt_min_idx
     alt_max  = prData.alt_max_idx
     turb_idx = prData.turbulence_idx
-
 
     # Compute kernel, put it on orig grid using vector crap
     kernel = RADIAL_KERNELS[PIREP_INT_CRAFT_TO_SPREAD_INT[aircraft][intensity]]
@@ -190,14 +307,30 @@ def add_pirep(grid, prData, aircraft, intensity, BACKGROUND_RISK):
 
 # Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
 def concatenate_all_pireps(reports: list[dict], background_risk: float):
-    # make final grid and temp grid
+    """
+    Generates a grid representing a map of CONUS denoting risk of turbulence
+    in a given area.
+
+    Parameters
+    ----------
+    reports: list[dict]
+        List of PIREPs reported over CONUS where turbulence was reported.
+    background_risk: float
+        The base risk of encountering turbulence
+
+    Returns
+    -------
+    finalGrid: npt.NDarray
+        A grid that represents turbulence risk over the entirity of CONUS
+    """
+    # Make final grid to spread all events onto
     finalGrid = np.full(
         (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan,
         dtype=np.float32
     )
 
+    # Add all pireps to the grid one by one
     import pirep as pr
-
     for report in reports:
         prGridData, aircraft, intensity = pr.compute_grid(report)
         # Add targeted pirep to grid
@@ -206,6 +339,7 @@ def concatenate_all_pireps(reports: list[dict], background_risk: float):
         except Exception:
             LOGGER.error(f"Failed to add pirep {report}\n", exc_info=True)
 
+    # Fill in bg risk everywhere we didnt previously fill in
     mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
     finalGrid[mask] = np.random.uniform(
         1e-5, 1e-7, size=mask.sum()
