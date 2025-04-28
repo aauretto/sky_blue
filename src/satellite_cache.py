@@ -1,3 +1,21 @@
+"""
+File satellite_cache.py acts as an in-between for accessing GOES satellite
+images. An image can be requested using retrieve_satellite_data. If the 
+requested image is saved to disk (cached) already, access should be fast, if
+not, it is first saved to disk then accessed so subsequent accesses can be
+quicker.  
+
+Usage: Call retreive_satellite_data with a list of timestamps for the images 
+       requested. If the user wishes to build a cache, run this file directly
+       and the time range specified at the top of the `main` function in this
+       file will be cached in the directory specified by CACHE_DIR.
+
+Effects:
+    Running code in this file will populate the folder specified by CACHE_DIR
+    with an image per timestamp requested. Cached images are large (~90-100MB) 
+    per file.
+"""
+
 from goes2go import GOES
 import datetime as dt
 import satellite as st
@@ -6,41 +24,16 @@ import numpy as np
 import pandas as pd
 import time
 from concurrent.futures import ThreadPoolExecutor
-
-
 import os
 import xarray as xr
 
-### MEGA CONSTANTS:
+### CONSTANTS USED WHEN BUILDING A CACHE:
 MAX_PROCESSES = 24
 WINDOW_PER_HOUR = 12
 BANDS = [8,9,10,13,14,15]
 CACHE_DIR = "/cluster/tufts/capstone25skyblue/Caches/sat_cache"
+SAT = GOES(satellite=16, product="ABI", domain="C")
 
-
-############TODO REMOVE THIS 
-def generate_timestamps(
-    start: dt.datetime = dt.datetime(2017, 3, 1, 0, 3, tzinfo=dt.UTC),
-    end: dt.datetime = dt.datetime(2025, 1, 1, 0, 0, tzinfo=dt.UTC),
-) -> list[dt.datetime]:
-    """
-    Generates a list of 5 minutes seperated datetimes starting on minute 3
-    of each year 2018-2024 and 2017 without Jan and Feb
-
-    Returns
-    -------
-    a list of datetimes in the range
-    """
-
-    timestamps = [[] for _ in range(12)]
-    current_time = start
-
-    while current_time < end:
-        timestamps[current_time.minute // 5].append(current_time)
-        current_time = current_time + dt.timedelta(minutes=5)
-
-    return timestamps
-########################TODO REMOVE ABOVE
 
 def parse_timestamp(ts):
     """
@@ -57,11 +50,6 @@ def parse_timestamp(ts):
     """
     return ts.strftime("%Y_%m_%d|%H_%M_%S").split("|")
 
-SAT = GOES(satellite=16, product="ABI", domain="C")
-
-
-# Worker function that will download a single GOES-16 image and save it with an updated timstamp
-# in the cache
 def cache_worker(ts):
     """
     Downloads the GOES-16 image nearest to the timestamp provided
@@ -114,8 +102,6 @@ def cache_worker(ts):
     print(f"\x1b[94m[{ts}] > Saving to disk took {endTime - procTime}s\x1b[0m")
     print(f"[{ts}] > Total time was {endTime - startTime}s")
 
- 
-
 def cache_images_from_aws(timestamps):
     """
     Downloads the GOES-16 image nearest to each timestamp in the provided
@@ -135,7 +121,6 @@ def cache_images_from_aws(timestamps):
     with multiprocessing.Pool(processes=MAX_PROCESSES // WINDOW_PER_HOUR) as exec:
         xs = exec.map(cache_worker, timestamps)
     
-
 def retreive_satellite_data(tsList):
     """
     Attempts to pull the requested satellite data from the cache and if it
@@ -179,12 +164,33 @@ def retreive_satellite_data(tsList):
     [allStamps, allImages] = list(zip(*list(stampsAndImages)))
     return (np.vstack(allImages), list(allStamps))
 
-
-if __name__ =='__main__':
-    multiprocessing.set_start_method("forkserver", force=True)
-
+def main():
     startTime = dt.datetime(2024, 2, 2, 0, 0, tzinfo=dt.UTC)
     endTime = dt.datetime(2024, 2, 3, 0, 0, tzinfo=dt.UTC)
+    
+    def generate_timestamps(
+        start: dt.datetime = dt.datetime(2017, 3, 1, 0, 3, tzinfo=dt.UTC),
+        end: dt.datetime = dt.datetime(2025, 1, 1, 0, 0, tzinfo=dt.UTC),
+    ) -> list[dt.datetime]:
+        """
+        Generates a list of 5 minutes seperated datetimes starting on minute 3
+        of each year 2018-2024 and 2017 without Jan and Feb
+
+        Returns
+        -------
+        a list of datetimes in the range
+        """
+
+        timestamps = [[] for _ in range(12)]
+        current_time = start
+
+        while current_time < end:
+            timestamps[current_time.minute // 5].append(current_time)
+            current_time = current_time + dt.timedelta(minutes=5)
+
+        return timestamps
+
+    multiprocessing.set_start_method("forkserver", force=True)
 
     tsList = generate_timestamps(startTime, endTime)
     print(f"Generated timestamps {len(tsList)=}")
@@ -194,3 +200,6 @@ if __name__ =='__main__':
         exec.map(cache_images_from_aws, tsList)
     end_t = time.time()
     print(f"Completed from {startTime} to {endTime} in {end_t - start_t} seconds")
+
+if __name__ =='__main__':
+    main()
