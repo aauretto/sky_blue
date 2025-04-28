@@ -5,7 +5,8 @@ import numpy.typing as npt
 import pandas as pd
 from consts import MAP_RANGE
 from Logger import LOGGER
-
+from pirep.spreading import add_pirep
+from pirep.PirepGrid import PirepGrid
 
 def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
     from urllib import parse
@@ -101,15 +102,6 @@ def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
     return exploded_reports
 
 
-# Temporary struct that holds some turb data
-class PirepGrid():
-    def __init__(self, lat_idx, lon_idx, alt_min_idx, alt_max_idx, turbulence_idx):
-        self.lat_idx = lat_idx
-        self.lon_idx = lon_idx
-        self.alt_min_idx = alt_min_idx
-        self.alt_max_idx = alt_max_idx
-        self.turbulence_idx = turbulence_idx
-
 def compute_grid(report: dict) -> npt.NDArray:
     from consts import GRID_RANGE, MAP_RANGE
 
@@ -155,3 +147,46 @@ def compute_grid(report: dict) -> npt.NDArray:
         return (grid, aircraft, intensity)
     else:
         return (grid, None, None)
+
+# Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
+def concatenate_all_pireps(reports: list[dict], background_risk: float):
+    """
+    Generates a grid representing a map of CONUS denoting risk of turbulence
+    in a given area.
+
+    Parameters
+    ----------
+    reports: list[dict]
+        List of PIREPs reported over CONUS where turbulence was reported.
+    background_risk: float
+        The base risk of encountering turbulence
+
+    Returns
+    -------
+    finalGrid: npt.NDarray
+        A grid that represents turbulence risk over the entirity of CONUS
+    """
+    from consts import GRID_RANGE
+    # Make final grid to spread all events onto
+    finalGrid = np.full(
+        (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan,
+        dtype=np.float32
+    )
+
+    # Add all pireps to the grid one by one
+    import pirep as pr
+    for report in reports:
+        prGridData, aircraft, intensity = compute_grid(report)
+        # Add targeted pirep to grid
+        try:
+            add_pirep(finalGrid, prGridData, aircraft, intensity, background_risk)
+        except Exception:
+            LOGGER.error(f"Failed to add pirep {report}\n", exc_info=True)
+
+    # Fill in bg risk everywhere we didnt previously fill in
+    mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
+    finalGrid[mask] = np.random.uniform(
+        1e-5, 1e-7, size=mask.sum()
+    )  # TODO document magic numbers
+
+    return finalGrid

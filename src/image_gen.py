@@ -6,7 +6,7 @@ import numpy as np
 from PIL import Image
 
 import pirep as pr
-from pirep.defs.spreading import concatenate_all_pireps
+
 
 if __name__ == "__main__":
 	day_start = dt.datetime(2024, 2, 2, 0, tzinfo=dt.UTC)
@@ -16,7 +16,7 @@ if __name__ == "__main__":
 		day_end = day_start + one_day
 
 		reports = pr.parse_all(pr.fetch(pr.url(day_start, day_end)))
-		grid = concatenate_all_pireps(reports, 4e-5)
+		grid = pr.concatenate_all_pireps(reports, 4e-5)
 
 		MAX = 1.0 # Set this to the maximum turbulence index/score
 

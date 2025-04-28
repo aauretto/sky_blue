@@ -14,14 +14,13 @@ import numpy as np
 import numpy.typing as npt
 from scipy import constants as u
 from pirep.defs.aircraft import Aircraft
-from pirep import PirepGrid
+from pirep.PirepGrid import PirepGrid
 
 from consts import MAP_RANGE, GRID_RANGE
 
-import pirep.defs.merge as merge
 from Logger import LOGGER
 
-from pirep.defs.generate_spreading_arrays import create_radial_grid
+from pirep.generate_spreading_arrays import create_radial_grid
 
 # Disks that represent risk of turbulence relative to the point the pirep was reported at.
 RADIAL_KERNELS = {
@@ -305,44 +304,4 @@ def add_pirep(
     kernel_area = subGrid[k_lat_min : k_lat_max, k_lon_min : k_lon_max , :]
     grid[g_lat_min : g_lat_max, g_lon_min : g_lon_max , :] = np.fmax(target_area, kernel_area)
 
-# Function that takes reports and spreads all PIREPS and smooshes everything together iteratively
-def concatenate_all_pireps(reports: list[dict], background_risk: float):
-    """
-    Generates a grid representing a map of CONUS denoting risk of turbulence
-    in a given area.
 
-    Parameters
-    ----------
-    reports: list[dict]
-        List of PIREPs reported over CONUS where turbulence was reported.
-    background_risk: float
-        The base risk of encountering turbulence
-
-    Returns
-    -------
-    finalGrid: npt.NDarray
-        A grid that represents turbulence risk over the entirity of CONUS
-    """
-    # Make final grid to spread all events onto
-    finalGrid = np.full(
-        (GRID_RANGE["LAT"], GRID_RANGE["LON"], GRID_RANGE["ALT"]), np.nan,
-        dtype=np.float32
-    )
-
-    # Add all pireps to the grid one by one
-    import pirep as pr
-    for report in reports:
-        prGridData, aircraft, intensity = pr.compute_grid(report)
-        # Add targeted pirep to grid
-        try:
-            add_pirep(finalGrid, prGridData, aircraft, intensity, background_risk)
-        except Exception:
-            LOGGER.error(f"Failed to add pirep {report}\n", exc_info=True)
-
-    # Fill in bg risk everywhere we didnt previously fill in
-    mask = np.isnan(finalGrid) | (finalGrid == -np.inf)
-    finalGrid[mask] = np.random.uniform(
-        1e-5, 1e-7, size=mask.sum()
-    )  # TODO document magic numbers
-
-    return finalGrid

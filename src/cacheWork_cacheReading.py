@@ -5,7 +5,7 @@ import pickle
 import numpy as np
 import time
 import sys
-from pirep.defs.spreading import concatenate_all_pireps
+from pirep import concatenate_all_pireps
 import psutil
 import gc
 

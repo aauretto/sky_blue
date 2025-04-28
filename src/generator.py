@@ -28,9 +28,6 @@ import xarray as xr
 from numpy import random as rnd
 from satellite_cache import retreive_satellite_data
 from cacheWork_cacheReading import retrieve_from_pirep_cache
-
-
-from pirep.defs.spreading import concatenate_all_pireps
 from concurrent.futures import ThreadPoolExecutor
 
 class Generator(keras.utils.Sequence):
@@ -154,7 +151,7 @@ class Generator(keras.utils.Sequence):
         delta_t = dt.timedelta(minutes=consts.PIREP_RELEVANCE_DURATION)
         return np.array(
             [
-                concatenate_all_pireps(
+                pr.concatenate_all_pireps(
                     pr.parse_all(pr.fetch(pr.url(t - delta_t, t + delta_t))),
                     background_risk=4e-5,
                 )
@@ -174,7 +171,7 @@ class Generator(keras.utils.Sequence):
         frame = []
         for ts in timestamps:
             start_idx, end_idx = retrieve_from_pirep_cache(ts - delta_t, ts + delta_t, self.y_times)
-            frame.append(concatenate_all_pireps(self.y_reports[start_idx:end_idx], background_risk=4e-5))
+            frame.append(pr.concatenate_all_pireps(self.y_reports[start_idx:end_idx], background_risk=4e-5))
         return np.array(frame)
 
     def __generate_frames(self, timestamp: dt.datetime) -> list[dt.datetime]:
