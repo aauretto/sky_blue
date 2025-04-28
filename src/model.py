@@ -30,7 +30,7 @@ import argparse
 import consts as consts
 from generator import Generator
 import satellite as st
-from cacheReading import read_pirep_cache, retrieve_from_pirep_cache
+from cacheWork_cacheReading import read_pirep_cache, retrieve_from_pirep_cache
 from consts import PIREP_RELEVANCE_DURATION
 
 CHECKPOINT_DIR = './checkpoints'

@@ -9,13 +9,21 @@ import pirep as pr
 from pirep.defs.spreading import concatenate_all_pireps
 
 if __name__ == "__main__":
-	reports = pr.parse_all(pr.fetch(pr.url(dt.datetime(2024, 11, 6, 23, 30, 0, tzinfo=dt.UTC), dt.datetime(2024, 11, 8, 0, 0, 0, tzinfo=dt.UTC))))
-	grid = concatenate_all_pireps(reports, 4e-5)
+	day_start = dt.datetime(2024, 2, 2, 0, tzinfo=dt.UTC)
+	one_day = dt.timedelta(days=1)
 
-	MAX = 1.0 # Set this to the maximum turbulence index/score
+	for day in range(9):
+		day_end = day_start + one_day
 
-	# TODO: check that this breaks down the grid into each layer, and no more. There should be as many images as layers.
-	for idx in range(14):
+		reports = pr.parse_all(pr.fetch(pr.url(day_start, day_end)))
+		grid = concatenate_all_pireps(reports, 4e-5)
 
-		im = Image.fromarray(np.uint8(grid[:, :, idx] * 255 / MAX))
-		im.save(f"layer{idx + 1}.gif")
+		MAX = 1.0 # Set this to the maximum turbulence index/score
+
+		# TODO: check that this breaks down the grid into each layer, and no more. There should be as many images as layers.
+		print(f"Got {day_start} generating images")
+		for idx in range(14):
+
+			im = Image.fromarray(np.uint8(grid[:, :, idx] * 255 / MAX))
+			im.save(f"/skyblue/images_for_demo/{day_start.strftime('%Y_%m_%d')}alt{idx:02}.gif")
+		day_start = day_end

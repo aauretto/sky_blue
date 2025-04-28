@@ -9,9 +9,24 @@ from pirep.defs.spreading import concatenate_all_pireps
 import psutil
 import gc
 
-def read_pirep_cache() -> tuple[list[pd._libs.tslibs.timestamps.Timestamp], list[dict]]:
-    _CSV_NAME = '/cluster/tufts/capstone25skyblue/Caches/PIREPcacheFullPickled.csv'
-    df = pd.read_csv(_CSV_NAME)
+def read_pirep_cache(csvName = '/cluster/tufts/capstone25skyblue/Caches/PIREPcacheFullPickled.csv') -> tuple[list[pd._libs.tslibs.timestamps.Timestamp], list[dict]]:
+    """
+    Pulls in the PIREP cache from its location on disk and returns the relevant data as 
+    versatile lists
+
+    Parameters
+    ----------
+    csvName: str
+        The path to the csv to read
+
+    Returns
+    -------
+    times: list[pd._libs.tslibs.timestamps.Timestamp]
+        The timestamps from the cache
+    reports: list[dict]
+        the pireps from the cache
+    """
+    df = pd.read_csv(csvName)
     times = pd.to_datetime(df['Timestamp'], utc=True)
     reports = [pickle.loads(ast.literal_eval(d)) for d in df['Data']]
     del df
@@ -20,6 +35,21 @@ def read_pirep_cache() -> tuple[list[pd._libs.tslibs.timestamps.Timestamp], list
 
 def retrieve_from_pirep_cache(start: dt.datetime, end: dt.datetime, 
                               times: list[pd._libs.tslibs.timestamps.Timestamp], reports: list[dict] = None) -> list[dict]:
+    """
+    Returns the start and end indices of the place in times which correspond to [start, end)
+
+    Parameters
+    ----------
+    start: dt.datetime
+        The start time of the PIREPs to look for
+    end: dt.datetime
+        The end time of the PIREPs to look for
+    times: list[pd._libs.tslibs.timestamps.Timestamp]
+        The times to search through
+    reports: list[dict]
+        An unused parameter that could in theory be used to return the actually relevant pireps
+
+    """
     start_idx = np.searchsorted(times, start, side='left')
     end_idx = np.searchsorted(times, end, side='right')
     return start_idx, end_idx
@@ -27,6 +57,11 @@ def retrieve_from_pirep_cache(start: dt.datetime, end: dt.datetime,
 
 
 if __name__ == "__main__":
+
+    """
+    Some profiling we did of the cache we made
+    """
+
     def get_memory_usage():
         """Returns the current memory usage of the process in MB."""
         process = psutil.Process()

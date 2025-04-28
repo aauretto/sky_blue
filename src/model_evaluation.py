@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 import satellite as st
 import datetime as dt
 import random as rnd
-from cacheReading import read_pirep_cache, retrieve_from_pirep_cache
+from cacheWork_cacheReading import read_pirep_cache, retrieve_from_pirep_cache
 from consts import PIREP_RELEVANCE_DURATION
 from goes2go import GOES
 from generator import Generator

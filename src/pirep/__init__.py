@@ -101,15 +101,6 @@ def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
     return exploded_reports
 
 
-# performs in place dropping of reports containing lats and/or lons outside of range
-# def fetch_parse_and_drop_irrelevant(date_s: dt.datetime, date_e: dt.datetime) -> pd.DataFrame:
-#     reports = parse_all(fetch(url(date_s, date_e)))
-#     return reports[
-#             reports["Location"].apply(lambda loc: MAP_RANGE["LAT"]["MIN"] <= loc.lat <= MAP_RANGE['LAT']['MAX'] and
-#                                                 MAP_RANGE['LON']['MIN'] <= loc.lon <= MAP_RANGE['LON']['MAX'])
-# ]
-
-
 # Temporary struct that holds some turb data
 class PirepGrid():
     def __init__(self, lat_idx, lon_idx, alt_min_idx, alt_max_idx, turbulence_idx):
