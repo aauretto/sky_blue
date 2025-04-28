@@ -9,6 +9,21 @@ from pirep.spreading import add_pirep
 from pirep.PirepGrid import PirepGrid
 
 def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
+    """
+    Creates a url to pull pireps from
+
+    Parameters
+    ----------
+    date_s: dt.datetime
+        The UTC datetime to start pulling pireps from
+    date_e: dt.datetime
+        The UTC datetime to pull pireps up to
+    
+    Returns
+    -------
+    url: str
+        The url to pull pireps from
+    """
     from urllib import parse
 
     from pirep.sources import SRC_PIREPS
@@ -28,6 +43,14 @@ def url(date_s: dt.datetime, date_e: dt.datetime) -> str:
 
 
 def fetch(url: str) -> list[dict]:
+    """
+    Actually fetches the pireps from the url
+
+    Parameters
+    ----------
+    url: str
+        The url to fetch the PIREP from
+    """
     df = pd.read_csv(url)
 
     # Fix dataframe columns
@@ -45,6 +68,19 @@ def fetch(url: str) -> list[dict]:
 
 
 def parse(row: dict) -> dict:
+    """
+    Updates a pirep to be parsed to actual Python objects
+
+    Parameters
+    ----------
+    row: dict
+        A singe row from the return of fetch
+    
+    Returns
+    -------
+    dict
+        The row updated to include parsed information
+    """
     import traceback
 
     from pirep.defs.altitude import Altitude, AltitudeError
@@ -74,6 +110,21 @@ def parse(row: dict) -> dict:
 
 
 def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
+    """
+    Parses all the PIREPs to uasbale python objects
+
+    Parameters
+    ----------
+    table: list[dict]
+        The return of fetch
+    drop_no_turbulence: bool
+        A flag for whether or not to drop any reports without turbulence
+
+    Returns
+    -------
+    list(dict)
+        The original table updated to include parsed information
+    """
 
     reports: list[dict] = [parse(row) for row in table]
     reports = [
@@ -102,7 +153,21 @@ def parse_all(table: list[dict], drop_no_turbulence: bool = True) -> list[dict]:
     return exploded_reports
 
 
-def compute_grid(report: dict) -> npt.NDArray:
+def compute_grid(report: dict):
+    """
+    Takes a single PIREP and creates the necessary information to 
+    put it on the grid
+
+    Parameters
+    ----------
+    report: dict
+        The pirep report to actaully put on the grid
+    
+    Returns
+    -------
+    tuple(PirepGrid, Aircraft, Turbulence.Intensity)
+        The information needed to gridify the pirep
+    """
     from consts import GRID_RANGE, MAP_RANGE
 
     from pirep.defs.report import Aircraft, Altitude, Location, Turbulence

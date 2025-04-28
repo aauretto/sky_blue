@@ -1,11 +1,11 @@
 #!/bin/bash
-#SBATCH -J Model3              # job name
-#SBATCH --time=07-00:00:00     # requested time (DD-HH:MM:SS)
+#SBATCH -J Full_Time_No_Typos              # job name
+#SBATCH --time=01-00:00:00     # requested time (DD-HH:MM:SS)
 #SBATCH -p preempt             # running on "mpi" partition/queue
 #SBATCH -N 1                   # 1 node
 #SBATCH -n 16                  # 16 tasks total (default 1 CPU core per task) = # of cores
 #SBATCH --mem=64g              # requesting 64GB of RAM total
-#SBATCH --gres=gpu:h100:1      # GPUs that we want: h100
+#SBATCH --gres=gpu:a100:1      # GPUs that we want: h100
 # Submit this job with the following command from command line interface:
 # sbatch execute_model.slurm
 # You can also find batch job examples on the cluster for MALAB, R, and Python jobs at:
@@ -27,15 +27,11 @@
 #SBATCH --output=MyJob.execute_model.%j.%N.out #saving standard output to file, %j=JOBID, %N=NodeName
 #SBATCH --error=MyJob.execute_model.%j.%N.err #saving standard error to file, %j=JOBID, %N=NodeName
 #SBATCH --mail-type=ALL #email optitions
-#SBATCH --mail-user=aiden.auretto@tufts.edu,simon.webber@tufts.edu
+#SBATCH --mail-user=simon.webber@tufts.edu
 
 #[commands_you_would_like_to_exe_on_the_compute_nodes]
 
 # Run scripts that will copy down newest image then run it
 module load singularity
 
-/cluster/tufts/capstone25skyblue/model_executor /cluster/tufts/capstone25skyblue/skyblue_images_hpc-gpu-no-repo.sif /cluster/tufts/capstone25skyblue/aauret01/sky_blue
-
-
-
-# Submitted batch job 13097526
+/cluster/tufts/capstone25skyblue/model_executor /cluster/tufts/capstone25skyblue/skyblue_images_hpc-gpu-no-repo.sif /cluster/tufts/capstone25skyblue/swebbe01/sky_blue

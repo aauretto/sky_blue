@@ -184,6 +184,17 @@ class Generator(keras.utils.Sequence):
         return [timestamp + dt.timedelta(hours=i) for i in range(self.frame_size)]
 
     def __getitem__(self, batch_index):  # Returns one batch of (X, Y) data at the specified batch index.
+        """
+        Gets a single batch of data 
+
+        Input:
+            batch_index: int
+                The index of the batch to retrieve
+    
+        Output:
+            (np.NDArray, np.NDArray)
+                The x and y data of the batch
+        """
         batch_x = []
         batch_y = []
 

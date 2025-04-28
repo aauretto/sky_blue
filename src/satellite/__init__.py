@@ -1,5 +1,6 @@
-import datetime as dt
 
+
+import datetime as dt
 import numpy as np
 import numpy.typing as npt
 from goes2go import GOES
@@ -14,6 +15,13 @@ def generate_timestamps(
     Generates a list of 5 minutes seperated datetimes starting on minute 3
     of each year 2018-2024 and 2017 without Jan and Feb
 
+    Parameters
+    ----------
+    start: dt.datetime
+        The beginning of the time range to fetch
+    end: dt.datetime
+        The end of the time range to fetch
+    
     Returns
     -------
     a list of datetimes in the range
@@ -29,6 +37,21 @@ def generate_timestamps(
     return timestamps
 
 def fetch(timestamp: dt.datetime, satellite: GOES) -> Dataset:
+    """
+    Gets a single satellite image nearest to timestamp
+
+    Parameters
+    ----------
+    timestamp: dt.datetime
+        The timestamp for the time we want an image for.
+    satellite: GOES
+        GOES object representing the satellite we want to fetch from
+    
+    Returns
+    -------
+    :Dataset
+        xarray dataset containing a satellite image.
+    """
     return satellite.nearesttime(
         timestamp.replace(tzinfo=None),
         return_as="xarray",
@@ -38,10 +61,43 @@ def fetch(timestamp: dt.datetime, satellite: GOES) -> Dataset:
 
 
 def fetch_range(start: dt.datetime, end: dt.datetime, satellite: GOES) -> Dataset:
+    """
+    Fetches all images in range [start, end]
+
+    Parameters
+    ----------
+    start: dt.datetime
+        The starting timestamp for the time we want an image for.
+    end: dt.datetime
+        The ending timestamp for the time we want an image for.
+    satellite: GOES
+        GOES object representing the satellite we want to fetch from
+    
+    Returns
+    -------
+    :Dataset
+        xarray dataset containing all satellite images in range.
+
+    """
     return satellite.timerange(start, end, return_as="xarray", download=False)
 
 
 def fetch_bands(data: Dataset, bands: list[int]) -> DataArray:
+    """
+    Extracts bands of interest from data retrieved from satellite.
+
+    Parameters
+    ----------
+    data: Dataset
+        xarray dataset containing a satellite image.
+    bands: list[int]
+        Bands in data we want to keep.
+    
+    Returns
+    -------
+    :DataArray
+        The input data but only keeping bands listed in bands
+    """
     return (
         data[[f"CMI_C{band:02d}" for band in bands]]
         .to_dataarray(dim="band")
@@ -49,8 +105,21 @@ def fetch_bands(data: Dataset, bands: list[int]) -> DataArray:
     )
 
 
-# Code pulled from the NOAA Documentation for the AWS Bucket
 def calculate_coordinates(data: Dataset) -> tuple[npt.ArrayLike, npt.ArrayLike]:
+    """
+    Takes a xarray dataset of a satellite image and returns the lat-lon data
+    for each datapoint in the array.
+
+    Code pulled from the NOAA Documentation for the AWS Bucket
+
+    data: Dataset
+        The input xarray dataset
+    
+    Returns
+    -------
+    :tuple[npt.ArrayLike, npt.ArrayLike]
+        (Lon coords, Lat coords)
+    """
     # Read in GOES ABI fixed grid projection variables and constants
     x_coordinate_1d = data.variables["x"][:]  # E/W scanning angle in radians
     y_coordinate_1d = data.variables["y"][:]  # N/S elevation angle in radians
@@ -104,6 +173,23 @@ def project(
     lon: npt.ArrayLike | npt.DTypeLike,
     temps: npt.ArrayLike | npt.DTypeLike,
 ) -> npt.ArrayLike | npt.DTypeLike:
+    """
+    Projects satellite image onto our grid with equal spaced lat and lon on x and y axes
+
+    Parameters
+    ----------
+    lat: npt.ArrayLike | npt.DTypeLike
+        Latitude coordinates
+    lat: npt.ArrayLike | npt.DTypeLike
+        Longitude coordinates
+    lat: npt.ArrayLike | npt.DTypeLike
+        Temprature values
+    
+    Returns
+    -------
+    :npt.ArrayLike | npt.DTypeLike
+        A grid representing CONUS with data projected into the proper location
+    """
     from consts import GRID_RANGE, MAP_RANGE
     from utils.convert import convert_coord as convert
 
@@ -133,7 +219,18 @@ def project(
 #   F - num files
 #   B - num Bands
 # Seems like when we get multiple bands we are smoothing across multiple bands :(
-def smooth(all_data):
+def smooth(all_data: npt.ArrayLike | npt.DTypeLike) -> npt.ArrayLike | npt.DTypeLike:
+    """
+    Fills in the gaps for all bands in the data. Due to projection, some pixels may
+    not have values and need to be interpolated.
+
+    all_data: npt.ArrayLike | npt.DTypeLike
+
+    Returns
+    -------
+    :npt.ArrayLike | npt.DTypeLike
+        Interpolated data.
+    """
     n_files = all_data.shape[0]
     n_bands = all_data.shape[3]
 
@@ -146,6 +243,19 @@ def smooth(all_data):
 def smooth_single_band(
     data: npt.ArrayLike | npt.DTypeLike,
 ) -> npt.ArrayLike | npt.DTypeLike:
+    """
+    Fills in the gaps for a single band of data
+
+    Parameters
+    ----------
+    data: npt.ArrayLike
+        A single band of pirep data
+    
+    Returns
+    -------
+    npt.ArrayLike
+        The single band of pirep data smoothed
+    """
     from scipy.ndimage import distance_transform_edt
 
     ## runs after projection, gets points that are in between buckets from
@@ -157,8 +267,3 @@ def smooth_single_band(
     data[empty_mask] = data[tuple(indices[:, empty_mask])]
     return data
 
-
-def union_sat_data(
-    west: npt.ArrayLike | npt.DTypeLike, east: npt.ArrayLike | npt.DTypeLike
-) -> npt.ArrayLike | npt.DTypeLike:
-    pass

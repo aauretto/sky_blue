@@ -15,6 +15,14 @@ SAVE_DIR = '/cluster/tufts/capstone25skyblue/models/2024_02_02-05_ex_machina_def
 MODEL_SAVE_PATH = SAVE_DIR + 'simon_2024_02_02-052025_04_14_20_03model.keras'
 
 def get_image(ts):
+    """
+    Retrieves a single satellite frame 
+
+    Parameters
+    ----------
+    ts: dt.dateimte
+        The UTC date representing the last hour 
+    """
     timestamps = [ts - i * dt.timedelta(hours = 1) for i in range(9)]
     timestamps.reverse()
     try:

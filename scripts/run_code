@@ -1,5 +1,7 @@
 #! /usr/bin/bash
 
+# Launches a singularity container with a repo mounted in under skyblue.
+
 SIF_FILE=$1
 REPO_ROOT=$2
 DO_INTERACTIVE=$3

@@ -1,5 +1,5 @@
 #! /usr/bin/bash
-
+# Trains a model by first launching a singluarity container then running execute_model.sh
 SIF_FILE=$1
 REPO_ROOT=$2
 DO_INTERACTIVE=$3

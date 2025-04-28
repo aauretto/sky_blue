@@ -1,3 +1,8 @@
+#! /bin/bash
+
+# Pulls a docker image and creates a sif file for that image. For use on a cluster that
+# has singularity to convert docker images into singularity images. 
+
 # Cmd line args:
 CONTAINER_REPO=$1
 

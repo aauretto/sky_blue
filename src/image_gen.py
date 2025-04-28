@@ -1,3 +1,6 @@
+"""
+Creates a series of demo images for what a fully trained model could ook like
+"""
 #!/usr/bin/env python3
 
 import datetime as dt

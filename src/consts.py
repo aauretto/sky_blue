@@ -1,7 +1,6 @@
 PIREP_RELEVANCE_DURATION = 15  # mins
 
-# Map Range
-
+# Map Range: the real lat/lon box we use to define CONUS
 MAP_RANGE = {
     "LAT": {
         "MIN": 22,  # degrees N
@@ -31,8 +30,7 @@ MAP_RANGE = {
     },
 }
 
-# Grid Range
-
+# Grid Range: the dimensions of the grid we use to put data onto
 GRID_RANGE = {
     "LAT": 1500,  # number of rows
     "LON": 2500,  # number of cols

@@ -1,3 +1,11 @@
+"""
+File: merge.py
+
+Description:
+    An aritifact of how we used to merge pireps. Left for later users to 
+    consider for a refactor
+"""
+
 import numpy as np
 from scipy.ndimage import maximum_filter
 
