@@ -7,7 +7,7 @@ COPY pirep_ssl_cert.crt /usr/local/share/ca-certificates/pirep_ssl_cert.crt
 RUN update-ca-certificates
 ENV SSL_CERT_FILE=/etc/ssl/certs/ca-certificates.crt
 
-# Needed for HPC -- Lets tensorflow fallback to suboptimal GPU algorithms rather
+# Needed for Tufts HPC -- Lets tensorflow fallback to suboptimal GPU algorithms rather
 # than crash
 ENV XLA_FLAGS=--xla_gpu_strict_conv_algorithm_picker=false
 
